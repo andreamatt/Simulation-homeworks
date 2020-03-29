@@ -1,18 +1,18 @@
-import pandas
+from pandas import read_csv
 import numpy as np
 from matplotlib.pyplot import hist, show, scatter
 from numpy import mean, min, max, median, quantile
 from scipy.stats import binom, norm, t as student, chi2
 from math import sqrt, pow, floor, ceil
 
+
 def variance(values):
     return np.var(values, ddof=1)
+
 
 def std(values):
     return np.std(values, ddof=1)
 
-data = 'HW1\\data'
-data_ex1 = f'{data}\\data_ex2.csv'
 
 def CoV(values):
     # Coeff of variation (not defined on heavy tailed sets, because variance=>inf)
@@ -46,26 +46,24 @@ def lorenz_curve(values):
     curve = []
     line = []
     tot = sum(values)
-    for i in range(len(values)):
+    cum_sum = np.cumsum(values)
+    for i in np.arange(0, len(values), 20):
         line.append(i/len(values))
-        curve.append(sum(values[:i])/tot)
+        curve.append(cum_sum[i]/tot)
 
-    scatter(line, curve)
-
+    scatter(line, curve, s=0.1)
 
 
 def quantile_confidence(values, q, confidence):
-    # return tuple (j, k) of indexes
+    # return tuple (lower, upper) of values
     values = sorted(values)
     n = len(values)
     if n > 100:
         # approximate
         z = norm.ppf((1+confidence)/2)
-        left = n*q
-        right = z*sqrt(n*q*(1-q))
-        j = floor(left-right)
-        k = ceil(left+right)+1
-        return (j, k, confidence)
+        j = floor(n*q-z*sqrt(n*q*(1-q)))
+        k = ceil(n*q+z*sqrt(n*q*(1-q)))+1
+        return (values[j], values[k], confidence)
 
     results = []
     for j in range(1, n):
@@ -88,6 +86,7 @@ def mean_confidence_asymptotic(values, confidence):
     k = m + z*s/sqrt(n)
     return (j, k)
 
+
 def mean_confidence_normal(values, confidence):
     # returns lower and upper bounds of mean confidence for normally distributed iid RV
     # under 30 values prefer this over asymptotic
@@ -99,6 +98,7 @@ def mean_confidence_normal(values, confidence):
     k = m + z*s/sqrt(n)
     return (j, k)
 
+
 def std_confidence_normal(values, confidence):
     n = len(values)
     z1 = chi2.ppf((1-confidence)/2, n-1)
@@ -109,23 +109,9 @@ def std_confidence_normal(values, confidence):
     return (j, k)
 
 
-# print(quantile_confidence(31, 0.5, 0.95))
-
-#0.98
-print(0.5*(1.96))
-print(norm.ppf((1+0.95)/2))
-print(norm.ppf((1+0.99)/2))
-print(student.ppf((1+0.95)/2, 100-1))
-print(student.ppf((1+0.95)/2, 100))
-
-
-ex1 = pandas.read_csv(data_ex1, header=None)
-values = ex1.to_numpy()[:, 0]
-
-# print("mean", mean(values))
-# print("std", std(values))
-# print("var (aka std^2)", var(values))
-# print("CoV", CoV(values))
-# print("MAD", MAD(values))
-# print("Lorenz gap", lorenz_gap(values))
-# print("JFI", JFI(values))
+def bootstrap(values, confidence, func, r0=25):
+    R = 1#ceil(2*r0/(1-confidence))
+    n = len(values)
+    for r in range(R):
+        V = np.random.choice(values, size=(n,))
+        print(V)
