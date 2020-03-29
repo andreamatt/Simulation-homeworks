@@ -66,14 +66,17 @@ def quantile_confidence(values, q, confidence):
         return (values[j], values[k], confidence)
 
     results = []
+    binoms = [binom.cdf(i, n, q) for i in range(0, n)]
     for j in range(1, n):
         for k in range(j, n):
-            val = binom.cdf(k, n, 0.5)-binom.cdf(j, n, 0.5)
+            val = binoms[k] - binoms[j]
             if val >= confidence:
                 results.append((j, k, val))
 
+    # sort by smallest interval and highest confidence value
     results = sorted(results, key=lambda x: (x[1]-x[0], -x[2]))
-    return (values[results[0]], values[results[1]])
+    best = results[0]
+    return (values[best[0]], values[best[1]])
 
 
 def mean_confidence_asymptotic(values, confidence):
@@ -110,8 +113,29 @@ def std_confidence_normal(values, confidence):
 
 
 def bootstrap(values, confidence, func, r0=25):
-    R = 1#ceil(2*r0/(1-confidence))
+    R = 1  # ceil(2*r0/(1-confidence))
     n = len(values)
     for r in range(R):
         V = np.random.choice(values, size=(n,))
         print(V)
+
+
+def QQ_plot(values):
+    values = sorted(values)
+    curve = []
+    line = []
+    tot = sum(values)
+    cum_sum = np.cumsum(values)
+    for i in np.arange(0, len(values), 20):
+        line.append(i/len(values))
+        curve.append(cum_sum[i]/tot)
+
+    scatter(line, curve, s=0.1)
+
+def success_probability_confidence_normal(values, confidence):
+    n = len(values)
+    z = sum(values)
+    eta = norm.ppf((1+confidence)/2)
+    lower = z/n - eta/n * sqrt(z* (1 - z/n))
+    upper = z/n + eta/n * sqrt(z* (1 - z/n))
+    return (lower, upper)
