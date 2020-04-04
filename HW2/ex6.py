@@ -14,6 +14,7 @@ def std(values):
 
 Ntr = 10000
 results = -np.log(np.random.rand(Ntr)) / 2
+results = expon.ppf(np.random.rand(Ntr), scale=1 / 2)
 results = sorted(results)
 # plt.hist(results)
 # plt.show()
@@ -22,7 +23,7 @@ X = []
 Y = []
 n = len(results)
 for i in np.arange(0, n, 1):
-	X.append(expon.ppf((i + 1) / (n + 1)))
+	X.append(expon.ppf((i + 1) / (n + 1), scale=1 / 2))
 	Y.append(results[i])
 X = np.array(X)
 Y = np.array(Y)
@@ -36,7 +37,7 @@ X = []
 Y = []
 n = len(results)
 for i in np.arange(0, n, 1):
-	X.append(expon.ppf((i + 1) / (n + 1)))
+	X.append(expon.ppf((i + 1) / (n + 1), scale=1 / 5))
 	Y.append(results[i])
 X = np.array(X)
 Y = np.array(Y)
