@@ -22,9 +22,9 @@ data = np.array([1, 4, 2, 7, 10, 9, 9, 14, 7, 5, 3])
 N = sum(data)
 X = range(2, 13)
 Y = data/sum(data)
-plt.plot(X, Y)
+plt.bar(X, Y) # bar, lines o cosa?
 Y = [triangular(k) for k in X]
-plt.plot(X, Y)
+plt.bar(X, Y)
 
 K = len(X)
 
@@ -34,7 +34,7 @@ for i in range(K):
 	k = X[i]
 	T += (data[i] - triangular(k)*N)**2 / (N*triangular(k))
 
-print(T)
+print("T=",T)
 print("Prob t>=T (p-value)", 1 - chi2.cdf(T, K-1))
 
 possib = [1, 2, 3, 4, 5, 6]
@@ -42,7 +42,4 @@ d1 = np.random.choice(possib, size=10000)
 d2 = np.random.choice(possib, size=10000)
 tot = list(d1+d2)
 
-X = range(2, 13)
-Y = [tot.count(k)/10000 for k in X]
-plt.plot(X,Y, 'r-')
 plt.show()
