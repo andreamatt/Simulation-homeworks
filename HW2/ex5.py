@@ -1,4 +1,11 @@
-# import and solve data
+# Exercise 5
+# Compute an approximate value for π by using Monte-Carlo simulation to approximate the ratio between the
+# area of a circle of radius 1 to the area of the square circumscribed to it (which has side length equal to 2).
+# 1. Set a stopping rule in terms of the confidence interval for the success probability (where a success occurs if
+# a point falls within the circle).
+# Make an algorithm that keeps drawing additional points until the stopping rule is satisfied.
+
+# import
 import numpy as np
 from matplotlib import pyplot as plt
 from numpy import mean, min, max, median, quantile
@@ -12,37 +19,9 @@ def std(values):
 	return np.std(values, ddof=1)
 
 
-def success_probability_confidence_normal(values, confidence):
-	n = len(values)
-	z = sum(values)
-	eta = norm.ppf((1 + confidence) / 2)
-	lower = z / n - (eta / n) * sqrt(z * (1 - z / n))
-	upper = z / n + (eta / n) * sqrt(z * (1 - z / n))
-	return (lower, upper)
-
-
-def success_probability_confidence_three(values, confidence):
-	n = len(values)
-	p0 = 1 - pow(((1 - confidence) / 2), 1 / n)
-	if sum(values) == 0:
-		lower = 0
-		upper = p0
-	elif sum(values) == len(values):
-		lower = 1 - p0
-		upper = 1
-	else:
-		lower = 1 - p0
-		upper = p0
-	return (lower, upper)
-
-
-def success_probability_confidence(values, confidence):
-	if sum(values) >= 6 and len(values) - sum(values) >= 6:
-		return success_probability_confidence_normal(values, confidence)
-	return success_probability_confidence_three(values, confidence)
-
-
 outcomes = []
+points_inside = []
+points_outside = []
 # generate some data first
 i = 0
 while i <= 100:
@@ -52,18 +31,18 @@ while i <= 100:
 	d = sqrt(x**2 + y**2)
 	if d <= 1:
 		outcomes.append(1)
+		points_inside.append([x, y])
 	else:
 		outcomes.append(0)
+		points_outside.append([x, y])
 
-l = 0.01
+l = 0.02
 gamma = 0.95
 z = norm.ppf((1 + gamma) / 2)
-print(z)
 while (True):
 	S = std(outcomes)
-	inter_len = 2 * z * S / sqrt(len(outcomes))
-	#print(inter_len)
-	if inter_len < l:
+	interval_len = 2 * z * S / sqrt(len(outcomes))
+	if interval_len < l:
 		break
 
 	i += 1
@@ -72,7 +51,17 @@ while (True):
 	d = sqrt(x**2 + y**2)
 	if d <= 1:
 		outcomes.append(1)
+		points_inside.append([x, y])
 	else:
 		outcomes.append(0)
+		points_outside.append([x, y])
 
-print(f'{sum(outcomes) / len(outcomes) * 4: .4f}, {i}, {inter_len}, {sum(outcomes) / len(outcomes)}, {pi/4}')
+points_inside = np.array(points_inside)
+points_outside = np.array(points_outside)
+plt.scatter(points_inside[:, 0], points_inside[:, 1], s=0.2)
+plt.scatter(points_outside[:, 0], points_outside[:, 1], s=0.2)
+plt.axis('equal')
+plt.show()
+
+print(f'Estimated π value: {mean(outcomes) * 4: .4f}, using {i} points')
+print(f'Estimated probability: {mean(outcomes): .4f}, with CI at 0.95 of size {interval_len: .4f}, compared to the theoretical probability {pi/4: .4f}')

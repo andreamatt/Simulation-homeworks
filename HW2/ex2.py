@@ -13,6 +13,7 @@ from numpy import mean, min, max, median, quantile
 from scipy.stats import binom, norm, t as student, expon
 from math import sqrt, pow, floor, ceil, exp
 
+np.set_printoptions(precision=3)
 
 # define corrected functions for std and variance
 def variance(values):
@@ -44,24 +45,18 @@ def expectation_maximization_normal(values, curve_n, max_iter=10000, curve_prob=
 	prev_total = sum(means + deviations + curve_prob)
 	while iteration < max_iter:
 		pdfs_per_curve = norm.pdf(values_repeated.T, means, deviations)
-		# print("pdfs per curve", pdfs_per_curve.shape)
 		denoms = np.sum(pdfs_per_curve * curve_prob, axis=1)
-		# print("denoms", denoms.shape)
 		b = (pdfs_per_curve * curve_prob).T / denoms
-		#print("b", b.shape)
 		sum_b = np.sum(b, axis=1)
-		# print("sum_b", sum_b.shape)
 		means = np.sum(b * values, axis=1) / sum_b
-		# print("new_m", means.shape, means)
 		variances = np.sum(b.T * ((values_repeated.T - means)**2), axis=0) / sum_b
 		deviations = np.sqrt(variances)
-		# print("new_s", deviations.shape, deviations)
 		if prior:
 			curve_prob = sum_b / n
 
 		iteration += 1
 		new_total = sum(means + deviations + curve_prob)
-		# stop when it's no longer changing
+		# stop when total difference is no longer changing
 		if abs(new_total / prev_total - 1) <= 0.0001:
 			break
 		prev_total = new_total
