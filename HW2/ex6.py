@@ -17,26 +17,32 @@ from statsmodels.api import qqplot
 Ntr = 10000
 # use the inverted cdf: x = - ln(U) / mean
 average = 2
-results = -np.log(np.random.rand(Ntr)) / average
+lam = 1 / average  # lambda = 1/avarage
+results = -np.log(np.random.rand(Ntr)) / lam
+plt.hist(results, bins=20)
 
 # draw qq plot
-qqplot(results, dist=expon, scale=1 / average, line='45')
+qqplot(results, dist=expon, scale=1 / lam, line='45')
 
 # draw qq against different average values: 5 and 0.5
-qqplot(results, dist=expon, scale=1 / 5, line='45')
-qqplot(results, dist=expon, scale=1 / 0.5, line='45')
+qqplot(results, dist=expon, scale=5, line='45')
+qqplot(results, dist=expon, scale=0.5, line='45')
 
 # try with more draws (x2, x4, x20)
-Ntr_2 = Ntr*2
-results = -np.log(np.random.rand(Ntr_2)) / average
-qqplot(results, dist=expon, scale=1 / average, line='45')
+Ntr_2 = Ntr * 2
+results = -np.log(np.random.rand(Ntr_2)) / lam
+qqplot(results, dist=expon, scale=1 / lam, line='45')
 
-Ntr_4 = Ntr*4
-results = -np.log(np.random.rand(Ntr_4)) / average
-qqplot(results, dist=expon, scale=1 / average, line='45')
+Ntr_4 = Ntr * 4
+results = -np.log(np.random.rand(Ntr_4)) / lam
+qqplot(results, dist=expon, scale=1 / lam, line='45')
 
-Ntr_20 = Ntr*20
-results = -np.log(np.random.rand(Ntr_20)) / average
-qqplot(results, dist=expon, scale=1 / average, line='45')
+Ntr_20 = Ntr * 20
+results = -np.log(np.random.rand(Ntr_20)) / lam
+qqplot(results, dist=expon, scale=1 / lam, line='45')
+
+Ntr_1_100 = Ntr // 100
+results = -np.log(np.random.rand(Ntr_1_100)) / lam
+qqplot(results, dist=expon, scale=1 / lam, line='45')
 
 plt.show()

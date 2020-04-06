@@ -101,12 +101,12 @@ def prediction_interval_normal(values, gamma):
 		rt = sqrt(1 + 1 / n)
 		return (m - eta * rt * s, m + eta * rt * s)
 
+# give mean and variance
+print(f"Detrended data has mean {mean(Y_detr): .3f} and variance {variance(Y_detr): .3f}")
 
 # give prediction interval
 interval = prediction_interval_bootstrap(values, 0.95)
-print(f"Bootstrap prediction interval at 0.95: [{interval[0]: .3f} , {interval[1]: .3f}]")
-interval = prediction_interval_normal(values, 0.95)
-print(f"Normal prediction interval at 0.95: [{interval[0]: .3f} , {interval[1]: .3f}]")
+print(f"Bootstrap prediction interval at level 0.95: [{interval[0]: .3f} , {interval[1]: .3f}]")
 
 # show detrend using low and high polynomial degree
 degree = 3

@@ -28,7 +28,6 @@ data = 'HW2/data'
 data_ex2 = read_csv(f'{data}\\data_ex2.csv', header=None)
 values = data_ex2.to_numpy()[:, 0]
 
-
 def expectation_maximization_normal(values, curve_n, max_iter=10000, curve_prob=None, prior=True):
 	n = len(values)
 	# use the same std for all of them
@@ -76,6 +75,25 @@ plt.show()
 
 print("prior false")
 curves = expectation_maximization_normal(values, 3, max_iter=10000, prior=False)
+print(curves)
+plt.hist(values, bins=50, density=True, color='y', linewidth=0.1, edgecolor='b')
+X_prob = np.arange(min(values), max(values), 1 / 100)
+for c in curves:
+	plt.scatter(X_prob, c[2] * norm.pdf(X_prob, c[0], c[1]), s=1, zorder=2)
+plt.show()
+
+off_start = [0.8, 0.1, 0.1]
+print(f"prior true, starting from probabilities: {off_start}")
+curves = expectation_maximization_normal(values, 3, max_iter=10000, prior=True, curve_prob=off_start)
+print(curves)
+plt.hist(values, bins=50, density=True, color='y', linewidth=0.1, edgecolor='b')
+X_prob = np.arange(min(values), max(values), 1 / 100)
+for c in curves:
+	plt.scatter(X_prob, c[2] * norm.pdf(X_prob, c[0], c[1]), s=1, zorder=2)
+plt.show()
+
+print(f"prior false, starting from probabilities: {off_start}")
+curves = expectation_maximization_normal(values, 3, max_iter=10000, prior=False, curve_prob=off_start)
 print(curves)
 plt.hist(values, bins=50, density=True, color='y', linewidth=0.1, edgecolor='b')
 X_prob = np.arange(min(values), max(values), 1 / 100)
