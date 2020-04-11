@@ -5,7 +5,7 @@ from scipy.stats import binom, norm, t as student, expon, poisson, chi2
 from math import sqrt, pow, floor, ceil, exp, log, sin, pi
 from statsmodels.api import qqplot
 
-A = 1.8988301
+A = 1.8988
 
 
 def f(x):
@@ -18,8 +18,8 @@ def g(x, l):
 	return l * exp(-x * l)
 
 
-l = 0.6
-c = 1.8611
+l = 0.5
+c = 2.188
 
 X = np.arange(0, 6, 0.01)
 Y = np.array([f(x)/2 for x in X])
