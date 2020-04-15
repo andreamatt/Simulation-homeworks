@@ -22,27 +22,32 @@ l = 0.5
 c = 2.188
 
 X = np.arange(0, 6, 0.01)
-Y = np.array([f(x)/2 for x in X])
+Y = np.array([f(x) / 2 for x in X])
 plt.scatter(X, Y, s=0.1)
 
-samples = []
-Xs = []
-U1s = []
-Rs = []
 Ntr = 1000000
+U1 = np.random.rand(Ntr)
+U2 = np.random.rand(Ntr)
+U3 = np.random.rand(Ntr)
+# choose the X value using the inverse CDF of g(x) => quantiles
+X = expon.ppf(U1, scale=1 / l)
+samples = []
 for i in range(Ntr):
-	U1 = np.random.rand()
-	X = -1 / l * log(U1)  # choose the X value using the inverse CDF of g(x)
-	if X >= 6:
+	x = X[i]
+	if x >= 6:
 		continue
-	R = f(X) / (c * g(X, l))
-	U2 = np.random.rand()
-	if U2 <= R:
-		if np.random.rand() > 0.5:
-			X = -X # random sign
-		samples.append(X)
+	R = f(x) / (c * g(x, l))
+	if U2[i] <= R:
+		if U3[i] > 0.5:
+			x = -x  # random sign
+		samples.append(x)
 
 plt.hist(samples, bins=200, density=True)
+
+X = np.arange(-6, 6, 0.01)
+Y = np.array([f(x)/2 for x in X])
+plt.plot(X, Y, 'k-')
+
 print(f"Efficiency: {len(samples)/Ntr}")
 
 plt.show()

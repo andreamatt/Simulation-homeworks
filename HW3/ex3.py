@@ -26,19 +26,17 @@ def mean_confidence_asymptotic(values, confidence):
 	return (j, k)
 
 
-# probability that node at stage k+1 doesnt receive = p^(nodes that received at stage k)
-
-# p = 0.5 # failure prob
 confidence = 0.95
 X = np.arange(0, 1, 1 / 100)
 
-figs, axs = plt.subplots(3)
-
-R = 2 # stages
+R = 2  # stages
 N = 2
 Ntr = 2000
 probs_2_2 = []
 probs_2_2_CI = []
+plot_1_Y = []
+plot_1_Y_CI = []
+
 for p in X:
 	successful_nodes_per_stage = np.zeros((Ntr, R))
 	successes = np.zeros(Ntr)
@@ -50,24 +48,27 @@ for p in X:
 			number_successes_prev = sum(results)
 			successful_nodes_per_stage[t][s] = number_successes_prev
 
-		prob = pow(p, number_successes_prev) # prob failure
+		prob = pow(p, number_successes_prev)  # prob failure
 		if np.random.rand() >= prob:
 			successes[t] = 1
 
 	D_failure_prob = 1 - mean(successes)
 	probs_2_2.append(D_failure_prob)
-	probs_2_2_CI.append(mean_confidence_asymptotic(-1 * successes + 1, confidence)) # use failures, not successes
+	probs_2_2_CI.append(mean_confidence_asymptotic(-1 * successes + 1, confidence))  # use failures, not successes
 
-	axs[1].scatter([p, p], np.mean(successful_nodes_per_stage, axis=0), s=1, c=['r', 'b'])
-	axs[1].plot([p, p], mean_confidence_asymptotic( successful_nodes_per_stage[:,0] , confidence), 'r-', linewidth=0.2)
-	axs[1].plot([p, p], mean_confidence_asymptotic( successful_nodes_per_stage[:,1] , confidence), 'b-', linewidth=0.2)
+	plot_1_Y.append(np.mean(successful_nodes_per_stage, axis=0))
+	plot_1_Y_CI.append(mean_confidence_asymptotic(successful_nodes_per_stage[:, 0], confidence))
+	plot_1_Y_CI.append(mean_confidence_asymptotic(successful_nodes_per_stage[:, 1], confidence))
 
-R = 5 # stages
+R = 5  # stages
 N = 10
 Ntr = 200
 probs_5_10 = []
 probs_5_10_CI = []
-for p in X:
+plot_2_Y = []
+plot_2_Y_CI = []
+for i in range(len(X)):
+	p = X[i]
 	successful_nodes_per_stage = np.zeros((Ntr, R))
 	successes = np.zeros(Ntr)
 	for t in range(Ntr):
@@ -84,34 +85,49 @@ for p in X:
 
 	D_failure_prob = 1 - mean(successes)
 	probs_5_10.append(D_failure_prob)
-	probs_5_10_CI.append(mean_confidence_asymptotic(-1 * successes + 1, confidence)) # use failures, not successes
+	probs_5_10_CI.append(mean_confidence_asymptotic(-1 * successes + 1, confidence))  # use failures, not successes
 
-	axs[2].scatter([p, p, p, p, p], np.mean(successful_nodes_per_stage, axis=0), s=1, c=['r', 'b', 'k', 'g', 'y'])
-	axs[2].plot([p, p], mean_confidence_asymptotic( successful_nodes_per_stage[:,0] , confidence), 'r-', linewidth=0.2)
-	axs[2].plot([p, p], mean_confidence_asymptotic( successful_nodes_per_stage[:,1] , confidence), 'b-', linewidth=0.2)
-	axs[2].plot([p, p], mean_confidence_asymptotic( successful_nodes_per_stage[:,2] , confidence), 'k-', linewidth=0.2)
-	axs[2].plot([p, p], mean_confidence_asymptotic( successful_nodes_per_stage[:,3] , confidence), 'g-', linewidth=0.2)
-	axs[2].plot([p, p], mean_confidence_asymptotic( successful_nodes_per_stage[:,4] , confidence), 'y-', linewidth=0.2)
+	plot_2_Y.append(np.mean(successful_nodes_per_stage, axis=0))
+	plot_2_Y_CI.append(mean_confidence_asymptotic(successful_nodes_per_stage[:, 0], confidence))
+	plot_2_Y_CI.append(mean_confidence_asymptotic(successful_nodes_per_stage[:, 1], confidence))
+	plot_2_Y_CI.append(mean_confidence_asymptotic(successful_nodes_per_stage[:, 2], confidence))
+	plot_2_Y_CI.append(mean_confidence_asymptotic(successful_nodes_per_stage[:, 3], confidence))
+	plot_2_Y_CI.append(mean_confidence_asymptotic(successful_nodes_per_stage[:, 4], confidence))
 
-axs[0].scatter(X, probs_2_2, s=0.5, c='r')
-axs[0].scatter(X, probs_5_10, s=0.5, c='r')
+## PLOTTING prob of end given link p
+plt.scatter(X, probs_2_2, s=2, c='r')
+plt.scatter(X, probs_5_10, s=2, c='g')
 
 for i in range(len(X)):
+	x = X[i]
 	CI = probs_2_2_CI[i]
-	axs[0].plot([X[i], X[i]], CI, 'k-', linewidth=0.2)
+	plt.plot([x, x], CI, 'r-', linewidth=1)
 	CI = probs_5_10_CI[i]
-	axs[0].plot([X[i], X[i]], CI, 'k-', linewidth=0.2)
+	plt.plot([x, x], CI, 'g-', linewidth=1)
 
-X = values[:, 0]
-Y = values[:, 1]
-axs[0].scatter(X, Y, s=0.2, c='b')
-Y = values[:, 2]
-axs[0].scatter(X, Y, s=0.2, c='b')
+theor_X = values[:, 0]
+theor_Y = values[:, 1]
+plt.plot(theor_X, theor_Y, 'k-', linewidth=1)
+theor_Y = values[:, 2]
+plt.plot(theor_X, theor_Y, 'b-', linewidth=1)
 
+plt.show()
 
+## PLOTTING mean messages at stages given link p for case 2,2
+for i in range(len(X)):
+	x = X[i]
+	plt.scatter([x] * 2, plot_1_Y[i], c=['r', 'b'], s=2)
+	plt.plot([x] * 2, plot_1_Y_CI[2 * i], 'r-', linewidth=1)
+	plt.plot([x] * 2, plot_1_Y_CI[2 * i + 1], 'b-', linewidth=1)
+plt.show()
 
-
-
-
-
+## PLOTTING mean messages at stages given link p for case 10,5
+for i in range(len(X)):
+	x = X[i]
+	plt.scatter([x] * 5, plot_2_Y[i], c=['r', 'b', 'k', 'g', 'm'], s=2)
+	plt.plot([x] * 2, plot_2_Y_CI[5 * i], 'r-', linewidth=1)
+	plt.plot([x] * 2, plot_2_Y_CI[5 * i + 1], 'b-', linewidth=1)
+	plt.plot([x] * 2, plot_2_Y_CI[5 * i + 2], 'k-', linewidth=1)
+	plt.plot([x] * 2, plot_2_Y_CI[5 * i + 3], 'g-', linewidth=1)
+	plt.plot([x] * 2, plot_2_Y_CI[5 * i + 4], 'm-', linewidth=1)
 plt.show()
