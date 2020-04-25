@@ -2,7 +2,7 @@ from lib import Simulation
 import numpy as np
 from numpy import mean, min, max, median, quantile, sqrt
 from matplotlib import pyplot as plt
-from scipy.stats import expon, norm
+from scipy.stats import expon, norm, erlang
 from time import time
 
 
@@ -27,58 +27,38 @@ def mean_confidence_asymptotic(values, confidence):
 
 λ = 10
 µ = 15
-max_time = 2000 / µ
-Ntr = 5000
+c = 4
+max_time = 50#2000 / µ
+debug_interval = max_time/15
+Ntr = 1000
 simulations = []
 for i in range(Ntr):
 	if i % 50 == 0:
 		print(f"Running simulation {i}")
-	sim = Simulation(max_time, λ, µ)
+	sim = Simulation(max_time, λ, µ, c, debug_interval)
 	sim.run()
 	simulations.append(sim)
-
-# s1 = simulations[0]
-# s2 = simulations[1]
-# s3 = simulations[2]
-
-# plt.plot(s1.event_times[:100], s1.avg_tot_times[:100], 'b-', linewidth=0.2)
-# plt.plot(s2.event_times[:100], s2.avg_tot_times[:100], 'g-', linewidth=0.2)
-# plt.plot(s3.event_times[:100], s3.avg_tot_times[:100], 'r-', linewidth=0.2)
-# plt.plot([0, s3.event_times[100]], [1 / (µ - λ), 1 / (µ - λ)], 'k-', linewidth=0.4)
-# plt.show()
-
-# plt.plot(s1.event_times[-100:], s1.avg_tot_times[-100:], 'b-', linewidth=0.2)
-# plt.plot(s2.event_times[-100:], s2.avg_tot_times[-100:], 'g-', linewidth=0.2)
-# plt.plot(s3.event_times[-100:], s3.avg_tot_times[-100:], 'r-', linewidth=0.2)
-# plt.plot([s3.event_times[-100], s3.event_times[-1]], [1 / (µ - λ), 1 / (µ - λ)], 'k-', linewidth=0.4)
-# plt.show()
-
-# plot emp distr of n of packets in the system at time t1
 
 ρ = λ / µ
 theor_avg_q_size = ρ / (1 - ρ)
 theor_avg_q_time = ρ**2 / (λ * (1 - ρ))
 print(f'theor avg q time: {theor_avg_q_time}')
 
-t_interval = max_time / 5
-ts = np.arange(0.05 * max_time, max_time, t_interval)
+t_interval = debug_interval
+ts = np.arange(0, max_time, t_interval)[1:]
 hist_per_t = []
 bin_edges_per_t = []
 means_per_t = []
 std_per_t = []
 CI_per_t = []
-std_factor = 2
+std_factor = 1.5
 confidence = 0.95
-for t in ts:
-	values = []
-	for sim in simulations:
-		index = np.argwhere(sim.event_times < t)[-1][0]
-		value = sim.avg_q_times[index]
-		values.append(value)
-
+for i in range(len(ts)):
+	# t = ts[i]
+	values = [sim.debugStats[i].avg_q_time for sim in simulations]
 	s = std(values)
 	m = mean(values)
-	hist, bin_edges = np.histogram(values, bins=100, density=True)  #range=[min_h, max_h]
+	hist, bin_edges = np.histogram(values, bins=30, density=True)  #range=[min_h, max_h]
 	hist_per_t.append(hist)
 	bin_edges_per_t.append(bin_edges)
 	means_per_t.append(m)
@@ -87,6 +67,7 @@ for t in ts:
 
 scale_factor = max([max(h) for h in hist_per_t]) * 2
 print("scale: ", scale_factor)
+plt.plot([0, max_time], [theor_avg_q_time, theor_avg_q_time], 'y-', linewidth=1)
 for i in range(len(ts)):
 	t = ts[i]
 	m = means_per_t[i]
@@ -106,7 +87,6 @@ for i in range(len(ts)):
 	plt.plot([t, t], CI, 'r-', linewidth=2)
 	plt.plot([t], [m], 'ko', markersize=3)
 
-plt.plot([0, max_time], [theor_avg_q_time, theor_avg_q_time], 'y-', linewidth=1)
 plt.show()
 
 # # print(f'Theoretical: {theor_avg}, empirical: {mean(sim.area)}, events: {(len(Y)-2)/2}')
