@@ -122,7 +122,6 @@ class Simulation:
 		self.packets_exited: List[Packet] = []
 
 		# simulation state
-		self.last_event_time: float = 0
 		self.clock: float = 0
 		self.event_queue = EventQueue()
 		self.event_queue.add(Event(0, EventType.Start))
@@ -131,13 +130,13 @@ class Simulation:
 			self.event_queue.add(Event(debug_time, EventType.Debug))
 
 		# stat counters
+		self.event_times = []
+		self.q_sizes = []
+		self.u_sizes = []
 		self.areaQ: float = 0
 		self.areaU: float = 0
 		self.areaQ_debug: float = 0
 		self.areaU_debug: float = 0
-		# cumulative sums	 to calculate average
-		# self.sum_q_time: float = 0
-		# self.sum_tot_time: float = 0
 		# at run finish calculate the following
 		self.q_times: List[float] = []
 		self.tot_times: List[float] = []
@@ -224,6 +223,12 @@ class Simulation:
 			q_size = len(self.packets_queue)
 			busy_servers = sum(s.packet != None for s in self.servers)
 
+			# instant counters
+			self.event_times.append(event.time)
+			self.q_sizes.append(q_size)
+			self.u_sizes.append(busy_servers)
+
+			# overral counters
 			self.areaQ += q_size * time_from_previous
 			self.areaU += busy_servers * time_from_previous
 			self.areaQ_debug += q_size * time_from_previous
@@ -242,7 +247,7 @@ class Simulation:
 				new_arrival = Event(new_arrival_time, EventType.Arrival)
 				self.event_queue.add(new_arrival)
 			elif event.type == EventType.Debug:
-				prev_debug_time = 0 if len(self.debugStats) == 0 else self.debugStats[0].event_time
+				prev_debug_time = 0 if len(self.debugStats) == 0 else self.debugStats[-1].event_time
 				time_diff = event.time - prev_debug_time
 				ds = DebugStats()
 				self.debugStats.append(ds)
@@ -254,19 +259,22 @@ class Simulation:
 				ds.avg_busy_servers = self.areaU_debug / time_diff
 				ds.avg_q_size = self.areaQ_debug / time_diff
 				ds.avg_load = ds.avg_q_size + ds.avg_busy_servers
-				ds.avg_q_time = mean([p.queue_exit - p.queue_enter for p in self.packets_exited if p.queue_exit > prev_debug_time])
-				ds.avg_tot_time = mean([p.service_exit - p.queue_enter for p in finished_packets if p.service_exit > prev_debug_time])
-				#since the beninning
+				q_times_since_last = [p.queue_exit - p.queue_enter for p in self.packets_exited if p.queue_exit > prev_debug_time]
+				tot_times_since_last = [p.service_exit - p.queue_enter for p in finished_packets if p.service_exit > prev_debug_time]
+				ds.avg_q_time = mean(q_times_since_last) if len(q_times_since_last) > 0 else 0
+				ds.avg_tot_time = mean(tot_times_since_last) if len(tot_times_since_last) > 0 else 0
+				# since the beninning
 				ds.cum_avg_busy_servers = self.areaU / ds.event_time
 				ds.cum_avg_q_size = self.areaQ / ds.event_time
-				ds.cum_avg_load = ds.avg_q_size + ds.avg_busy_servers
-				ds.cum_avg_q_time = mean([p.queue_exit - p.queue_enter for p in self.packets_exited])
-				ds.cum_avg_tot_time = mean([p.queue_exit - p.queue_enter for p in finished_packets])
+				ds.cum_avg_load = ds.cum_avg_q_size + ds.cum_avg_busy_servers
+				q_times = [p.queue_exit - p.queue_enter for p in self.packets_exited]
+				tot_times = [p.service_exit - p.queue_enter for p in finished_packets]
+				ds.cum_avg_q_time = mean(q_times) if len(q_times) > 0 else 0
+				ds.cum_avg_tot_time = mean(tot_times) if len(tot_times) > 0 else 0
 
 				# reset counters
 				self.areaU_debug = 0
 				self.areaQ_debug = 0
-
 			elif event.type == EventType.Arrival:
 				self.arrival(event)
 			elif event.type == EventType.Departure:
@@ -278,3 +286,10 @@ class Simulation:
 		for s in self.servers:
 			for p in s.packets_finished:
 				self.tot_times.append(p.service_exit - p.queue_enter)
+
+		# convert to numpy
+		self.event_times = np.array(self.event_times)
+		self.q_sizes = np.array(self.q_sizes)
+		self.u_sizes = np.array(self.u_sizes)
+		self.q_times = np.array(self.q_times)
+		self.tot_times = np.array(self.tot_times)
