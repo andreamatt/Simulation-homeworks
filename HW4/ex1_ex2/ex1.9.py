@@ -9,7 +9,7 @@ from math import factorial as fact
 λ = 10
 µ = 15
 c = 1  # number of servers
-max_time = 10000  #2000 / µ
+max_time = 1000  #2000 / µ
 debug_interval = max_time / 200
 Ntr = 3  # number of simulations to run
 
@@ -27,10 +27,8 @@ print(f'Finished simulating')
 pi_0 = 1 / (sum([(c * ρ)**k / fact(k) for k in range(0, c)]) + (c * ρ)**c / (fact(c) * (1 - ρ)))
 pi_c_plus = (c * ρ)**c / (fact(c) * (1 - ρ)) * pi_0
 theor_avg_load = c * ρ + ρ / (1 - ρ) * pi_c_plus
-theor_avg_q_time = ρ / (λ * (1 - ρ)) * pi_c_plus
-theor_avg_q_size = ρ / (1 - ρ) * pi_c_plus
-# print(f'theor avg q time: {theor_avg_q_time}')
-plt.plot([0, max_time], [theor_avg_q_size] * 2, 'k-', linewidth=1)
+
+plt.plot([0, max_time], [theor_avg_load] * 2, 'k-', linewidth=1)
 for sim in simulations:
 	debug_times = [ds.event_time for ds in sim.debugStats]
 	cum_avg_loads = [ds.cum_avg_load for ds in sim.debugStats]

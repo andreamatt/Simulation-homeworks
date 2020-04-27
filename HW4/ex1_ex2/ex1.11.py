@@ -43,9 +43,7 @@ print(f'Finished simulating')
 ρ = λ / (c * µ)
 pi_0 = 1 / (sum([(c * ρ)**k / fact(k) for k in range(0, c)]) + (c * ρ)**c / (fact(c) * (1 - ρ)))
 pi_c_plus = (c * ρ)**c / (fact(c) * (1 - ρ)) * pi_0
-theor_avg_load = c * ρ + ρ / (1 - ρ) * pi_c_plus
 theor_avg_q_time = ρ / (λ * (1 - ρ)) * pi_c_plus
-theor_avg_q_size = ρ / (1 - ρ) * pi_c_plus
 
 values = [mean(sim.q_times) for sim in simulations]
 interval = mean_confidence_asymptotic(values, 0.95)

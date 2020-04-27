@@ -44,7 +44,6 @@ pi_0 = 1 / (sum([(c * ρ)**k / fact(k) for k in range(0, c)]) + (c * ρ)**c / (f
 pi_c_plus = (c * ρ)**c / (fact(c) * (1 - ρ)) * pi_0
 theor_avg_load = c * ρ + ρ / (1 - ρ) * pi_c_plus
 theor_avg_q_time = ρ / (λ * (1 - ρ)) * pi_c_plus
-theor_avg_q_size = ρ / (1 - ρ) * pi_c_plus
 
 t_interval = debug_interval
 ts = np.arange(0, max_time, t_interval)[1:]

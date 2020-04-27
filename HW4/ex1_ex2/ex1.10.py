@@ -31,13 +31,10 @@ for i in range(len(parameters)):
 	pi_0 = 1 / (sum([(c * ρ)**k / fact(k) for k in range(0, c)]) + (c * ρ)**c / (fact(c) * (1 - ρ)))
 	pi_c_plus = (c * ρ)**c / (fact(c) * (1 - ρ)) * pi_0
 	theor_avg_load = c * ρ + ρ / (1 - ρ) * pi_c_plus
-	theor_avg_q_time = ρ / (λ * (1 - ρ)) * pi_c_plus
-	theor_avg_q_size = ρ / (1 - ρ) * pi_c_plus
 
-	f.plot([0, max_time], [theor_avg_q_size] * 2, 'k-', linewidth=1)
+	f.plot([0, max_time], [theor_avg_load] * 2, 'k-', linewidth=1)
 	for sim in simulations:
 		debug_times = [ds.event_time for ds in sim.debugStats]
 		cum_avg_loads = [ds.cum_avg_load for ds in sim.debugStats]
-		avg_loads = [ds.avg_load for ds in sim.debugStats]
 		f.plot(debug_times, cum_avg_loads, '-', c=np.random.rand(3,), linewidth=1)
 plt.show()
