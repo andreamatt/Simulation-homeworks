@@ -128,7 +128,7 @@ class Simulation:
 
 		# simulation state
 		self.clock: float = 0
-		self.event_queue = EventQueue()
+		self.event_queue = EventQueueHeap()
 		self.event_queue.add(Event(0, EventType.Start))
 		self.event_queue.add(Event(max_time, EventType.End))
 		for debug_time in np.arange(0, max_time, debug_interval)[1:]:
