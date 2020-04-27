@@ -5,6 +5,7 @@ from numpy import mean, min, max, median, quantile, array
 from math import ceil, sqrt
 from scipy.stats import expon
 from typing import Optional as Opt, List, Tuple, Union
+import heapq
 
 
 class EventType(Enum):
@@ -17,10 +18,9 @@ class EventType(Enum):
 class Node:
 
 	def __init__(self):
-		# self.locations = []
-		# self.destinations = []
-		self.speeds = []
-		self.iteration = 0
+		self.location = [0, 0]
+		self.destination = [0, 0]
+		self.speed = 0
 
 
 class Event:
@@ -35,7 +35,10 @@ class Event:
 		return f'{"{"}{self.time : .3f}; {str(self.type)[10:]}{"}"}'
 
 	def __repr__(self):
-		return self.__str__
+		return self.__str__()
+
+	def __lt__(self, other):
+		return self.time < other.time
 
 
 class EventQueue:
@@ -51,7 +54,7 @@ class EventQueue:
 		else:
 			current_node = self.head
 			prev_node = None
-			while (current_node != None and current_node.time < event.time):
+			while (current_node != None and current_node < event):
 				prev_node = current_node
 				current_node = current_node.next
 			if prev_node == None:  # new event at head
@@ -81,7 +84,28 @@ class EventQueue:
 		return res + '>'
 
 	def __repr__(self):
-		return self.__str__
+		return self.__str__()
+
+
+class EventQueueHeap:
+
+	def __init__(self):
+		self.heap: List[Event] = []
+
+	def add(self, event: Event):
+		heapq.heappush(self.heap, event)
+
+	def pop(self):
+		return heapq.heappop(self.heap)
+
+	def __str__(self):
+		res = '<'
+		for e in self.heap:
+			res += str(e)
+		return res + '>'
+
+	def __repr__(self):
+		return self.__str__()
 
 
 class DebugStats:
@@ -135,40 +159,25 @@ class Simulation:
 			if event.type == EventType.End:
 				break
 			elif event.type == EventType.Start:
-				events = []
 				for node in self.nodes:
-					time = 0
-					location = np.random.rand(2) * self.side
-					while(time < self.max_time):
-						destination = np.random.rand(2) * self.side
-						speed = self.get_rand_speed()
-						# update node
-						# node.locations.append(location)
-						# node.destinations.append(destination)
-						node.speeds.append(speed)
-								
-						# calculate dest time
-						distance = sqrt((location[0] - destination[0])**2 + (location[1] - destination[1])**2)
-						next_time = time + distance / speed
-						node_event = Event(next_time, EventType.Waypoint_reached, node=node)
-						# self.event_queue.add(node_event)
-						events.append(node_event)
-
-						# update
-						location = destination
-						time = next_time
-				events = sorted(events, key=lambda e: e.time, reverse=True)
-				for e in events:
-					self.event_queue.add(e)
-
+					node.location = np.random.rand(2) * self.side
+					node.destination = np.random.rand(2) * self.side
+					node.speed = self.get_rand_speed()
+					distance = sqrt((node.location[0] - node.destination[0])**2 + (node.location[1] - node.destination[1])**2)
+					next_time = event.time + distance / node.speed
+					node_event = Event(next_time, EventType.Waypoint_reached, node=node)
+					self.event_queue.add(node_event)
 			elif event.type == EventType.Debug:
 				ds = DebugStats()
 				ds.event_time = event.time
-				ds.avg_speed = mean([node.speeds[node.iteration] for node in self.nodes])
+				ds.avg_speed = mean([node.speed for node in self.nodes])
 				self.debugStats.append(ds)
 			elif event.type == EventType.Waypoint_reached:
 				node = event.node
-				node.iteration += 1
-
-		# convert to numpy
-		self.event_times = np.array(self.event_times)
+				node.location = node.destination
+				node.destination = np.random.rand(2) * self.side
+				node.speed = self.get_rand_speed()
+				distance = sqrt((node.location[0] - node.destination[0])**2 + (node.location[1] - node.destination[1])**2)
+				next_time = event.time + distance / node.speed
+				node_event = Event(next_time, EventType.Waypoint_reached, node=node)
+				self.event_queue.add(node_event)

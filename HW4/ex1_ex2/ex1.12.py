@@ -26,7 +26,7 @@ def mean_confidence_asymptotic(values, confidence):
 c = 1	# number of servers
 max_time = 50#2000 / µ
 debug_interval = max_time/20
-Ntr = 10000
+Ntr = 1000
 
 # RUN SIMULATIONS
 simulations = []

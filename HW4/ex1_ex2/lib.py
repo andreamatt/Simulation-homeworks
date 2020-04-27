@@ -5,6 +5,7 @@ from numpy import mean, min, max, median, quantile, array
 from math import ceil
 from scipy.stats import expon
 from typing import Optional as Opt, List, Tuple, Union
+import heapq
 
 
 class EventType(Enum):
@@ -25,9 +26,13 @@ class Packet:
 
 class Server:
 
-	def __init__(self):
+	def __init__(self, ID):
+		self.ID = ID
 		self.packet: Opt[Packet] = None
 		self.packets_finished: List[Packet] = []
+
+	def __lt__(self, other):
+		return self.ID < other.ID
 
 
 class Event:
@@ -42,7 +47,10 @@ class Event:
 		return f'{"{"}{self.time : .3f}; {str(self.type)[10:]}{"}"}'
 
 	def __repr__(self):
-		return self.__str__
+		return self.__str__()
+
+	def __lt__(self, other):
+		return self.time < other.time
 
 
 class EventQueue:
@@ -58,7 +66,7 @@ class EventQueue:
 		else:
 			current_node = self.head
 			prev_node = None
-			while (current_node != None and current_node.time < event.time):
+			while (current_node != None and current_node < event):
 				prev_node = current_node
 				current_node = current_node.next
 			if prev_node == None:  # new event at head
@@ -88,7 +96,28 @@ class EventQueue:
 		return res + '>'
 
 	def __repr__(self):
-		return self.__str__
+		return self.__str__()
+
+
+class EventQueueHeap:
+
+	def __init__(self):
+		self.heap: List[Event] = []
+
+	def add(self, event: Event):
+		heapq.heappush(self.heap, event)
+
+	def pop(self):
+		return heapq.heappop(self.heap)
+
+	def __str__(self):
+		res = '<'
+		for e in self.heap:
+			res += str(e)
+		return res + '>'
+
+	def __repr__(self):
+		return self.__str__()
 
 
 class DebugStats:
@@ -118,12 +147,13 @@ class Simulation:
 
 		# system state
 		self.packets_queue: List[Packet] = []
-		self.servers = tuple(Server() for i in range(n_servers))
+		self.servers = tuple(Server(i) for i in range(n_servers))
+		self.free_servers = list(self.servers)
 		self.packets_exited: List[Packet] = []
 
 		# simulation state
 		self.clock: float = 0
-		self.event_queue = EventQueue()
+		self.event_queue = EventQueueHeap()
 		self.event_queue.add(Event(0, EventType.Start))
 		self.event_queue.add(Event(max_time, EventType.End))
 		for debug_time in np.arange(0, max_time, debug_interval)[1:]:
@@ -150,12 +180,9 @@ class Simulation:
 		return random.expovariate(self.departure_rate)
 
 	def get_free_server(self):
-		i = 0
-		while (self.servers[i].packet != None):  # if busy go to the next
-			i += 1
-			if i == len(self.servers):
-				return None
-		return self.servers[i]
+		if len(self.free_servers)==0:
+			return None
+		return heapq.heappop(self.free_servers)
 
 	def arrival(self, event: Event):
 		current_time = event.time
@@ -192,7 +219,9 @@ class Simulation:
 		assert (departure_server.packet != None)
 		finished_packet = departure_server.packet
 		finished_packet.service_exit = current_time
-		departure_server.packet = None  # free the server
+		# free the server
+		departure_server.packet = None 
+		heapq.heappush(self.free_servers, departure_server)
 		# update packets stats
 		departure_server.packets_finished.append(finished_packet)
 
@@ -221,7 +250,7 @@ class Simulation:
 			# update counters
 			time_from_previous = event.time - self.clock
 			q_size = len(self.packets_queue)
-			busy_servers = sum(s.packet != None for s in self.servers)
+			busy_servers = len(self.servers) - len(self.free_servers)
 
 			# instant counters
 			self.event_times.append(event.time)
@@ -252,7 +281,7 @@ class Simulation:
 				ds = DebugStats()
 				self.debugStats.append(ds)
 				finished_packets = []
-				for s in self.servers:
+				for s in self.free_servers:
 					finished_packets += s.packets_finished
 				ds.event_time = event.time
 				# since last debug event
@@ -283,7 +312,7 @@ class Simulation:
 		# calculate others
 		for p in self.packets_exited:
 			self.q_times.append(p.queue_exit - p.queue_enter)
-		for s in self.servers:
+		for s in self.free_servers:
 			for p in s.packets_finished:
 				self.tot_times.append(p.service_exit - p.queue_enter)
 
