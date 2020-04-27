@@ -29,6 +29,7 @@ c = 1  # number of servers
 max_time = 50  #2000 / µ
 debug_interval = max_time / 20
 Ntr = 1000
+bins = 30
 
 # RUN SIMULATIONS
 simulations = []
@@ -60,7 +61,7 @@ for i in range(len(ts)):
 	values = [sim.debugStats[i].cum_avg_load for sim in simulations]
 	s = std(values)
 	m = mean(values)
-	hist, bin_edges = np.histogram(values, bins=50, density=True)
+	hist, bin_edges = np.histogram(values, bins=bins, density=True)
 	hist_per_t.append(hist)
 	bin_edges_per_t.append(bin_edges)
 	means_per_t.append(m)
@@ -103,7 +104,7 @@ for i in range(len(ts)):
 	values = [sim.debugStats[i].cum_avg_q_time for sim in simulations]
 	s = std(values)
 	m = mean(values)
-	hist, bin_edges = np.histogram(values, bins=30, density=True)
+	hist, bin_edges = np.histogram(values, bins=bins, density=True)
 	hist_per_t.append(hist)
 	bin_edges_per_t.append(bin_edges)
 	means_per_t.append(m)

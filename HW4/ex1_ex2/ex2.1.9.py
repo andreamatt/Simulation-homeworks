@@ -8,7 +8,7 @@ from math import factorial as fact
 
 λ = 10
 µ = 15
-c = 1  # number of servers
+c = 2  # number of servers
 max_time = 10000  #2000 / µ
 debug_interval = max_time / 200
 Ntr = 3  # number of simulations to run

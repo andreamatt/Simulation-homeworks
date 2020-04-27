@@ -7,10 +7,6 @@ from time import time
 from math import factorial as fact
 
 
-def variance(values):
-	return np.var(values, ddof=1)
-
-
 def std(values):
 	return np.std(values, ddof=1)
 
@@ -26,15 +22,19 @@ def mean_confidence_asymptotic(values, confidence):
 	return (j, k)
 
 
-λ = 50
+# 12: show number of packets in system over time
+λ = 70
 µ = 15
-c = 4
-max_time = 50  #2000 / µ
-debug_interval = max_time / 15
-Ntr = 1000
+c = 5  # number of servers
+max_time = 1000  #2000 / µ
+debug_interval = max_time / 20
+Ntr = 200
+bins = 30
+
+# RUN SIMULATIONS
 simulations = []
 for i in range(Ntr):
-	if i % 50 == 0:
+	if i % 10 == 0:
 		print(f"Running simulation {i}")
 	sim = Simulation(max_time, λ, µ, c, debug_interval)
 	sim.run()
@@ -45,12 +45,11 @@ pi_0 = 1 / (sum([(c * ρ)**k / fact(k) for k in range(0, c)]) + (c * ρ)**c / (f
 pi_c_plus = (c * ρ)**c / (fact(c) * (1 - ρ)) * pi_0
 theor_avg_load = c * ρ + ρ / (1 - ρ) * pi_c_plus
 theor_avg_q_time = ρ / (λ * (1 - ρ)) * pi_c_plus
-theor_avg_q_size = ρ / (1 - ρ) * pi_c_plus
-
-print(f'theor avg q time: {theor_avg_q_time}')
 
 t_interval = debug_interval
 ts = np.arange(0, max_time, t_interval)[1:]
+
+# plot avg system load distributions
 hist_per_t = []
 bin_edges_per_t = []
 means_per_t = []
@@ -59,11 +58,10 @@ CI_per_t = []
 std_factor = 1.5
 confidence = 0.95
 for i in range(len(ts)):
-	# t = ts[i]
-	values = [sim.debugStats[i].avg_q_time for sim in simulations]
+	values = [sim.debugStats[i].cum_avg_load for sim in simulations]
 	s = std(values)
 	m = mean(values)
-	hist, bin_edges = np.histogram(values, bins=30, density=True)  #range=[min_h, max_h]
+	hist, bin_edges = np.histogram(values, bins=bins, density=True)
 	hist_per_t.append(hist)
 	bin_edges_per_t.append(bin_edges)
 	means_per_t.append(m)
@@ -71,8 +69,8 @@ for i in range(len(ts)):
 	CI_per_t.append(mean_confidence_asymptotic(values, confidence))
 
 scale_factor = max([max(h) for h in hist_per_t]) * 2
-print("scale: ", scale_factor)
-plt.plot([0, max_time], [theor_avg_q_time, theor_avg_q_time], 'y-', linewidth=1)
+
+plt.plot([0, max_time], [theor_avg_load, theor_avg_load], 'y-', linewidth=1)
 for i in range(len(ts)):
 	t = ts[i]
 	m = means_per_t[i]
@@ -94,8 +92,45 @@ for i in range(len(ts)):
 
 plt.show()
 
-# # print(f'Theoretical: {theor_avg}, empirical: {mean(sim.area)}, events: {(len(Y)-2)/2}')
+# plot avg q_time distributions
+hist_per_t = []
+bin_edges_per_t = []
+means_per_t = []
+std_per_t = []
+CI_per_t = []
+std_factor = 1.5
+confidence = 0.95
+for i in range(len(ts)):
+	values = [sim.debugStats[i].cum_avg_q_time for sim in simulations]
+	s = std(values)
+	m = mean(values)
+	hist, bin_edges = np.histogram(values, bins=bins, density=True)
+	hist_per_t.append(hist)
+	bin_edges_per_t.append(bin_edges)
+	means_per_t.append(m)
+	std_per_t.append(s)
+	CI_per_t.append(mean_confidence_asymptotic(values, confidence))
 
-# print(f'Active server time %: {sim.areaU / max_time}, theoric: {ρ}')
-# print(f'Average q size: {(sim.areaQ+sim.areaU) / max_time}, theoric: {theor_avg_q_size}')
-# print(f'Average q waiting time: {mean([2])}, theoric: {theor_avg_q_time}, finished packets: {len(sim.packets_finished)}')
+scale_factor = max([max(h) for h in hist_per_t]) * 2
+
+plt.plot([0, max_time], [theor_avg_q_time, theor_avg_q_time], 'y-', linewidth=1)
+for i in range(len(ts)):
+	t = ts[i]
+	m = means_per_t[i]
+	s = std_per_t[i]
+	hist = hist_per_t[i] / scale_factor
+	bin_edges = bin_edges_per_t[i][:-1]
+	bin_w = bin_edges[1] - bin_edges[0]
+	CI = CI_per_t[i]
+	min_h = max((m - std_factor * s * 1.5, 0))
+	max_h = m + std_factor * s * 1.5
+	valid_indexes = np.argwhere(np.logical_and(bin_edges > min_h, bin_edges < max_h))[:, 0]
+	# truncate
+	hist = hist[valid_indexes]
+	bin_edges = bin_edges[valid_indexes]
+	plt.plot(t - hist * t_interval, bin_edges + bin_w / 2, 'b-', linewidth=1, zorder=3)
+	plt.plot([t, t], [min_h - bin_w / 2, max_h + bin_w / 2], 'b-', linewidth=0.5)
+	plt.plot([t, t], CI, 'r-', linewidth=2)
+	plt.plot([t], [m], 'ko', markersize=3)
+
+plt.show()
