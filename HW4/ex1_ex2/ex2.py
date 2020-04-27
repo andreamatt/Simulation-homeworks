@@ -4,6 +4,7 @@ from numpy import mean, min, max, median, quantile, sqrt
 from matplotlib import pyplot as plt
 from scipy.stats import expon, norm, erlang
 from time import time
+from math import factorial as fact
 
 
 def variance(values):
@@ -25,11 +26,11 @@ def mean_confidence_asymptotic(values, confidence):
 	return (j, k)
 
 
-λ = 10
+λ = 50
 µ = 15
 c = 4
-max_time = 50#2000 / µ
-debug_interval = max_time/15
+max_time = 50  #2000 / µ
+debug_interval = max_time / 15
 Ntr = 1000
 simulations = []
 for i in range(Ntr):
@@ -39,9 +40,13 @@ for i in range(Ntr):
 	sim.run()
 	simulations.append(sim)
 
-ρ = λ / µ
-theor_avg_q_size = ρ / (1 - ρ)
-theor_avg_q_time = ρ**2 / (λ * (1 - ρ))
+ρ = λ / (c * µ)
+pi_0 = 1 / (sum([(c * ρ)**k / fact(k) for k in range(0, c)]) + (c * ρ)**c / (fact(c) * (1 - ρ)))
+pi_c_plus = (c * ρ)**c / (fact(c) * (1 - ρ)) * pi_0
+theor_avg_load = c * ρ + ρ / (1 - ρ) * pi_c_plus
+theor_avg_q_time = ρ / (λ * (1 - ρ)) * pi_c_plus
+theor_avg_q_size = ρ / (1 - ρ) * pi_c_plus
+
 print(f'theor avg q time: {theor_avg_q_time}')
 
 t_interval = debug_interval

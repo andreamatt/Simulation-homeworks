@@ -180,7 +180,7 @@ class Simulation:
 		return random.expovariate(self.departure_rate)
 
 	def get_free_server(self):
-		if len(self.free_servers)==0:
+		if len(self.free_servers) == 0:
 			return None
 		return heapq.heappop(self.free_servers)
 
@@ -220,7 +220,7 @@ class Simulation:
 		finished_packet = departure_server.packet
 		finished_packet.service_exit = current_time
 		# free the server
-		departure_server.packet = None 
+		departure_server.packet = None
 		heapq.heappush(self.free_servers, departure_server)
 		# update packets stats
 		departure_server.packets_finished.append(finished_packet)
@@ -295,9 +295,10 @@ class Simulation:
 				# since the beninning
 				ds.cum_avg_busy_servers = self.areaU / ds.event_time
 				ds.cum_avg_q_size = self.areaQ / ds.event_time
-				ds.cum_avg_load = ds.cum_avg_q_size + ds.cum_avg_busy_servers
+				ds.cum_avg_load = ds.cum_avg_busy_servers + ds.cum_avg_q_size
 				q_times = [p.queue_exit - p.queue_enter for p in self.packets_exited]
 				tot_times = [p.service_exit - p.queue_enter for p in finished_packets]
+				# print("q_times", q_times)
 				ds.cum_avg_q_time = mean(q_times) if len(q_times) > 0 else 0
 				ds.cum_avg_tot_time = mean(tot_times) if len(tot_times) > 0 else 0
 

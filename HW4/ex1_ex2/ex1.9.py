@@ -4,6 +4,7 @@ from numpy import mean, min, max, median, quantile, sqrt
 from matplotlib import pyplot as plt
 from scipy.stats import expon, norm, erlang
 from time import time
+from math import factorial as fact
 
 λ = 10
 µ = 15
@@ -22,8 +23,12 @@ for i in range(Ntr):
 print(f'Finished simulating')
 
 # 9: show average number of packets in system over time
-ρ = λ / µ
-theor_avg_q_size = ρ / (1 - ρ)
+ρ = λ / (c * µ)
+pi_0 = 1 / (sum([(c * ρ)**k / fact(k) for k in range(0, c)]) + (c * ρ)**c / (fact(c) * (1 - ρ)))
+pi_c_plus = (c * ρ)**c / (fact(c) * (1 - ρ)) * pi_0
+theor_avg_load = c * ρ + ρ / (1 - ρ) * pi_c_plus
+theor_avg_q_time = ρ / (λ * (1 - ρ)) * pi_c_plus
+theor_avg_q_size = ρ / (1 - ρ) * pi_c_plus
 # print(f'theor avg q time: {theor_avg_q_time}')
 plt.plot([0, max_time], [theor_avg_q_size] * 2, 'k-', linewidth=1)
 for sim in simulations:
