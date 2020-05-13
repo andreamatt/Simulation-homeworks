@@ -1,0 +1,6 @@
+﻿namespace GeRaF
+{
+    class DebugStats
+    {
+    }
+}

@@ -1,0 +1,2 @@
+D:\Programming\Simulation-homeworks\GeRaF\obj\Debug\GeRaF.csprojAssemblyReference.cache
+D:\Programming\Simulation-homeworks\GeRaF\obj\Debug\GeRaF.csproj.CoreCompileInputs.cache

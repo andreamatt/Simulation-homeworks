@@ -4,7 +4,7 @@ import numpy as np
 from numpy import mean, min, max, median, quantile, array
 from math import ceil, sqrt, floor
 from scipy.stats import expon
-from typing import Optional as Opt, List, Tuple, Union
+from typing import Optional as Opt, List, Tuple, Union, Dict
 import heapq
 
 
@@ -12,15 +12,39 @@ class EventType(Enum):
 	Start = 0
 	End = 1
 	Debug = 2
-	Transmission = 3
+	# start events: 1. set carrier busy 2. set collisions on active transmissions 3. add to active transmissions
+	# end events: 1. set carrier to free 2. move to finished transmission/delete (CTSs are just moved, others deleted)
+	SENSE_start = 3,  # start sensing
+	SENSE_end = 4,  # check that last active pulse is older than relative sense_start. If free, RTS_start. if busy, backoff to SENSE_start
+	RTS_start = 5,  # node, time, region index. 1.select active nodes in that area and add to scheduled RTS_end (keep them awake)
+	RTS_end = 6,  # node, time, region index, receiving nodes. 1.schedule CTS_start for selected nodes 2.schedule COL_check in cts_time time (plus some delta to be sure)
+	CTS_start = 7,  # :
+	CTS_end = 8,  # :
+	COL_check = 9,
+	# 0. no response => next region
+	# source, sink, node, ...: 1. no collision => PKT_start with first CTS sender; any collision => COL_start OR (next_region and RTS_start) depending on collision count
+	# modified 1. at least 1 non-overlapping => PKT_start with first CTS sender; all overlapping => COL_start
+	# modified 2. select between non-overlapping using probabilities of success
+	# modified 3. no collision => PKT_start with probabilities; any collision => COL_start
+	# modified 4. send collision message only for collided CTSs (others stay silent)
+	COL_start = 10,
+	COL_end = 11,  # ... : .. schedule COL_check in max_backoff time. 2.schedule CTS_start for available nodes with backoff
+	PKT_start = 12,  # nodes not selected can go to sleep, schedule ACK_check
+	PKT_end = 13,  # if packet has no collision schedule ACK_start, else stay
+	ACK_start = 14,
+	ACK_end = 15,
+	ACK_check = 16  # if no collision, finished. Else, schedule PKT_start again
 
 
 class Node:
 
-	def __init__(self, location=(0, 0), range=0):
+	def __init__(self, id: int, location: Tuple[float, float] = (0, 0), range: float = 0):
+		self.id = id
 		self.location = (0, 0)
 		self.range = 0
 		self.neighbours: Tuple['Node', ...] = tuple()
+		self.awake = True
+		self.sensing = set() # set of packets that is sensing
 
 	def __str__(self):
 		return f'{"node_("}{self.location[0]: .3f}, {self.location[1]: .3f}{")"}'
@@ -29,20 +53,11 @@ class Node:
 		return self.__str__()
 
 
-def distance(n1: Node, n2: Node) -> float:
-	x1, y1 = n1.location
-	x2, y2 = n2.location
-	return sqrt((x1 - x2)**2 + (y1 - y2)**2)
-
-
 class Event:
 
-	def __init__(self, time: float, eventType: EventType, source: Opt[Node] = None, sink: Opt[Node] = None):
+	def __init__(self, time: float, eventType: EventType):
 		self.time = time
 		self.type = eventType
-		self.next: Opt['Event'] = None
-		self.source: Opt[Node] = source
-		self.sink: Opt[Node] = sink
 
 	def __str__(self):
 		return f'{"{"}{self.time : .3f}; {str(self.type)[10:]}{"}"}'
@@ -50,8 +65,16 @@ class Event:
 	def __repr__(self):
 		return self.__str__()
 
-	def __lt__(self, other):
+	def __lt__(self, other: 'Event'):
 		return self.time < other.time
+
+
+class Transmission(Event):
+
+	def __init__(self, time, eventType, source=None, destination=None):
+		super().__init__(time, eventType)
+		self.source = source
+		self.destination = destination
 
 
 class EventQueueHeap:
@@ -82,6 +105,21 @@ class DebugStats:
 		self.avg_speed: float = 0
 
 
+class ProtocolParameters:
+
+	def __init__(self):
+		self.duty_cycle = 0.1  # NOT IN SECONDS: active time percentage (t_l / (t_l + t_s))
+		self.t_sense = 0.0521  # carrier sense duration
+		self.t_backoff = 0.219  # backoff interval length (constant?)
+		self.t_listen = 0.016  # listening time
+		self.t_sleep = self.t_listen * ((1 / self.duty_cycle) - 1)  # 0.144000, sleep time
+		self.t_data = 0.0521  # data transmission time
+		self.t_signal = 0.00521  # signal packet transmission time (RTS and CTS ?)
+		self.n_regions = 4  # number of priority regions
+		self.n_max_attempts = 50  # number of attempts for searching a relay
+		self.n_max_coll = 6  # number of attempts for solving a collision
+
+
 class Simulation:
 
 	def __init__(self, transmissions: int, side: float, t_range: float, n_bins: int, nodes: int, debug_interval: float):
@@ -90,9 +128,10 @@ class Simulation:
 		self.side = side
 		self.node_range = t_range
 		self.n_bins = n_bins
+		self.distances: Dict[int, Dict[int, float]] = {}
 
 		# system state
-		self.nodes: List[Node] = [Node() for i in range(nodes)]
+		self.nodes: List[Node] = [Node(i) for i in range(nodes)]
 
 		# simulation state
 		self.clock: float = 0
@@ -133,8 +172,13 @@ class Simulation:
 				# calculate neighbours
 				for n1 in self.nodes:
 					neighbours = []
+					self.distances[n1.id] = {}
 					for n2 in self.nodes:
-						if n1 != n2 and distance(n1, n2) < n1.range:
+						x1, y1 = n1.location
+						x2, y2 = n2.location
+						d = sqrt((x1 - x2)**2 + (y1 - y2)**2)
+						self.distances[n1.id][n2.id] = d
+						if n1 != n2 and d < n1.range:
 							neighbours.append(n2)
 					n1.neighbours = tuple(neighbours)
 				# add transmissions
@@ -172,27 +216,31 @@ class Simulation:
 				return None
 			else:
 				steps += 1
-				current_node = np.random.choice(r)
+				current_node = np.random.choice(chosen_region)
 
-	def priority_regions(self, source, sink):
-		# keep only the ones advancing the packet geographically (closer to sink than the source)
-		source_dist = distance(source, sink)
-		nodes: List[Tuple[Node, float]] = []
-		for n in source.neighbours:
-			d = distance(n, sink)
-			if d < source_dist:
-				nodes.append((n, d))
-		# bins
-		bins = [[] for i in range(self.n_bins)]
-		bin_width = source.range / self.n_bins
-		for n, d in nodes:
-			# calc distance using farthest bin as maximum
-			bin_dist = d - (source_dist - source.range)
-			i = floor(bin_dist / bin_width)
-			bins[i].append(n)
+	# def priority_regions(self, source, sink):
+	# 	# keep only the ones advancing the packet geographically (closer to sink than the source)
+	# 	source_dist = self.distance(source, sink)
+	# 	nodes: List[Tuple[Node, float]] = []
+	# 	for n in source.neighbours:
+	# 		d = self.distance(n, sink)
+	# 		if d < source_dist:
+	# 			nodes.append((n, d))
+	# 	# bins
+	# 	bins = [[] for i in range(self.n_bins)]
+	# 	bin_width = source.range / self.n_bins
+	# 	for n, d in nodes:
+	# 		# calc distance using farthest bin as maximum
+	# 		bin_dist = d - (source_dist - source.range)
+	# 		i = floor(bin_dist / bin_width)
+	# 		bins[i].append(n)
 
-		return bins
+	# 	return bins
+
+	def distance(self, n1: Node, n2: Node) -> float:
+		return self.distances[n1.id][n2.id]
 
 
-sim = Simulation(100, 100, 30, 4, 100, 1)
-sim.run()
+print(ProtocolParameters().t_sleep)
+# sim = Simulation(100, 100, 30, 4, 100, 1)
+# sim.run()
