@@ -66,7 +66,9 @@ namespace GeRaF
         }
 
         public void FreeNow(Simulation sim) {
-            sim.eventQueue.Remove(freeEvent);
+            if (busyWith != this) {
+                sim.eventQueue.Remove(freeEvent);
+            }
             Free();
         }
     }

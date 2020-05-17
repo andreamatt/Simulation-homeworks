@@ -1,7 +1,7 @@
 .vscode/
 .idea/
-.GeRaF/bin/
-.GeRaF/obj/
+.GeRaF/bin/*
+.GeRaF/obj/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
