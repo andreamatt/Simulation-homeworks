@@ -19,6 +19,7 @@ namespace GeRaF
         // system state
         public List<Relay> relays;
         public Dictionary<int, Dictionary<int, double>> distances;
+        public List<Packet> finishedPackets = new List<Packet>();
 
         // simulation state
         public double clock;
@@ -43,9 +44,11 @@ namespace GeRaF
             for (int i = 0; i < n_nodes; i++) {
                 var relay = new Relay();
                 relay.id = i;
-                relay.location = new Vector2(RNG.rand * area_side, RNG.rand * area_side);
+                relay.X = RNG.rand() * area_side;
+                relay.Y = RNG.rand() * area_side;
                 relay.range = this.range;
                 relay.awake = true;
+                relays.Add(relay);
             }
 
             // calculate distances and neighbours
@@ -53,7 +56,7 @@ namespace GeRaF
             foreach (var r1 in relays) {
                 distances[r1.id] = new Dictionary<int, double>();
                 foreach (var r2 in relays) {
-                    var dist = Vector2.Distance(r1.location, r2.location);
+                    var dist = Math.Sqrt(Math.Pow(r1.X - r2.X, 2) + Math.Pow(r1.Y - r2.Y, 2));
                     if (dist < r1.range) {
                         r1.neighbours.Add(r2);
                     }

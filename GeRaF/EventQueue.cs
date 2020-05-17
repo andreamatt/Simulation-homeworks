@@ -9,7 +9,7 @@ namespace GeRaF
 {
     class EventQueue
     {
-        private FastPriorityQueue<Event> queue;
+        private SimplePriorityQueue<Event, double> queue = new SimplePriorityQueue<Event, double>();
 
         public void Add(Event e) {
             queue.Enqueue(e, e.time);
@@ -23,10 +23,22 @@ namespace GeRaF
             return queue.Dequeue();
         }
 
+        public void Remove(Event e) {
+            queue.Remove(e);
+        }
+
+        public void Reschedule(Event e) {
+            queue.UpdatePriority(e, e.time);
+        }
+
         public bool isEmpty => queue.Count == 0;
 
         public void Clear() {
             queue.Clear();
+        }
+
+        public List<Event> ToList() {
+            return queue.ToList();
         }
     }
 }

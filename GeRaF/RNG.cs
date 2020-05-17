@@ -9,10 +9,12 @@ namespace GeRaF
     static class RNG
     {
         static private Random random = new Random();
-        static public double rand => random.NextDouble();
+        static public double rand() {
+            return random.NextDouble();
+        }
 
         static public double rand_expon(double lambda) {
-            return -Math.Log(RNG.rand) / lambda
+            return -Math.Log(rand()) / lambda;
         }
 
         static public int rand_int(int min, int max) {

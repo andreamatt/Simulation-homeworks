@@ -8,6 +8,7 @@ namespace GeRaF
 {
     enum TransmissionType
     {
+        SINK_RTS,
         RTS,
         CTS,
         PKT,
