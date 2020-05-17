@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,8 +22,12 @@ namespace GeRaF
 		private int _id;
 		public int Id => _id;
 		public double generationTime;
+		[JsonIgnore]
 		public Relay startRelay;
+		public int startRelayId => startRelay == null ? -1 : startRelay.id;
+		[JsonIgnore]
 		public Relay sink;
+		public int sinkId => sink == null ? -1 : sink.id;
 		private Result result = Result.None;
 		public Result Result => result;
 

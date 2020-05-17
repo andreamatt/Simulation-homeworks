@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -13,9 +14,13 @@ namespace GeRaF
 		public double X;
 		public double Y;
 		public double range = -1;
+		[JsonIgnore]
 		public List<Relay> neighbours = new List<Relay>();
+		public List<int> neighboursIds => neighbours.Select(n => n.id).ToList();
 		public bool awake = true;
+		[JsonIgnore]
 		public HashSet<Transmission> activeTransmissions = new HashSet<Transmission>();
+		[JsonIgnore]
 		public HashSet<Transmission> finishedTransmissions = new HashSet<Transmission>();
 		public Packet packetToSend = null;
 
@@ -32,8 +37,11 @@ namespace GeRaF
 
 		// contention status
 		private Relay busyWith = null; // è in contesa per un pacchetto
-		private FreeRelayEvent freeEvent = null;
+
+		[JsonIgnore]
 		public Relay BusyWith => busyWith;
+		public int BusyWithId => busyWith == null ? -1 : busyWith.id;
+		private FreeRelayEvent freeEvent = null;
 
 		public void SelfReserve() {
 			busyWith = this;

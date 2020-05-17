@@ -42,7 +42,7 @@ namespace GeRaF
 	abstract class Event
 	{
 		public double time;
-		//public EventType type;
+		public string type => this.GetType().Name;
 
 		public abstract void Handle(Simulation sim);
 	}
@@ -56,7 +56,7 @@ namespace GeRaF
 		public override void Handle(Simulation sim) {
 			// add initial packet arrival
 			var p = new PacketGenerationEvent();
-			p.time = RNG.rand_expon(sim.packet_rate);
+			p.time = RNG.rand_expon(sim.simulationParameters.packet_rate);
 			sim.eventQueue.Add(p);
 		}
 	}
@@ -80,7 +80,7 @@ namespace GeRaF
 		public override void Handle(Simulation sim) {
 			// schedule next packet arrival
 			var p = new PacketGenerationEvent();
-			p.time = sim.clock + RNG.rand_expon(sim.packet_rate);
+			p.time = sim.clock + RNG.rand_expon(sim.simulationParameters.packet_rate);
 			sim.eventQueue.Add(p);
 
 			// give this packet to some relay or discard it if none are available
@@ -168,9 +168,4 @@ namespace GeRaF
 			}
 		}
 	}
-
-	//class DebugEvent : Event
-	//{
-
-	//}
 }

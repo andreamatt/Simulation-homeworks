@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -9,11 +11,7 @@ namespace GeRaF
 {
 	class Simulation
 	{
-		public double max_time;
-		public int area_side;
-		public double range;
-		public int n_nodes;
-		public double packet_rate;
+		public SimulationParameters simulationParameters;
 		public ProtocolParameters protocolParameters;
 
 		// system state
@@ -30,23 +28,18 @@ namespace GeRaF
 		// debug stats
 		public List<DebugStats> debugStats;
 
-		public Simulation(double max_time, int area_side, double range, int n_nodes, double packet_rate, ProtocolParameters protocolParameters) {
-			this.max_time = max_time;
-			this.area_side = area_side;
-			this.range = range;
-			this.n_nodes = n_nodes;
-			this.packet_rate = packet_rate;
+		public Simulation(SimulationParameters simulationParameters, ProtocolParameters protocolParameters) {
+			this.simulationParameters = simulationParameters;
 			this.protocolParameters = protocolParameters;
-
 
 			// init relays
 			relays = new List<Relay>();
-			for (int i = 0; i < n_nodes; i++) {
+			for (int i = 0; i < simulationParameters.n_nodes; i++) {
 				var relay = new Relay();
 				relay.id = i;
-				relay.X = RNG.rand() * area_side;
-				relay.Y = RNG.rand() * area_side;
-				relay.range = this.range;
+				relay.X = RNG.rand() * simulationParameters.area_side;
+				relay.Y = RNG.rand() * simulationParameters.area_side;
+				relay.range = simulationParameters.range;
 				relay.awake = true;
 				relays.Add(relay);
 			}
@@ -68,15 +61,28 @@ namespace GeRaF
 			clock = 0;
 			eventQueue = new EventQueue();
 			eventQueue.Add(new StartEvent());
-			eventQueue.Add(new EndEvent(max_time));
+			if (simulationParameters.debug_always == false) {
+				eventQueue.Add(new DebugEvent());
+			}
+			eventQueue.Add(new EndEvent(simulationParameters.max_time));
+
+			// init debug state
+			debugStats = new List<DebugStats>();
 		}
 
 		public void Run() {
 			while (eventQueue.isEmpty == false) {
 				var e = eventQueue.Pop();
 				this.clock = e.time;
+				if (simulationParameters.debug_always) {
+					DebugEvent.DebugNow(this);
+				}
 				e.Handle(this);
 			}
+
+			var debugWriter = new StreamWriter(simulationParameters.debug_file);
+			debugWriter.Write(JsonConvert.SerializeObject(debugStats, Formatting.Indented));
+			debugWriter.Close();
 		}
 	}
 }
