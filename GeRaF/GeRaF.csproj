@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>GeRaF.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Priority Queue, Version=4.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\OptimizedPriorityQueue.4.2.0\lib\net45\Priority Queue.dll</HintPath>
@@ -50,17 +53,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Event\Check\EventCheckACK.cs" />
+    <Compile Include="Event\Check\EventCheckCOL.cs" />
+    <Compile Include="Event\Check\EventCheckSinkCOL.cs" />
+    <Compile Include="Event\EventTransmission.cs" />
+    <Compile Include="Event\EventSensing.cs" />
+    <Compile Include="Event\Transmission\EventPKT.cs" />
+    <Compile Include="Event\Transmission\EventACK.cs" />
+    <Compile Include="Event\Transmission\EventCOL.cs" />
+    <Compile Include="Event\Transmission\EventCTS.cs" />
     <Compile Include="DebugStats.cs" />
-    <Compile Include="Event.cs" />
-    <Compile Include="EventQueue.cs" />
-    <Compile Include="Packet.cs" />
+    <Compile Include="Event\EventMain.cs" />
+    <Compile Include="Utils\EventQueue.cs" />
+    <Compile Include="Event\Transmission\EventSinkRTS.cs" />
+    <Compile Include="Element\Packet.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProtocolParameters.cs" />
-    <Compile Include="RNG.cs" />
-    <Compile Include="Relay.cs" />
+    <Compile Include="Utils\RNG.cs" />
+    <Compile Include="Element\Relay.cs" />
+    <Compile Include="Event\Transmission\EventRTS.cs" />
     <Compile Include="Simulation.cs" />
-    <Compile Include="Transmission.cs" />
+    <Compile Include="Element\Transmission.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
