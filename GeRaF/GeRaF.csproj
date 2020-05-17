@@ -59,14 +59,14 @@
     <Compile Include="Event\Check\EventCheckACK.cs" />
     <Compile Include="Event\Check\EventCheckCOL.cs" />
     <Compile Include="Event\Check\EventCheckSinkCOL.cs" />
-    <Compile Include="Event\Debug\DebugEvent.cs" />
+    <Compile Include="Event\DebugStats\DebugEvent.cs" />
     <Compile Include="Event\EventTransmission.cs" />
     <Compile Include="Event\EventSensing.cs" />
     <Compile Include="Event\Transmission\EventPKT.cs" />
     <Compile Include="Event\Transmission\EventACK.cs" />
     <Compile Include="Event\Transmission\EventCOL.cs" />
     <Compile Include="Event\Transmission\EventCTS.cs" />
-    <Compile Include="Event\Debug\DebugStats.cs" />
+    <Compile Include="Event\DebugStats\DebugStats.cs" />
     <Compile Include="Event\EventMain.cs" />
     <Compile Include="SimulationParameters.cs" />
     <Compile Include="Utils\EventQueue.cs" />
