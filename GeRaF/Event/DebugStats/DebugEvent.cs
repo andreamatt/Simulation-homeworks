@@ -23,10 +23,18 @@ namespace GeRaF
 			var stats = new DebugStats() {
 				time = sim.clock,
 				events = sim.eventQueue.ToList(),
-				finishedPackets = sim.finishedPackets,
-				relays = sim.relays
+				relays = sim.relays,
+				finishedPackets = sim.finishedPackets
 			};
-			sim.debugStats.Add(stats);
+
+			var stats_to_string = JsonConvert.SerializeObject(stats, Formatting.Indented);
+			if (DebugStats.first) {
+				DebugStats.first = false;
+				sim.debugWriter.Write(stats_to_string);
+			}
+			else {
+				sim.debugWriter.Write(",\n" + stats_to_string);
+			}
 		}
 	}
 }

@@ -19,15 +19,21 @@ namespace GeRaF
 
 	class Transmission
 	{
+		[JsonIgnore]
 		static private int max_id = 0;
+
+		[JsonIgnore]
 		private int _id;
 		public int Id => _id;
+
 		[JsonIgnore]
 		public Relay source;
 		public int sourceId => source.id;
+
 		[JsonIgnore]
 		public Relay destination;
 		public int destinationId => destination.id;
+
 		public TransmissionType transmissionType;
 		public bool failed;
 

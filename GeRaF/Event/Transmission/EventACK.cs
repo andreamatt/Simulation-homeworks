@@ -48,11 +48,10 @@ namespace GeRaF
 			relay.packetToSend = Packet.copy(senderRelay.packetToSend);
 
 			// if reached sink, stop
-			if (relay.packetToSend.sink == senderRelay) {
+			if (relay.packetToSend.sink == relay) {
 				relay.packetToSend.Finish(Result.Success, sim);
 			}
 			else {
-				relay.FreeNow(sim);
 				relay.SelfReserve();
 				// schedule SENSE_Start
 				var SENSE_start = new StartSensingEvent();

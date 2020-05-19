@@ -25,19 +25,19 @@ namespace GeRaF
 		public double X;
 		public double Y;
 		public double range = -1;
+
 		[JsonIgnore]
 		public List<Relay> neighbours = new List<Relay>();
 		public List<int> neighboursIds => neighbours.Select(n => n.id).ToList();
+
 		public RelayStatus status = RelayStatus.Free;
-		//public bool IsAwake => status != RelayStatus.Asleep;
-		public Packet packetToSend = null;
 
 		[JsonIgnore]
+		public Packet packetToSend = null;
+		public int packetToSendId => packetToSend == null ? -1 : packetToSend.Id;
+
 		public HashSet<Transmission> activeTransmissions = new HashSet<Transmission>();
-		public List<Transmission> activeTransmissionsList => activeTransmissions.ToList();
-		[JsonIgnore]
 		public HashSet<Transmission> finishedTransmissions = new HashSet<Transmission>();
-		public List<Transmission> finishedTransmissionsList => finishedTransmissions.ToList();
 
 		// iteration status
 		public int regionIndex = 0;
@@ -51,11 +51,14 @@ namespace GeRaF
 		public bool hasSensed = false;
 
 		// contention status
+		[JsonIgnore]
 		private Relay busyWith = null; // è in contesa per un pacchetto
 
 		[JsonIgnore]
 		public Relay BusyWith => busyWith;
 		public int BusyWithId => busyWith == null ? -1 : busyWith.id;
+
+		[JsonIgnore]
 		private FreeRelayEvent freeEvent = null;
 
 		public void SelfReserve() {

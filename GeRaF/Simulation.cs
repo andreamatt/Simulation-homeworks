@@ -24,9 +24,7 @@ namespace GeRaF
 		public EventQueue eventQueue;
 
 		// stat counters
-
-		// debug stats
-		public List<DebugStats> debugStats;
+		public StreamWriter debugWriter;
 
 		public Simulation(SimulationParameters simulationParameters, ProtocolParameters protocolParameters) {
 			this.simulationParameters = simulationParameters;
@@ -71,11 +69,13 @@ namespace GeRaF
 			foreach (var r1 in relays) {
 				distances[r1.id] = new Dictionary<int, double>();
 				foreach (var r2 in relays) {
-					var dist = Math.Sqrt(Math.Pow(r1.X - r2.X, 2) + Math.Pow(r1.Y - r2.Y, 2));
-					if (dist < r1.range) {
-						r1.neighbours.Add(r2);
+					if (r1 != r2) {
+						var dist = Math.Sqrt(Math.Pow(r1.X - r2.X, 2) + Math.Pow(r1.Y - r2.Y, 2));
+						if (dist < r1.range) {
+							r1.neighbours.Add(r2);
+						}
+						distances[r1.id][r2.id] = dist;
 					}
-					distances[r1.id][r2.id] = dist;
 				}
 			}
 
@@ -89,7 +89,8 @@ namespace GeRaF
 			eventQueue.Add(new EndEvent(simulationParameters.max_time));
 
 			// init debug state
-			debugStats = new List<DebugStats>();
+			debugWriter = new StreamWriter(simulationParameters.debug_file);
+			debugWriter.Write("[\n");
 		}
 
 		public void Run() {
@@ -102,8 +103,7 @@ namespace GeRaF
 				e.Handle(this);
 			}
 
-			var debugWriter = new StreamWriter(simulationParameters.debug_file);
-			debugWriter.Write(JsonConvert.SerializeObject(debugStats, Formatting.Indented));
+			debugWriter.Write("\n]");
 			debugWriter.Close();
 		}
 	}

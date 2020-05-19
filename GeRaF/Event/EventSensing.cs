@@ -59,7 +59,7 @@ namespace GeRaF
 				relay.SENSE_count = 0;
 
 				// check if sink is in range
-				if (sim.distances[relay.id][relay.packetToSend.sink.id] < relay.range) {
+				if (sim.distances[relay.id][relay.packetToSend.sink.id] <= relay.range) {
 					var SINK_RTS_start = new StartSINKRTSEvent();
 					SINK_RTS_start.time = sim.clock;
 					SINK_RTS_start.relay = relay;

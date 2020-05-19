@@ -39,7 +39,7 @@ namespace GeRaF
 				if (n.status == RelayStatus.Free) {
 					// if neigh relay is in correct region AND transmission has not failed AND is not in another contention, schedule CTS
 					var dist = sim.distances[n.id][sink.id];
-					if (dist > minDistance && dist < maxDistance && t.failed == false && n.BusyWith == null) {
+					if (dist > minDistance && dist < maxDistance && t.failed == false && n.status == RelayStatus.Free) {
 						n.Reserve(relay, sim);
 						var CTS_start = new StartCTSEvent();
 						CTS_start.relay = n;
