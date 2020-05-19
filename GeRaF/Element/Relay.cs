@@ -8,6 +8,17 @@ using System.Threading.Tasks;
 
 namespace GeRaF
 {
+	enum RelayStatus
+	{
+		Asleep,
+		Free,   // awake with no task
+		Transmitting,
+		Sensing,
+		Awaiting_Signal,
+		Backoff_Sensing,
+		Backoff_CTS
+	}
+
 	class Relay
 	{
 		public int id = -1;
@@ -17,12 +28,16 @@ namespace GeRaF
 		[JsonIgnore]
 		public List<Relay> neighbours = new List<Relay>();
 		public List<int> neighboursIds => neighbours.Select(n => n.id).ToList();
-		public bool awake = true;
+		public RelayStatus status = RelayStatus.Free;
+		//public bool IsAwake => status != RelayStatus.Asleep;
+		public Packet packetToSend = null;
+
 		[JsonIgnore]
 		public HashSet<Transmission> activeTransmissions = new HashSet<Transmission>();
+		public List<Transmission> activeTransmissionsList => activeTransmissions.ToList();
 		[JsonIgnore]
 		public HashSet<Transmission> finishedTransmissions = new HashSet<Transmission>();
-		public Packet packetToSend = null;
+		public List<Transmission> finishedTransmissionsList => finishedTransmissions.ToList();
 
 		// iteration status
 		public int regionIndex = 0;
@@ -71,6 +86,7 @@ namespace GeRaF
 		public void Free() {
 			busyWith = null;
 			freeEvent = null;
+			status = RelayStatus.Free;
 		}
 
 		public void FreeNow(Simulation sim) {

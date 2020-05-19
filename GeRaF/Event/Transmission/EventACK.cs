@@ -10,7 +10,8 @@ namespace GeRaF
 	{
 		public Relay senderRelay;
 		public override void Handle(Simulation sim) {
-			triggerNeighbourSensing();
+			relay.status = RelayStatus.Transmitting;
+
 			var transmissions = sendTransmissions(TransmissionType.ACK);
 			// schedule ACK_end
 			var ACK_end = new EndACKEvent();
@@ -26,7 +27,6 @@ namespace GeRaF
 	{
 		public Relay senderRelay;
 		public override void Handle(Simulation sim) {
-			triggerNeighbourSensing();
 			foreach (var t in transmissions) {
 				var n = t.destination;
 				n.activeTransmissions.Remove(t);

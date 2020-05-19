@@ -11,7 +11,8 @@ namespace GeRaF
 		public Relay chosenRelay;
 
 		public override void Handle(Simulation sim) {
-			triggerNeighbourSensing();
+			relay.status = RelayStatus.Transmitting;
+
 			var transmissions = sendTransmissions(TransmissionType.PKT);
 			// put other interested relays (not chosen) to sleep
 			// schedule PKT_end
@@ -29,7 +30,8 @@ namespace GeRaF
 		public Relay chosenRelay;
 
 		public override void Handle(Simulation sim) {
-			triggerNeighbourSensing();
+			relay.status = RelayStatus.Awaiting_Signal; // waits for ACK
+
 			foreach (var t in transmissions) {
 				var n = t.destination;
 				n.activeTransmissions.Remove(t);

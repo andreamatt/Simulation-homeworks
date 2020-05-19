@@ -16,7 +16,7 @@ namespace GeRaF
 	class ProtocolParameters
 	{
 		public double duty_cycle = 0.1; // NOT IN SECONDS: active time percentage (t_l / (t_l + t_s))
-		public double t_sense = 0.0525; // carrier sense duration (needs to be more than any signal duration)
+		public double t_sense = 0.0521; // carrier sense duration (needs to be more than any signal duration)
 		public double t_backoff = 0.0219; // backoff interval length (constant?)
 		public double t_listen = 0.016; // listening time, must be quite higher than t_signal
 		public double t_sleep; // t_listen * ((1 / duty_cycle) - 1); // 0.144000, sleep time

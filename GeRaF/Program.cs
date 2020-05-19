@@ -15,7 +15,7 @@ namespace GeRaF
 				area_side = 100,
 				debug_interval = 0.1,
 				debug_always = true,
-				debug_file = "debug.txt",
+				debug_file = "../../debug.json",
 				max_time = 10,
 				n_nodes = 3,
 				packet_rate = 1,

@@ -9,7 +9,8 @@ namespace GeRaF
 	class StartSINKRTSEvent : StartTransmissionEvent
 	{
 		public override void Handle(Simulation sim) {
-			triggerNeighbourSensing();
+			relay.status = RelayStatus.Transmitting;
+
 			var transmissions = sendTransmissions(TransmissionType.SINK_RTS);
 
 			// schedule SINK_RTS_end
@@ -24,12 +25,12 @@ namespace GeRaF
 	class EndSINKRTSEvent : EndTransmissionEvent
 	{
 		public override void Handle(Simulation sim) {
-			triggerNeighbourSensing();
+			relay.status = RelayStatus.Awaiting_Signal; // waits for CTS
 
 			var sink = relay.packetToSend.sink;
 			foreach (var t in transmissions) {
 				var n = t.destination;
-				if (n.awake && n == sink && n.BusyWith == null) {
+				if (n.status == RelayStatus.Free && n == sink) {
 					n.Reserve(relay, sim);
 					var CTS_start = new StartCTSEvent();
 					CTS_start.relay = n;

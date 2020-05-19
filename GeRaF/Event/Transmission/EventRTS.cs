@@ -9,7 +9,8 @@ namespace GeRaF
 	class StartRTSEvent : StartTransmissionEvent
 	{
 		public override void Handle(Simulation sim) {
-			triggerNeighbourSensing();
+			relay.status = RelayStatus.Transmitting;
+
 			var transmissions = sendTransmissions(TransmissionType.RTS);
 
 			// schedule RTS_end
@@ -24,7 +25,7 @@ namespace GeRaF
 	class EndRTSEvent : EndTransmissionEvent
 	{
 		public override void Handle(Simulation sim) {
-			triggerNeighbourSensing();
+			relay.status = RelayStatus.Awaiting_Signal; // waits for CTS
 
 			var sink = relay.packetToSend.sink;
 			var sourceToSink = sim.distances[relay.id][sink.id];
@@ -35,7 +36,7 @@ namespace GeRaF
 
 			foreach (var t in transmissions) {
 				var n = t.destination;
-				if (n.awake) {
+				if (n.status == RelayStatus.Free) {
 					// if neigh relay is in correct region AND transmission has not failed AND is not in another contention, schedule CTS
 					var dist = sim.distances[n.id][sink.id];
 					if (dist > minDistance && dist < maxDistance && t.failed == false && n.BusyWith == null) {

@@ -9,7 +9,8 @@ namespace GeRaF
 	class StartCOLEvent : StartTransmissionEvent
 	{
 		public override void Handle(Simulation sim) {
-			triggerNeighbourSensing();
+			relay.status = RelayStatus.Transmitting;
+
 			var transmissions = sendTransmissions(TransmissionType.COL);
 
 			// schedule COL_end
@@ -24,7 +25,8 @@ namespace GeRaF
 	class EndCOLEvent : EndTransmissionEvent
 	{
 		public override void Handle(Simulation sim) {
-			triggerNeighbourSensing();
+			relay.status = RelayStatus.Awaiting_Signal; // waits for CTS
+
 			var backoffSize = sim.protocolParameters.t_backoff * Math.Pow(2, relay.COL_count);
 			foreach (var t in transmissions) {
 				var n = t.destination;
@@ -32,6 +34,7 @@ namespace GeRaF
 				n.activeTransmissions.Remove(t);
 				relay.activeTransmissions.Remove(t);
 				if (t.failed == false && n.BusyWith == relay) {
+					relay.status = RelayStatus.Backoff_CTS;
 					// update busy
 					n.Reserve(relay, sim);
 					// schedule CTS

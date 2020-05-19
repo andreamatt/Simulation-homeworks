@@ -10,7 +10,8 @@ namespace GeRaF
 	{
 		public Relay requester;
 		public override void Handle(Simulation sim) {
-			triggerNeighbourSensing();
+			relay.status = RelayStatus.Transmitting;
+
 			var transmissions = sendTransmissions(TransmissionType.CTS);
 
 			// schedule CTS_end
@@ -27,7 +28,8 @@ namespace GeRaF
 	{
 		public Relay requester;
 		public override void Handle(Simulation sim) {
-			triggerNeighbourSensing();
+			relay.status = RelayStatus.Awaiting_Signal;
+
 			foreach (var t in transmissions) {
 				var n = t.destination;
 				// remove transmission

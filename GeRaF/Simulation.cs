@@ -40,7 +40,7 @@ namespace GeRaF
 				relay.X = RNG.rand() * simulationParameters.area_side;
 				relay.Y = RNG.rand() * simulationParameters.area_side;
 				relay.range = simulationParameters.range;
-				relay.awake = true;
+				relay.status = RelayStatus.Free;
 				relays.Add(relay);
 			}
 

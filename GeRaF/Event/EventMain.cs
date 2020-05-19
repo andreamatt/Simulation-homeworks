@@ -84,7 +84,7 @@ namespace GeRaF
 			sim.eventQueue.Add(p);
 
 			// give this packet to some relay or discard it if none are available
-			var freeRelays = sim.relays.Where(r => r.awake && r.BusyWith == null).ToList();
+			var freeRelays = sim.relays.Where(r => r.status == RelayStatus.Free).ToList();
 			if (freeRelays.Count > 0) {
 				var chosen = freeRelays[RNG.rand_int(0, freeRelays.Count)];
 
@@ -110,21 +110,6 @@ namespace GeRaF
 				var packet = new Packet();
 				packet.generationTime = sim.clock;
 				packet.Finish(Result.No_start_relays, sim);
-			}
-		}
-	}
-
-	abstract class SensingTriggerEvent : Event
-	{
-		public Relay relay;
-		protected void triggerNeighbourSensing() {
-			foreach (var n in relay.neighbours) {
-				if (n.awake) {
-					// if they are sensing, set to sensed
-					if (n.isSensing) {
-						n.hasSensed = true;
-					}
-				}
 			}
 		}
 	}

@@ -10,12 +10,16 @@ namespace GeRaF
 	{
 		public Relay relay;
 		public override void Handle(Simulation sim) {
+			relay.status = RelayStatus.Sensing;
+
 			// check if sensingCount is less than max allowed
 			if (relay.SENSE_count < sim.protocolParameters.n_max_sensing) {
 				relay.SENSE_count++;
 				// enable sensing on relay
 				relay.isSensing = true;
-				//relay.hasSensed = false;
+				if (relay.neighbours.Any(n => n.status == RelayStatus.Transmitting)) {
+					relay.hasSensed = true;
+				}
 
 				// schedule sensing end
 				var end = new EndSensingEvent();
@@ -35,8 +39,10 @@ namespace GeRaF
 	{
 		public Relay relay;
 		public override void Handle(Simulation sim) {
+
 			if (relay.hasSensed) {
 				// reschedule with linear backoff
+				relay.status = RelayStatus.Backoff_Sensing;
 				var backOffSize = sim.protocolParameters.t_backoff;
 				var start = new StartSensingEvent();
 				start.time = sim.clock + backOffSize * RNG.rand();
@@ -44,7 +50,7 @@ namespace GeRaF
 				sim.eventQueue.Add(start);
 			}
 			else {
-				// set sensing count to 0
+				// reset sensing count to 0
 				relay.SENSE_count = 0;
 
 				// check if sink is in range

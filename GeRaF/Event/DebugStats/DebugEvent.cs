@@ -21,6 +21,7 @@ namespace GeRaF
 		public static void DebugNow(Simulation sim) {
 			// dump simulation to file
 			var stats = new DebugStats() {
+				time = sim.clock,
 				events = sim.eventQueue.ToList(),
 				finishedPackets = sim.finishedPackets,
 				relays = sim.relays
