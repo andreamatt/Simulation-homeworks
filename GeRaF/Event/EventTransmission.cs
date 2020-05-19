@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,9 @@ namespace GeRaF
 {
 	abstract class StartTransmissionEvent : Event
 	{
+		[JsonIgnore]
 		public Relay relay;
+		public int relayId => relay.id;
 		protected List<Transmission> sendTransmissions(TransmissionType type) {
 			// trigger sensing
 			foreach (var n in relay.neighbours) {
@@ -45,7 +48,11 @@ namespace GeRaF
 
 	abstract class EndTransmissionEvent : Event
 	{
+		[JsonIgnore]
 		public Relay relay;
+		public int relayId => relay.id;
+
+		[JsonIgnore]
 		public List<Transmission> transmissions;
 	}
 }

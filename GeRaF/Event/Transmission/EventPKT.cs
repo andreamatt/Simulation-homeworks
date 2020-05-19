@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,9 @@ namespace GeRaF
 {
 	class StartPKTEvent : StartTransmissionEvent
 	{
+		[JsonIgnore]
 		public Relay chosenRelay;
+		public int chosenRelayId => chosenRelay.id;
 
 		public override void Handle(Simulation sim) {
 			relay.status = RelayStatus.Transmitting;
@@ -27,7 +30,9 @@ namespace GeRaF
 
 	class EndPKTEvent : EndTransmissionEvent
 	{
+		[JsonIgnore]
 		public Relay chosenRelay;
+		public int chosenRelayId => chosenRelay.id;
 
 		public override void Handle(Simulation sim) {
 			relay.status = RelayStatus.Awaiting_Signal; // waits for ACK

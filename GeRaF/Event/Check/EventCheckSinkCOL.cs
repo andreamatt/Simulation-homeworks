@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,10 @@ namespace GeRaF
 {
 	class CheckSINKCOLEvent : Event
 	{
+		[JsonIgnore]
 		public Relay relay;
+		public int relayId => relay.id;
+
 		public override void Handle(Simulation sim) {
 			// no CTS or CTS failed => back to sensing
 			if (relay.finishedTransmissions.Count == 0 || relay.finishedTransmissions.First().failed) {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,9 @@ namespace GeRaF
 {
 	class StartACKEvent : StartTransmissionEvent
 	{
+		[JsonIgnore]
 		public Relay senderRelay;
+		public int senderRelayId => senderRelay.id;
 		public override void Handle(Simulation sim) {
 			relay.status = RelayStatus.Transmitting;
 
@@ -25,7 +28,9 @@ namespace GeRaF
 
 	class EndACKEvent : EndTransmissionEvent
 	{
+		[JsonIgnore]
 		public Relay senderRelay;
+		public int senderRelayId => senderRelay.id;
 		public override void Handle(Simulation sim) {
 			foreach (var t in transmissions) {
 				var n = t.destination;

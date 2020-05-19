@@ -33,16 +33,38 @@ namespace GeRaF
 			this.protocolParameters = protocolParameters;
 
 			// init relays
-			relays = new List<Relay>();
-			for (int i = 0; i < simulationParameters.n_nodes; i++) {
-				var relay = new Relay();
-				relay.id = i;
-				relay.X = RNG.rand() * simulationParameters.area_side;
-				relay.Y = RNG.rand() * simulationParameters.area_side;
-				relay.range = simulationParameters.range;
-				relay.status = RelayStatus.Free;
-				relays.Add(relay);
-			}
+			relays = new List<Relay>(){
+				new Relay(){
+					id = 0,
+					X = 10,
+					Y = 10,
+					range = 11,
+					status = RelayStatus.Free
+				},
+				new Relay(){
+					id = 1,
+					X = 20,
+					Y = 10,
+					range = 11,
+					status = RelayStatus.Free
+				},
+				new Relay(){
+					id = 2,
+					X = 30,
+					Y = 10,
+					range = 11,
+					status = RelayStatus.Free
+				}
+			};
+			//for (int i = 0; i < simulationParameters.n_nodes; i++) {
+			//	var relay = new Relay();
+			//	relay.id = i;
+			//	relay.X = RNG.rand() * simulationParameters.area_side;
+			//	relay.Y = RNG.rand() * simulationParameters.area_side;
+			//	relay.range = simulationParameters.range;
+			//	relay.status = RelayStatus.Free;
+			//	relays.Add(relay);
+			//}
 
 			// calculate distances and neighbours
 			distances = new Dictionary<int, Dictionary<int, double>>();
@@ -72,11 +94,11 @@ namespace GeRaF
 
 		public void Run() {
 			while (eventQueue.isEmpty == false) {
-				var e = eventQueue.Pop();
-				this.clock = e.time;
 				if (simulationParameters.debug_always) {
 					DebugEvent.DebugNow(this);
 				}
+				var e = eventQueue.Pop();
+				this.clock = e.time;
 				e.Handle(this);
 			}
 

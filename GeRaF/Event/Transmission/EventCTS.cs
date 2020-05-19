@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,9 @@ namespace GeRaF
 {
 	class StartCTSEvent : StartTransmissionEvent
 	{
-		public Relay requester;
+		[JsonIgnore]
+		public Relay requesterRelay;
+		public int requesterRelayId => requesterRelay.id;
 		public override void Handle(Simulation sim) {
 			relay.status = RelayStatus.Transmitting;
 
@@ -17,7 +20,7 @@ namespace GeRaF
 			// schedule CTS_end
 			var end = new EndCTSEvent();
 			end.relay = relay;
-			end.requester = requester;
+			end.requesterRelay = requesterRelay;
 			end.transmissions = transmissions;
 			end.time = sim.clock + sim.protocolParameters.t_signal;
 			sim.eventQueue.Add(end);
@@ -26,7 +29,9 @@ namespace GeRaF
 
 	class EndCTSEvent : EndTransmissionEvent
 	{
-		public Relay requester;
+		[JsonIgnore]
+		public Relay requesterRelay;
+		public int requesterRelayId => requesterRelay.id;
 		public override void Handle(Simulation sim) {
 			relay.status = RelayStatus.Awaiting_Signal;
 
@@ -35,7 +40,7 @@ namespace GeRaF
 				// remove transmission
 				n.activeTransmissions.Remove(t);
 				relay.activeTransmissions.Remove(t);
-				if (n == requester) {
+				if (n == requesterRelay) {
 					// move cts to finished
 					n.finishedTransmissions.Add(t);
 				}

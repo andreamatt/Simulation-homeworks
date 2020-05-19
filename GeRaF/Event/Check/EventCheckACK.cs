@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,8 +9,13 @@ namespace GeRaF
 {
 	class CheckACKEvent : Event
 	{
+		[JsonIgnore]
 		public Relay relay;
+		public int relayId => relay.id;
+
+		[JsonIgnore]
 		public Relay chosenRelay;
+		public int chosenRelayId => chosenRelay.id;
 		public override void Handle(Simulation sim) {
 			if (relay.finishedTransmissions.Count == 1) {
 				relay.FreeNow(sim);

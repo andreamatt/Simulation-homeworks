@@ -24,7 +24,7 @@ namespace GeRaF
 			var sim = new Simulation(sp, pp);
 			sim.Run();
 			Console.WriteLine("Finished");
-			Console.ReadKey();
+			//Console.ReadKey();
 		}
 	}
 }

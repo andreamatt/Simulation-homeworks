@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,10 @@ namespace GeRaF
 {
 	class CheckCOLEvent : Event
 	{
+		[JsonIgnore]
 		public Relay relay;
+		public int relayId => relay.id;
+
 		public override void Handle(Simulation sim) {
 			// check CTS amount
 			if (relay.finishedTransmissions.Count == 0) {

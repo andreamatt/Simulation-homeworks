@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,9 @@ namespace GeRaF
 {
 	class StartSensingEvent : Event
 	{
+		[JsonIgnore]
 		public Relay relay;
+		public int relayId => relay.id;
 		public override void Handle(Simulation sim) {
 			relay.status = RelayStatus.Sensing;
 
@@ -37,7 +40,9 @@ namespace GeRaF
 
 	class EndSensingEvent : Event
 	{
+		[JsonIgnore]
 		public Relay relay;
+		public int relayId => relay.id;
 		public override void Handle(Simulation sim) {
 
 			if (relay.hasSensed) {

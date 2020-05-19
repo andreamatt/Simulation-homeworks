@@ -1,4 +1,5 @@
-﻿using Priority_Queue;
+﻿using Newtonsoft.Json;
+using Priority_Queue;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -116,7 +117,9 @@ namespace GeRaF
 
 	class FreeRelayEvent : Event
 	{
+		[JsonIgnore]
 		public Relay relay;
+		public int relayId => relay.id;
 		public override void Handle(Simulation sim) {
 			relay.Free();
 		}
@@ -124,7 +127,9 @@ namespace GeRaF
 
 	class RegionProgressEvent : Event
 	{
+		[JsonIgnore]
 		public Relay relay;
+		public int relayId => relay.id;
 		public override void Handle(Simulation sim) {
 			// no more regions
 			if (relay.regionIndex == sim.protocolParameters.n_regions - 1) {

@@ -41,7 +41,7 @@ namespace GeRaF
 					var CTS_start = new StartCTSEvent();
 					CTS_start.time = sim.clock + backoffSize * RNG.rand();
 					CTS_start.relay = n;
-					CTS_start.requester = relay;
+					CTS_start.requesterRelay = relay;
 					sim.eventQueue.Add(CTS_start);
 				}
 			}

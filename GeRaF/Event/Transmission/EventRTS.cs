@@ -43,7 +43,7 @@ namespace GeRaF
 						n.Reserve(relay, sim);
 						var CTS_start = new StartCTSEvent();
 						CTS_start.relay = n;
-						CTS_start.requester = relay;
+						CTS_start.requesterRelay = relay;
 						CTS_start.time = sim.clock;
 						sim.eventQueue.Add(CTS_start);
 					}
