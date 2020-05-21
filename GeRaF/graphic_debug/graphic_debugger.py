@@ -1,24 +1,9 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as patch
 import json
-from os.path import expanduser as ex
-
 
 with open('debug.json') as f:
     data = json.load(f)
-
-
-class Sim_inst:
-
-    def __init__(self, data):
-
-        self.events = data['events']
-        self.finishedPackets = data['finishedPackets']
-        self.relays = {}
-
-        for item in data['relays']:
-            relay = Node(item)
-            self.relays[relay.id] = relay
 
 
 class Transmission:
@@ -30,7 +15,7 @@ class Transmission:
         self.destinationId = data['destinationId']
 
 
-class Node:
+class Relay:
     def __init__(self, data):
         self.id = data['id']
         self.X = data['X']
@@ -48,6 +33,7 @@ class Node:
         self.BusyWithId = data['BusyWithId']
         self.activeTransmissions = []
         self.finishedTransmissions = []
+        self.marker = None
 
         for item in data['activeTransmissions']:
             transmission = Transmission(item)
@@ -64,6 +50,7 @@ class Node:
 
 class Sim_plotter:
     dot_radius = 1.2
+    fig, ax = plt.subplots()
     relay_colors = {
         "asleep": '#aaaaaa',  # grey
         "awake": "#50bbaa",  # green
@@ -82,50 +69,71 @@ class Sim_plotter:
         "ACK": ''  # dark green
     }
 
+    annot = ax.annotate('aa', xy=(13, 13), xytext=(23, 13), color='black', weight='medium',
+                        ha='center', va='bottom', bbox=dict(boxstyle="round", fc="w"))
+    annot.set_visible(False)
+
+    def __init__(self, data):
+
+        self.events = data['events']
+        self.finishedPackets = data['finishedPackets']
+        self.relays = {}
+
+        for item in data['relays']:
+            relay = Relay(item)
+            self.relays[relay.id] = relay
+
+    def update_annot(self, relay, pos, ind):
+        self.annot.set_position((pos[0] + 2, pos[1] + 2))
+        self.annot.set_text(f'Id: {relay.id}')
+        self.annot.get_bbox_patch().set_alpha(0.4)
+
+    def onclick(self, event):
+        print('')
+
+    def hover(self, event):
+        vis = self.annot.get_visible()
+        if event.inaxes == self.ax:
+            for key in self.relays:
+                relay = self.relays[key]
+                marker = relay.marker
+                pos = (relay.X, relay.Y)
+                cont, ind = marker.contains(event)
+                if cont:
+                    self.update_annot(relay, pos, ind)
+                    self.annot.set_visible(True)
+                    self.fig.canvas.draw_idle()
+                else:
+                    if vis:
+                        self.annot.set_visible(False)
+                        self.fig.canvas.draw_idle()
+
     def plot_relay(self, relay):
         relay_pos = (relay.X, relay.Y)
-        relay_mark = plt.Circle(relay_pos, radius=self.dot_radius,
-                                facecolor=self.relay_colors["awake"] if not relay.status == 0 else self.relay_colors["asleep"], edgecolor='black')
-        plt.gca().add_patch(relay_mark)
+        relay_marker = plt.Circle(relay_pos, radius=self.dot_radius,
+                                  facecolor=self.relay_colors["awake"] if not relay.status == 0 else self.relay_colors["asleep"], edgecolor='black')
+        self.ax.add_patch(relay_marker)
+        relay.marker = relay_marker
 
     def plot_signal(self, relay, signal=None):
         relay_pos = (relay.X, relay.Y)
-        relay_range = plt.Circle(
-            relay_pos, radius=relay.range, facecolor="000000", alpha=0.03, edgecolor='black')
-        plt.gca().add_patch(relay_range)
+        if relay.status == 2:
+            relay_range = plt.Circle(
+                relay_pos, radius=relay.range, facecolor="000000", alpha=0.03, edgecolor='black')
+            self.ax.add_patch(relay_range)
 
-    def plot_inst(self, data_inst):
-        plt.axes()
+    def plot_inst(self):
+        for key in self.relays:
+            relay = self.relays[key]
+            self.plot_relay(relay)
+            self.plot_signal(relay)
 
-        for key in data_inst.relays:
-            self.plot_relay(data_inst.relays[key])
-            # self.plot_signal(data_inst.relays[key])
-
-    '''        
-    # REVIEW - TEST annotations
-    if (relay["packetToSend"]):  # print packet under relay
-        # plt.annotate("M"+ str(relay["packetToSend"]["Id"]), relay_pos, color='black', weight='bold', fontsize=14, ha='center', va='top')
-        plt.annotate(
-            "P" + str(relay["packetToSend"]["Id"]),
-            fontsize=9,
-            xy=(relay['X'], relay['Y'] - 1),
-            xytext=(relay['X'] + 1, relay['Y'] - 5),
-            xycoords='data',
-            textcoords='data',
-            arrowprops=dict(arrowstyle="->", facecolor='black'),
-        )
-    '''
-
-    plt.axis('equal')
-    plt.show()
-    plt.savefig('sim_instant0.png')  # can set dpi=x
+        self.fig.canvas.mpl_connect('motion_notify_event', self.hover)
+        self.fig.canvas.mpl_connect('button_press_event', self.onclick)
+        plt.axis('scaled')
+        plt.show()
+        plt.savefig('sim_instant0.png')  # can set dpi=x
 
 
-instant = Sim_inst(data[0])
-plotter = Sim_plotter()
-plotter.plot_inst(instant)
-
-'''
-for key in instant.relays:
-    instant.relays[key].print()
-'''
+plotter = Sim_plotter(data[32])
+plotter.plot_inst()
