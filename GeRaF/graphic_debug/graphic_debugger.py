@@ -123,22 +123,14 @@ class Plot:
 		Plot.frame_index = 5
 
 		# matplotlib
-		
 		Plot.fig = plt.figure()
 		Plot.ax = Plot.fig.add_subplot(1, 1, 1)
 
-		ev_id = Plot.fig.canvas.mpl_connect('key_press_event', Plot.KeyPress)
-		Plot.fig.canvas.mpl_connect('button_press_event', Plot.OnClick)
-
-		# plt.ion()
-		# plt.plot([1.6, 2.7])
-
-		plt.show()
-		# plt.ion()
+		Plot.fig.canvas.mpl_connect('key_press_event', Plot.KeyPress)
+		#Plot.fig.canvas.mpl_connect('button_press_event', Plot.OnClick)
 
 		Plot.plot()
-		#Plot.fig.canvas.mpl_disconnect(ev_id)
-
+		plt.show()
 
 	@staticmethod
 	def KeyPress(event):
@@ -164,6 +156,7 @@ class Plot:
 		frame_plotter = Frame_plotter(Plot.frames[Plot.frame_index])
 		frame_plotter.plot()
 		Plot.fig.canvas.draw()
+		#plt.savefig('sim_instant0.png')  # can set dpi=x
 
 	@staticmethod
 	def increaseIndex():
@@ -249,7 +242,6 @@ class Frame_plotter:
 		axes = plt.gca()
 		axes.set_xlim([-Plot.sim_params.range, Plot.sim_params.area_side + Plot.sim_params.range])
 		axes.set_ylim([-Plot.sim_params.range, Plot.sim_params.area_side + Plot.sim_params.range])
-		#plt.savefig('sim_instant0.png')  # can set dpi=x
 
 
 if __name__ == "__main__":
