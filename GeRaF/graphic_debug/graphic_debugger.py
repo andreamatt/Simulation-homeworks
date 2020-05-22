@@ -81,12 +81,11 @@ class Relay:
 			transmission = Transmission(item)
 			self.finishedTransmissions.append(transmission)
 
-		# plot related
-		self.marker = None
+	def __str__(self):
+		return f"{'{'}{self.id};({self.X} . {self.Y}); ACTIVE: {self.activeTransmissions}{'}'}"
 
-	def print(self):
-		print(f'ID: {self.id}')
-		print(f'X: {self.X}, Y: {self.Y}, Range: {self.range}')
+	def __repr__(self):
+		return str(self)
 
 
 class Plot:
@@ -118,6 +117,7 @@ class Plot:
 		Plot.protocol_params = ProtocolParameters(data["ProtocolParameters"])
 		Plot.sim_params = SimulationParameters(data["SimulationParameters"])
 		Plot.relay_details = {i: False for i in range(Plot.sim_params.n_nodes)}
+		Plot.relay_markers = {}
 		
 		Plot.frames = data["Frames"]
 		Plot.frame_index = 5
@@ -127,7 +127,7 @@ class Plot:
 		Plot.ax = Plot.fig.add_subplot(1, 1, 1)
 
 		Plot.fig.canvas.mpl_connect('key_press_event', Plot.KeyPress)
-		#Plot.fig.canvas.mpl_connect('button_press_event', Plot.OnClick)
+		Plot.fig.canvas.mpl_connect('button_press_event', Plot.OnClick)
 
 		Plot.plot()
 		plt.show()
@@ -144,10 +144,16 @@ class Plot:
 
 	@staticmethod
 	def OnClick(event):
-		#if (event.dbclick) :
+		if (event.button==1):
+			for r_id, marker in Plot.relay_markers.items():
+				if marker.contains(event)[0]:
+					Plot.relay_details[r_id] = not Plot.relay_details[r_id]
+					break
 		print('%s click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
 		('double' if event.dblclick else 'single', event.button,
 		event.x, event.y, event.xdata, event.ydata))
+
+		Plot.plot()
 
 	@staticmethod
 	def plot():
@@ -187,35 +193,15 @@ class Frame_plotter:
 			relay = Relay(item)
 			self.relays[relay.id] = relay
 
-	# def update_annot(self, relay, pos, ind):
-	# 	self.annot.set_position((pos[0] + 2, pos[1] + 2))
-	# 	self.annot.set_text(f'Id: {relay.id}')
-	# 	self.annot.get_bbox_patch().set_alpha(0.4)
-
-
-	# def hover(self, event):
-	# 	is_vis = self.annot.get_visible()
-	# 	if event.inaxes == self.ax:
-	# 		for key in self.relays:
-	# 			relay = self.relays[key]
-	# 			marker: patch.Circle = relay.marker
-	# 			pos = (relay.X, relay.Y)
-	# 			cont, ind = marker.contains(event)
-
-	# 			if cont:
-	# 				self.update_annot(relay, pos, ind)
-	# 				self.annot.set_visible(True)
-	# 				self.fig.canvas.draw_idle()
-	# 			else:
-	# 				if is_vis:
-	# 					self.annot.set_visible(False)
-	# 					self.fig.canvas.draw_idle()
 
 	def plot_relay(self, relay):
 		relay_pos = (relay.X, relay.Y)
 		relay_marker = plt.Circle(relay_pos, radius=Plot.dot_radius, facecolor=Plot.relay_colors[relay.status], edgecolor='black')
 		Plot.ax.add_patch(relay_marker)
-		relay.marker = relay_marker
+		Plot.relay_markers[relay.id] = relay_marker
+		
+		if Plot.relay_details[relay.id]:
+			Plot.ax.annotate(str(relay), xy=(13, 13), xytext=relay_pos, color='black', weight='medium', ha='center', va='bottom', bbox=dict(boxstyle="round", fc="w"))
 
 	def plot_signal(self, relay, signal=None):
 		relay_pos = (relay.X, relay.Y)
@@ -235,13 +221,29 @@ class Frame_plotter:
 	def plot(self):
 		for key in self.relays:
 			relay = self.relays[key]
-			self.plot_relay(relay)
 			self.plot_signal(relay)
+			self.plot_relay(relay)
 
 		plt.axis('equal')
 		axes = plt.gca()
 		axes.set_xlim([-Plot.sim_params.range, Plot.sim_params.area_side + Plot.sim_params.range])
 		axes.set_ylim([-Plot.sim_params.range, Plot.sim_params.area_side + Plot.sim_params.range])
+
+		self.plot_legend()
+
+	def plot_legend(self):
+		patches = []
+		for k,v in Plot.relay_colors.items():
+			p = patch.Patch(color=v, label=k)
+			patches.append(p)
+		legend1 = plt.legend(handles=patches, loc=2)
+
+		patches = []
+		for k,v in Plot.signal_colors.items():
+			p = patch.Patch(color=v, label=k)
+			patches.append(p)
+		plt.legend(handles=patches, loc=1)
+		Plot.ax.add_artist(legend1)
 
 
 if __name__ == "__main__":
