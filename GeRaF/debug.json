@@ -1,7 +1,7 @@
 {
   "SimulationParameters": {
     "max_time": 3.0,
-    "area_side": 30,
+    "area_side": 100,
     "range": 10.0,
     "n_nodes": 3,
     "packet_rate": 0.5,

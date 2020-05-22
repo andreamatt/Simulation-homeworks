@@ -87,6 +87,9 @@ class Relay:
 	def __repr__(self):
 		return str(self)
 
+	def details(self):
+		return f"{self.id}\nACTIVE: {self.activeTransmissions}"
+
 
 class Plot:
 	# style
@@ -120,7 +123,11 @@ class Plot:
 		Plot.relay_markers = {}
 		
 		Plot.frames = data["Frames"]
-		Plot.frame_index = 5
+		Plot.frame_index = 0
+
+		# zoom and drag
+		Plot.center = (Plot.sim_params.area_side/2, Plot.sim_params.area_side/2)
+		Plot.scale = 1
 
 		# matplotlib
 		Plot.fig = plt.figure()
@@ -128,19 +135,40 @@ class Plot:
 
 		Plot.fig.canvas.mpl_connect('key_press_event', Plot.KeyPress)
 		Plot.fig.canvas.mpl_connect('button_press_event', Plot.OnClick)
+		Plot.fig.canvas.mpl_connect('scroll_event', Plot.OnScroll)
+
 
 		Plot.plot()
 		plt.show()
 
 	@staticmethod
 	def KeyPress(event):
-		if(event.key=="right"):
+		if(event.key=="2"):
 			Plot.increaseIndex()
-			Plot.plot()
-		elif(event.key=="left"):
+		elif(event.key=="1"):
 			Plot.decreaseIndex()
-			Plot.plot()
-		
+		elif(event.key == "-"):
+			Plot.scale += 0.1
+		elif(event.key == "+"):
+			Plot.scale -= 0.1
+		elif(event.key == "up"):
+			Plot.center = (Plot.center[0], Plot.center[1] - 10)
+		elif(event.key == "left"):
+			Plot.center = (Plot.center[0] + 10, Plot.center[1])
+		elif(event.key == "down"):
+			Plot.center = (Plot.center[0], Plot.center[1] + 10)
+		elif(event.key == "right"):
+			Plot.center = (Plot.center[0] - 10, Plot.center[1])
+
+		Plot.plot()
+
+	@staticmethod
+	def OnScroll(event):
+		if (event.button  == "up"):
+			Plot.scale -= 0.1
+		elif (event.button  == "down"):
+			Plot.scale += 0.1
+		Plot.plot()	
 
 	@staticmethod
 	def OnClick(event):
@@ -201,7 +229,8 @@ class Frame_plotter:
 		Plot.relay_markers[relay.id] = relay_marker
 		
 		if Plot.relay_details[relay.id]:
-			Plot.ax.annotate(str(relay), xy=(13, 13), xytext=relay_pos, color='black', weight='medium', ha='center', va='bottom', bbox=dict(boxstyle="round", fc="w"))
+			Plot.ax.annotate(relay.details(), xy=(13, 13), xytext=relay_pos, color='black', weight='medium', ha='center', va='bottom', bbox=dict(boxstyle="round", fc="w"))
+			
 
 	def plot_signal(self, relay, signal=None):
 		relay_pos = (relay.X, relay.Y)
@@ -219,15 +248,20 @@ class Frame_plotter:
 		Plot.ax.add_patch(relay_range)
 
 	def plot(self):
-		for key in self.relays:
-			relay = self.relays[key]
-			self.plot_signal(relay)
-			self.plot_relay(relay)
+		min_x = Plot.center[0] - Plot.sim_params.area_side*Plot.scale - Plot.sim_params.range
+		max_x = Plot.center[0] + Plot.sim_params.area_side*Plot.scale + Plot.sim_params.range
+		min_y = Plot.center[1] - Plot.sim_params.area_side*Plot.scale - Plot.sim_params.range
+		max_y = Plot.center[1] + Plot.sim_params.area_side*Plot.scale + Plot.sim_params.range
+
+		for relay in self.relays.values():
+			if relay.X < max_x and relay.X > min_x and relay.Y < max_y and relay.Y > min_y:
+				self.plot_signal(relay)
+				self.plot_relay(relay)
 
 		plt.axis('equal')
 		axes = plt.gca()
-		axes.set_xlim([-Plot.sim_params.range, Plot.sim_params.area_side + Plot.sim_params.range])
-		axes.set_ylim([-Plot.sim_params.range, Plot.sim_params.area_side + Plot.sim_params.range])
+		axes.set_xlim([min_x, max_x])
+		axes.set_ylim([min_y, max_y])
 
 		self.plot_legend()
 
