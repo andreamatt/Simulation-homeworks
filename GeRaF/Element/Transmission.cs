@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace GeRaF
 {
+	[JsonConverter(typeof(EnumJsonConverter))]
 	enum TransmissionType
 	{
 		SINK_RTS,

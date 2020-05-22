@@ -69,6 +69,7 @@
     <Compile Include="Event\DebugStats\DebugStats.cs" />
     <Compile Include="Event\EventMain.cs" />
     <Compile Include="SimulationParameters.cs" />
+    <Compile Include="Utils\EnumJsonConverter.cs" />
     <Compile Include="Utils\EventQueue.cs" />
     <Compile Include="Event\Transmission\EventSinkRTS.cs" />
     <Compile Include="Element\Packet.cs" />

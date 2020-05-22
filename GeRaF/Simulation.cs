@@ -90,7 +90,10 @@ namespace GeRaF
 
 			// init debug state
 			debugWriter = new StreamWriter(simulationParameters.debug_file);
-			debugWriter.Write("[\n");
+			debugWriter.Write("{\n");
+			debugWriter.Write($"\"SimulationParameters\": {JsonConvert.SerializeObject(simulationParameters)},\n");
+			debugWriter.Write($"\"ProtocolParameters\": {JsonConvert.SerializeObject(protocolParameters)},\n");
+			debugWriter.Write($"\"Frames\": [\n");
 		}
 
 		public void Run() {
@@ -103,8 +106,16 @@ namespace GeRaF
 				e.Handle(this);
 			}
 
-			debugWriter.Write("\n]");
+			debugWriter.Write("\n]\n}");
 			debugWriter.Close();
+
+			dynamic allFile;
+			using (var reader = new StreamReader(simulationParameters.debug_file)) {
+				allFile = JsonConvert.DeserializeObject(reader.ReadToEnd());
+			}
+			using (var writer = new StreamWriter(simulationParameters.debug_file)) {
+				writer.Write(JsonConvert.SerializeObject(allFile, Formatting.Indented));
+			}
 		}
 	}
 }

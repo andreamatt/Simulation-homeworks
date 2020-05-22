@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace GeRaF
 {
+	[JsonConverter(typeof(EnumJsonConverter))]
 	public enum EventType
 	{
 		Start = 0,
