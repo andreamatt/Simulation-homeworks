@@ -81,6 +81,7 @@
     <Compile Include="Event\Transmission\EventRTS.cs" />
     <Compile Include="Simulation.cs" />
     <Compile Include="Element\Transmission.cs" />
+    <Compile Include="Utils\StringCompress.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

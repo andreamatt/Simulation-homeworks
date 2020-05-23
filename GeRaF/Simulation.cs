@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using GeRaF.Utils;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -110,12 +111,20 @@ namespace GeRaF
 			debugWriter.Write("\n]\n}");
 			debugWriter.Close();
 
+			Console.WriteLine("Rewriting");
+
 			dynamic allFile;
 			using (var reader = new StreamReader(simulationParameters.debug_file)) {
 				allFile = JsonConvert.DeserializeObject(reader.ReadToEnd());
 			}
+			var formatted = JsonConvert.SerializeObject(allFile, Formatting.Indented);
 			using (var writer = new StreamWriter(simulationParameters.debug_file)) {
-				writer.Write(JsonConvert.SerializeObject(allFile, Formatting.Indented));
+				writer.Write(formatted);
+			}
+
+			Console.WriteLine("Compressing");
+			using (var writer = new StreamWriter(simulationParameters.debug_file_compressed)) {
+				writer.Write(StringCompress.Compress(formatted));
 			}
 		}
 	}

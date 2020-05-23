@@ -16,5 +16,6 @@ namespace GeRaF
 		public double debug_interval;
 		public bool debug_always;
 		public string debug_file;
+		public string debug_file_compressed;
 	}
 }

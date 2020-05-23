@@ -16,6 +16,7 @@ namespace GeRaF
 				debug_interval = 0.1,
 				debug_always = true,
 				debug_file = "../../debug.json",
+				debug_file_compressed = "../../debug_compressed.bin",
 				max_time = 20,
 				n_nodes = 30,
 				packet_rate = 0.5,
