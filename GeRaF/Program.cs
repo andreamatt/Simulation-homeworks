@@ -16,10 +16,10 @@ namespace GeRaF
 				debug_interval = 0.1,
 				debug_always = true,
 				debug_file = "../../debug.json",
-				max_time = 3,
-				n_nodes = 3,
+				max_time = 20,
+				n_nodes = 30,
 				packet_rate = 0.5,
-				range = 1000
+				range = 10
 			};
 			var sim = new Simulation(sp, pp);
 			sim.Run();
