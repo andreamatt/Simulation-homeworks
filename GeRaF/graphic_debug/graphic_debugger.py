@@ -1,9 +1,18 @@
+import shapely.geometry as sg
 import matplotlib.pyplot as plt
+import descartes
 import matplotlib.patches as patch
 import json
+from enum import Enum
+import time
 
 
-
+class info_modality(Enum):
+	off = 0
+	active_transmissions = 1
+	finished_transmissions = 2
+	packet_info = 3
+	
 
 class SimulationParameters:
 
@@ -46,6 +55,7 @@ class Transmission:
 		self.id = data['Id']
 		self.sourceId = data['sourceId']
 		self.destinationId = data['destinationId']
+		self.actualDestination = data['actualDestination']
 
 	def __str__(self):
 		return f"{'{'}{self.Type};{self.failed};{self.id};S_{self.sourceId};D_{self.destinationId}{'}'}"
@@ -53,6 +63,19 @@ class Transmission:
 	def __repr__(self):
 		return str(self)
 
+class Packet:
+	def __init__(self, data):
+		self.generationTime = data['generationTime']
+		self.Id = data['Id']
+		self.startRelayId = data['startRelayId']
+		self.sinkId = data['sinkId']
+		self.Result = data['Result']
+
+	def __str__(self) -> str:
+		return f"{'{'}{self.Id};SINK_{self.sinkId};{self.Result}{'}'}"
+
+	def __repr__(self) -> str:
+		return str(self)
 
 class Relay:
 
@@ -70,10 +93,11 @@ class Relay:
 		self.isSensing = data['isSensing']
 		self.hasSensed = data['hasSensed']
 		self.neighboursIds = data['neighboursIds']
-		self.packetToSendId = data['packetToSendId']
 		self.BusyWithId = data['BusyWithId']
 		self.activeTransmissions = []
 		self.finishedTransmissions = []
+		self.packetToSend = None if data['packetToSend']==None else Packet(data['packetToSend'])
+		self.regionIndex = data['regionIndex']
 
 		for item in data['activeTransmissions']:
 			transmission = Transmission(item)
@@ -89,9 +113,14 @@ class Relay:
 	def __repr__(self):
 		return str(self)
 
-	def details(self):
-		return f"{self.id}\nACTIVE: {self.activeTransmissions}"
-
+	def details(self, modality):
+		if modality == info_modality.active_transmissions.value:
+			return f"ACTIVE: {self.activeTransmissions}"
+		if modality == info_modality.finished_transmissions.value:
+			return f"FINISHED: {self.finishedTransmissions}"
+		if modality == info_modality.packet_info.value:
+			return f"PACKET: {self.packetToSend}"
+		
 
 class Plot:
 	# style
@@ -121,9 +150,10 @@ class Plot:
 	def Init(data):
 		Plot.protocol_params = ProtocolParameters(data["ProtocolParameters"])
 		Plot.sim_params = SimulationParameters(data["SimulationParameters"])
-		Plot.relay_details = {i: False for i in range(Plot.sim_params.n_nodes)}
+		Plot.Distances = data['Distances']
+		Plot.relay_details = {i: 0 for i in range(Plot.sim_params.n_nodes)}
 		Plot.relay_markers = {}
-		
+		Plot.show_Ids = False
 		Plot.frames = data["Frames"]
 		Plot.frame_index = 0
 
@@ -132,6 +162,7 @@ class Plot:
 		Plot.scale = 1
 
 		# matplotlib
+		Plot.last_time = 0
 		Plot.fig = plt.figure()
 		Plot.ax = Plot.fig.add_subplot(1, 1, 1)
 
@@ -152,24 +183,26 @@ class Plot:
 		elif(event.key == "-"):
 			Plot.scale += 0.1
 		elif(event.key == "+"):
-			Plot.scale -= 0.1
-		elif(event.key == "up"):
-			Plot.center = (Plot.center[0], Plot.center[1] - 10)
-		elif(event.key == "left"):
-			Plot.center = (Plot.center[0] + 10, Plot.center[1])
+			Plot.scale = max((0.01, Plot.scale-0.1))
 		elif(event.key == "down"):
-			Plot.center = (Plot.center[0], Plot.center[1] + 10)
+			Plot.center = (Plot.center[0], Plot.center[1] - 10)
 		elif(event.key == "right"):
+			Plot.center = (Plot.center[0] + 10, Plot.center[1])
+		elif(event.key == "up"):
+			Plot.center = (Plot.center[0], Plot.center[1] + 10)
+		elif(event.key == "left"):
 			Plot.center = (Plot.center[0] - 10, Plot.center[1])
+		elif(event.key == "i"):
+			Plot.show_Ids = not Plot.show_Ids
 
 		Plot.plot()
 
 	@staticmethod
 	def OnScroll(event):
 		if (event.button  == "up"):
-			Plot.scale -= 0.1
+			Plot.scale = max((0.01, Plot.scale-0.05))
 		elif (event.button  == "down"):
-			Plot.scale += 0.1
+			Plot.scale += 0.05
 		Plot.plot()	
 
 	@staticmethod
@@ -177,7 +210,7 @@ class Plot:
 		if (event.button==1):
 			for r_id, marker in Plot.relay_markers.items():
 				if marker.contains(event)[0]:
-					Plot.relay_details[r_id] = not Plot.relay_details[r_id]
+					Plot.relay_details[r_id] = 0 if Plot.relay_details[r_id] == 3 else Plot.relay_details[r_id] + 1
 					break
 		print('%s click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
 		('double' if event.dblclick else 'single', event.button,
@@ -187,11 +220,13 @@ class Plot:
 
 	@staticmethod
 	def plot():
+		time_before_draw = time.time()
 		Plot.fig.clf()
 		Plot.ax = Plot.fig.add_subplot(1, 1, 1)
 		frame_plotter = Frame_plotter(Plot.frames[Plot.frame_index])
 		frame_plotter.plot()
 		Plot.fig.canvas.draw()
+		Plot.last_time = time.time() - time_before_draw
 		#plt.savefig('sim_instant0.png')  # can set dpi=x
 
 	@staticmethod
@@ -226,21 +261,30 @@ class Frame_plotter:
 
 	def plot_relay(self, relay):
 		relay_pos = (relay.X, relay.Y)
+		text_pos = (relay.X, relay.Y + 2)
 		relay_marker = plt.Circle(relay_pos, radius=Plot.dot_radius, facecolor=Plot.relay_colors[relay.status], edgecolor='black')
 		Plot.ax.add_patch(relay_marker)
 		Plot.relay_markers[relay.id] = relay_marker
 		
-		if Plot.relay_details[relay.id]:
-			Plot.ax.annotate(relay.details(), xy=(13, 13), xytext=relay_pos, color='black', weight='medium', ha='center', va='bottom', bbox=dict(boxstyle="round", fc="w"))		
+		if Plot.show_Ids:
+			Plot.ax.annotate(relay.id, xy=relay_pos, xytext=text_pos, color='black', weight='medium', ha='center', va='bottom', bbox=dict(boxstyle="round", fc="w"))
+
+
+		modality = Plot.relay_details[relay.id]
 			
+		if modality != info_modality.off.value:
+			Plot.ax.annotate(relay.details(modality), xy=relay_pos, xytext=text_pos, color='black', weight='medium', ha='center', va='bottom', bbox=dict(boxstyle="round", fc="w"))		
+			if modality == info_modality.packet_info.value and relay.packetToSend != None:
+				packet = relay.packetToSend
+				sink = self.relays[packet.sinkId]
+				Plot.ax.arrow(relay.X, relay.Y, sink.X - relay.X, sink.Y - relay.Y, length_includes_head=True, head_width=2, head_length=3, capstyle="butt", ls="-")
+	
+	
 
 	def plot_arrow(self, relay):
 		if relay.status == "Transmitting":
 			for transmission in relay.activeTransmissions:
-				if transmission.Type == 'PKT':
-					
-					# FIXME - debug current event too
-
+				if transmission.Type == 'PKT' and transmission.actualDestination:
 					relay_dest_id = transmission.destinationId
 					destination = self.relays[relay_dest_id]
 					Plot.ax.arrow(relay.X, relay.Y, destination.X - relay.X, destination.Y - relay.Y, length_includes_head=True, head_width=2, head_length=3, capstyle="butt", ls="--")
@@ -248,17 +292,49 @@ class Frame_plotter:
 	def plot_signal(self, relay, signal=None):
 		relay_pos = (relay.X, relay.Y)
 
-		#if relay.status == 2: # status is a string
-		#print(relay.activeTransmissions)
-		color = "#000000"
 		transmissions = tuple(t for t in relay.activeTransmissions if t.sourceId==relay.id)
-
-		#print(relay.id, ":", transmissions)
 		if len(transmissions) != 0:
 			color = Plot.signal_colors[transmissions[0].Type]
+			alpha=0.15
+			relay_range = plt.Circle(relay_pos, radius=relay.range, facecolor=color, alpha=alpha, edgecolor='black')
+			Plot.ax.add_patch(relay_range)
 
-		relay_range = plt.Circle(relay_pos, radius=relay.range, facecolor=color, alpha=0.15, edgecolor='black')
-		Plot.ax.add_patch(relay_range)
+	def plot_regions(self, relay):
+		if relay.status == "Transmitting":
+			plot_regions=False
+			for transmission in relay.activeTransmissions:
+				if transmission.Type == 'RTS' and transmission.sourceId==relay.id:
+					plot_regions=True
+					break
+			if plot_regions:
+				regions = Plot.protocol_params.n_regions
+				region_index = relay.regionIndex
+				sink = self.relays[relay.packetToSend.sinkId]
+				# create the circles with shapely
+				dist = Plot.Distances[str(relay.id)][str(sink.id)]
+				a = sg.Point(sink.X,sink.Y).buffer(dist)
+				b = sg.Point(relay.X,relay.Y).buffer(relay.range)
+				starting = a.intersection(b)
+				for i in range(1, regions+1):
+					a = sg.Point(sink.X,sink.Y).buffer(dist - i/regions * relay.range)
+					diff = starting.difference(a)
+					if region_index==regions-i:
+						Plot.ax.add_patch(descartes.PolygonPatch(diff, fc='#00ff00', ec='k', alpha=0.15))
+					else:
+						Plot.ax.add_patch(descartes.PolygonPatch(diff, fc='#000000', ec='k', alpha=0.10))
+					starting = starting.intersection(a)
+
+
+				# compute the 3 parts
+				# middle = a.intersection(b)
+				# middle_2 = middle.intersection(a_1)
+
+				# use descartes to create the matplotlib patches
+				# Plot.ax.add_patch(descartes.PolygonPatch(middle, fc='#000000', ec='k', fill=None))
+				# Plot.ax.add_patch(descartes.PolygonPatch(starting, fc='#00ff00', ec='k', alpha=0.15))
+				
+				
+				
 
 	def plot(self):
 		min_x = Plot.center[0] - Plot.sim_params.area_side*Plot.scale - Plot.sim_params.range
@@ -268,32 +344,47 @@ class Frame_plotter:
 
 		Plot.ax.add_patch(plt.Rectangle((0, 0), Plot.sim_params.area_side, Plot.sim_params.area_side, fill=None, alpha=1))
 		for relay in self.relays.values():
-			if relay.X < max_x and relay.X > min_x and relay.Y < max_y and relay.Y > min_y:
-				self.plot_arrow(relay)
-				self.plot_signal(relay)
-				self.plot_relay(relay)
+			#if relay.X < max_x and relay.X > min_x and relay.Y < max_y and relay.Y > min_y:
+			self.plot_arrow(relay)
+			self.plot_signal(relay)
+			self.plot_relay(relay)
+			self.plot_regions(relay)
 
-		plt.axis('equal')
+
 		axes = plt.gca()
+		plt.axis('scaled')
 		axes.set_xlim([min_x, max_x])
 		axes.set_ylim([min_y, max_y])
+		
+		self.plot_legend(min_x, min_y)
 
-		self.plot_legend()
-
-	def plot_legend(self):
+	def plot_legend(self, min_x, min_y):
 		patches = []
 		for k,v in Plot.relay_colors.items():
 			p = patch.Patch(color=v, label=k)
 			patches.append(p)
-		legend1 = plt.legend(handles=patches, loc=2)
+		legend_relays = plt.legend(handles=patches, loc=2)
 
+
+		patches = [
+			patch.Patch(label=f"Time: {self.time: 5g}"),
+			patch.Patch(label=f"Frame: {Plot.frame_index}"),
+			patch.Patch(label=f"Show IDs: {Plot.show_Ids}"),
+			patch.Patch(label=f"Plot time: {Plot.last_time: 3g}")
+		]
+		legend_status = plt.legend(handles=patches, loc=3, handlelength=0, handletextpad=0)
+
+		
 		patches = []
 		for k,v in Plot.signal_colors.items():
 			p = patch.Patch(color=v, label=k)
 			patches.append(p)
 		plt.legend(handles=patches, loc=1)
-		Plot.ax.add_artist(legend1)
 
+		Plot.ax.add_artist(legend_relays)
+		Plot.ax.add_artist(legend_status)	
+			
+		
 
 if __name__ == "__main__":	 
 	with open('debug.json') as f:

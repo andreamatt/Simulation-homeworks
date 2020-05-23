@@ -15,7 +15,7 @@ namespace GeRaF
 		public override void Handle(Simulation sim) {
 			relay.status = RelayStatus.Transmitting;
 
-			var transmissions = sendTransmissions(TransmissionType.CTS);
+			var transmissions = sendTransmissions(TransmissionType.CTS, requesterRelay);
 
 			// schedule CTS_end
 			var end = new EndCTSEvent();

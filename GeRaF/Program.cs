@@ -17,9 +17,9 @@ namespace GeRaF
 				debug_always = true,
 				debug_file = "../../debug.json",
 				debug_file_compressed = "../../debug.7z",
-				max_time = 20,
-				n_nodes = 30,
-				packet_rate = 0.5,
+				max_time = 5,
+				n_nodes = 100,
+				packet_rate = 10,
 				range = 20
 			};
 			var sim = new Simulation(sp, pp);

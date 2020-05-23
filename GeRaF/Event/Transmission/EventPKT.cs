@@ -16,7 +16,7 @@ namespace GeRaF
 		public override void Handle(Simulation sim) {
 			relay.status = RelayStatus.Transmitting;
 
-			var transmissions = sendTransmissions(TransmissionType.PKT);
+			var transmissions = sendTransmissions(TransmissionType.PKT, chosenRelay);
 			// put other interested relays (not chosen) to sleep
 			// schedule PKT_end
 			var PKT_end = new EndPKTEvent();

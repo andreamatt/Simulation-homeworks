@@ -94,6 +94,7 @@ namespace GeRaF
 			debugWriter.Write("{\n");
 			debugWriter.Write($"\"SimulationParameters\": {JsonConvert.SerializeObject(simulationParameters)},\n");
 			debugWriter.Write($"\"ProtocolParameters\": {JsonConvert.SerializeObject(protocolParameters)},\n");
+			debugWriter.Write($"\"Distances\": {JsonConvert.SerializeObject(distances)},\n");
 			debugWriter.Write($"\"Frames\": [\n");
 		}
 
@@ -110,18 +111,19 @@ namespace GeRaF
 			debugWriter.Write("\n]\n}");
 			debugWriter.Close();
 
-			Console.WriteLine("Rewriting");
+			//Console.WriteLine("Rewriting");
 
-			dynamic allFile;
-			using (var reader = new StreamReader(simulationParameters.debug_file)) {
-				allFile = JsonConvert.DeserializeObject(reader.ReadToEnd());
-			}
-			var formatted = JsonConvert.SerializeObject(allFile, Formatting.Indented);
-			using (var writer = new StreamWriter(simulationParameters.debug_file)) {
-				writer.Write(formatted);
-			}
+			//dynamic allFile;
+			//using (var reader = new StreamReader(simulationParameters.debug_file)) {
+			//	allFile = JsonConvert.DeserializeObject(reader.ReadToEnd());
+			//}
 
-			Console.WriteLine("Compressing");
+			//var formatted = JsonConvert.SerializeObject(allFile, Formatting.Indented);
+			//using (var writer = new StreamWriter(simulationParameters.debug_file)) {
+			//	writer.Write(formatted);
+			//}
+
+			//Console.WriteLine("Compressing");
 			//using (var writer = new StreamWriter(simulationParameters.debug_file_compressed)) {
 			//	writer.Write(StringCompress.Compress(formatted));
 			//}

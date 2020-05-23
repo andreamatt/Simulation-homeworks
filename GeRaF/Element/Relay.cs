@@ -33,9 +33,9 @@ namespace GeRaF
 
 		public RelayStatus status = RelayStatus.Free;
 
-		[JsonIgnore]
+		//[JsonIgnore]
 		public Packet packetToSend = null;
-		public int packetToSendId => packetToSend == null ? -1 : packetToSend.Id;
+		//public int packetToSendId => packetToSend == null ? -1 : packetToSend.Id;
 
 		public HashSet<Transmission> activeTransmissions = new HashSet<Transmission>();
 		public HashSet<Transmission> finishedTransmissions = new HashSet<Transmission>();

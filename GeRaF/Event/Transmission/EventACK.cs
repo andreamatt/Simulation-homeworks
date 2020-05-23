@@ -15,7 +15,7 @@ namespace GeRaF
 		public override void Handle(Simulation sim) {
 			relay.status = RelayStatus.Transmitting;
 
-			var transmissions = sendTransmissions(TransmissionType.ACK);
+			var transmissions = sendTransmissions(TransmissionType.ACK, senderRelay);
 			// schedule ACK_end
 			var ACK_end = new EndACKEvent();
 			ACK_end.time = sim.clock + sim.protocolParameters.t_signal;

@@ -37,6 +37,7 @@ namespace GeRaF
 
 		public TransmissionType transmissionType;
 		public bool failed;
+		public bool actualDestination;
 
 		public Transmission() {
 			_id = max_id;

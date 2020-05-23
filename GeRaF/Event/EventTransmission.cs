@@ -12,7 +12,7 @@ namespace GeRaF
 		[JsonIgnore]
 		public Relay relay;
 		public int relayId => relay.id;
-		protected List<Transmission> sendTransmissions(TransmissionType type) {
+		protected List<Transmission> sendTransmissions(TransmissionType type, Relay actualDestination = null) {
 			// trigger sensing
 			foreach (var n in relay.neighbours) {
 				if (n.status == RelayStatus.Sensing) {
@@ -30,6 +30,9 @@ namespace GeRaF
 					t.source = relay;
 					t.destination = n;
 					t.transmissionType = type;
+					if (n == actualDestination) {
+						t.actualDestination = true;
+					}
 					if (n.activeTransmissions.Count > 0) {
 						// set other active transmissions to failed
 						foreach (var active_t in n.activeTransmissions) {

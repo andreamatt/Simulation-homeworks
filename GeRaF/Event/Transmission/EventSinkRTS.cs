@@ -11,7 +11,7 @@ namespace GeRaF
 		public override void Handle(Simulation sim) {
 			relay.status = RelayStatus.Transmitting;
 
-			var transmissions = sendTransmissions(TransmissionType.SINK_RTS);
+			var transmissions = sendTransmissions(TransmissionType.SINK_RTS, relay.packetToSend.sink);
 
 			// schedule SINK_RTS_end
 			var end = new EndSINKRTSEvent();
