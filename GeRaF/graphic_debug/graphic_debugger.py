@@ -3,6 +3,8 @@ import matplotlib.patches as patch
 import json
 
 
+
+
 class SimulationParameters:
 
 	def __init__(self, data):
@@ -97,22 +99,22 @@ class Plot:
 	# annot = ax.annotate('aa', xy=(13, 13), xytext=(23, 13), color='black', weight='medium', ha='center', va='bottom', bbox=dict(boxstyle="round", fc="w"))
 	# annot.set_visible(False)
 	relay_colors = {
-	    "Asleep": '#aaaaaa',  # grey
-	    "Free": "#50bbaa",  # green
-	    "Transmitting": 'blue',
-	    "Sensing": '#3399ff',  # lightblue
-	    "Awaiting_Signal": 'yellow',
-	    "Backoff_Sensing": 'red',
-	    "Backoff_CTS": '#ff9900'  # orange
+		"Asleep": '#aaaaaa',  # grey
+		"Free": "#50bbaa",  # green
+		"Transmitting": 'blue',
+		"Sensing": '#3399ff',  # lightblue
+		"Awaiting_Signal": 'yellow',
+		"Backoff_Sensing": 'red',
+		"Backoff_CTS": '#ff9900'  # orange
 	}
 
 	signal_colors = {
-	    "SINK_RTS": '#7bd1e2',  # lightblue
-	    "RTS": 'blue',
-	    "CTS": '#66ff66',  # light green
-	    "PKT": '#ff00ff',  # fucsia
-	    "COL": 'red',
-	    "ACK": '#009933'  # dark green
+		"SINK_RTS": '#7bd1e2',  # lightblue
+		"RTS": 'blue',
+		"CTS": '#66ff66',  # light green
+		"PKT": '#ff00ff',  # fucsia
+		"COL": 'red',
+		"ACK": '#009933'  # dark green
 	}
 
 	@staticmethod
@@ -194,7 +196,7 @@ class Plot:
 
 	@staticmethod
 	def increaseIndex():
-		print(Plot.sim_params.n_nodes)
+		#print(Plot.sim_params.n_nodes)
 		if Plot.frame_index < len(Plot.frames)-1:
 			Plot.frame_index += 1
 		else:
@@ -229,18 +231,29 @@ class Frame_plotter:
 		Plot.relay_markers[relay.id] = relay_marker
 		
 		if Plot.relay_details[relay.id]:
-			Plot.ax.annotate(relay.details(), xy=(13, 13), xytext=relay_pos, color='black', weight='medium', ha='center', va='bottom', bbox=dict(boxstyle="round", fc="w"))
+			Plot.ax.annotate(relay.details(), xy=(13, 13), xytext=relay_pos, color='black', weight='medium', ha='center', va='bottom', bbox=dict(boxstyle="round", fc="w"))		
 			
+
+	def plot_arrow(self, relay):
+		if relay.status == "Transmitting":
+			for transmission in relay.activeTransmissions:
+				if transmission.Type == 'PKT':
+					
+					# FIXME - debug current event too
+
+					relay_dest_id = transmission.destinationId
+					destination = self.relays[relay_dest_id]
+					Plot.ax.arrow(relay.X, relay.Y, destination.X - relay.X, destination.Y - relay.Y, length_includes_head=True, head_width=2, head_length=3, capstyle="butt", ls="--")
 
 	def plot_signal(self, relay, signal=None):
 		relay_pos = (relay.X, relay.Y)
 
 		#if relay.status == 2: # status is a string
-		print(relay.activeTransmissions)
+		#print(relay.activeTransmissions)
 		color = "#000000"
 		transmissions = tuple(t for t in relay.activeTransmissions if t.sourceId==relay.id)
 
-		print(relay.id, ":", transmissions)
+		#print(relay.id, ":", transmissions)
 		if len(transmissions) != 0:
 			color = Plot.signal_colors[transmissions[0].Type]
 
@@ -253,8 +266,10 @@ class Frame_plotter:
 		min_y = Plot.center[1] - Plot.sim_params.area_side*Plot.scale - Plot.sim_params.range
 		max_y = Plot.center[1] + Plot.sim_params.area_side*Plot.scale + Plot.sim_params.range
 
+		Plot.ax.add_patch(plt.Rectangle((0, 0), Plot.sim_params.area_side, Plot.sim_params.area_side, fill=None, alpha=1))
 		for relay in self.relays.values():
 			if relay.X < max_x and relay.X > min_x and relay.Y < max_y and relay.Y > min_y:
+				self.plot_arrow(relay)
 				self.plot_signal(relay)
 				self.plot_relay(relay)
 
@@ -280,7 +295,7 @@ class Frame_plotter:
 		Plot.ax.add_artist(legend1)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":	 
 	with open('debug.json') as f:
 		data = json.load(f)
 		Plot.Init(data)
