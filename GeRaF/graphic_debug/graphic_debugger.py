@@ -170,7 +170,7 @@ class Plot:
 		Plot.fig.canvas.mpl_connect('button_press_event', Plot.OnClick)
 		Plot.fig.canvas.mpl_connect('scroll_event', Plot.OnScroll)
 
-
+		Plot.background = None
 		Plot.plot()
 		plt.show()
 
@@ -222,11 +222,15 @@ class Plot:
 	def plot():
 		time_before_draw = time.time()
 		Plot.fig.clf()
+		if Plot.background!=None:
+			Plot.fig.canvas.restore_region(Plot.background)
 		Plot.ax = Plot.fig.add_subplot(1, 1, 1)
 		frame_plotter = Frame_plotter(Plot.frames[Plot.frame_index])
 		frame_plotter.plot()
 		Plot.fig.canvas.draw()
 		Plot.last_time = time.time() - time_before_draw
+		if Plot.background==None:
+			Plot.background = Plot.fig.canvas.copy_from_bbox(Plot.ax.bbox)
 		#plt.savefig('sim_instant0.png')  # can set dpi=x
 
 	@staticmethod

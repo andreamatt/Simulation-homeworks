@@ -73,6 +73,9 @@ namespace GeRaF
 			// dump debugstats to file
 			// clear event queue
 			sim.eventQueue.Clear();
+
+			DebugEvent.DebugNow(sim, true);
+
 			return;
 		}
 	}

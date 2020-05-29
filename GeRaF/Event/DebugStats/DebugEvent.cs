@@ -10,7 +10,7 @@ namespace GeRaF
 	class DebugEvent : Event
 	{
 		public override void Handle(Simulation sim) {
-			DebugNow(sim);
+			DebugNow(sim, false);
 
 			// schedule next debug
 			var dbgEvent = new DebugEvent();
@@ -18,14 +18,17 @@ namespace GeRaF
 			sim.eventQueue.Add(dbgEvent);
 		}
 
-		public static void DebugNow(Simulation sim) {
+		public static void DebugNow(Simulation sim, bool ending) {
 			// dump simulation to file
 			var stats = new DebugStats() {
 				time = sim.clock,
 				events = sim.eventQueue.ToList(),
-				relays = sim.relays,
-				finishedPackets = sim.finishedPackets
+				relays = sim.relays
 			};
+
+			if (ending) {
+				stats.finishedPackets = sim.finishedPackets;
+			}
 
 			var stats_to_string = JsonConvert.SerializeObject(stats, Formatting.Indented);
 			if (DebugStats.first) {

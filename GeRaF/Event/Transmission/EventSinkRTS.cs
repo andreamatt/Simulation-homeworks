@@ -44,11 +44,11 @@ namespace GeRaF
 			}
 
 			// schedule COL_check
-			var COL_check = new CheckSINKCOLEvent();
-			COL_check.relay = relay;
+			var sink_COL_check = new CheckSINKCOLEvent();
+			sink_COL_check.relay = relay;
 			// time + CTS_time + time delta to make sure CTS events come before COL check
-			COL_check.time = sim.clock + sim.protocolParameters.t_signal + sim.protocolParameters.t_delta;
-			sim.eventQueue.Add(COL_check);
+			sink_COL_check.time = sim.clock + sim.protocolParameters.t_signal + sim.protocolParameters.t_delta;
+			sim.eventQueue.Add(sink_COL_check);
 		}
 	}
 }

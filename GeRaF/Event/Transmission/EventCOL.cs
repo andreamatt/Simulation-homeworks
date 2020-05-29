@@ -47,10 +47,18 @@ namespace GeRaF
 			}
 
 			// schedule COL_check
-			var COL_check = new CheckCOLEvent();
-			COL_check.time = sim.clock + backoffSize + sim.protocolParameters.t_signal + sim.protocolParameters.t_delta;
-			COL_check.relay = relay;
-			sim.eventQueue.Add(COL_check);
+			if (relay.neighbours.Contains(relay.packetToSend.sink)) {
+				var sink_COL_check = new CheckSINKCOLEvent();
+				sink_COL_check.relay = relay;
+				sink_COL_check.time = sim.clock + sim.protocolParameters.t_signal + sim.protocolParameters.t_delta;
+				sim.eventQueue.Add(sink_COL_check);
+			}
+			else {
+				var COL_check = new CheckCOLEvent();
+				COL_check.time = sim.clock + backoffSize + sim.protocolParameters.t_signal + sim.protocolParameters.t_delta;
+				COL_check.relay = relay;
+				sim.eventQueue.Add(COL_check);
+			}
 		}
 	}
 }

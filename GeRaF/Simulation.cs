@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using GeRaF.Utils;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,61 +32,40 @@ namespace GeRaF
 			this.protocolParameters = protocolParameters;
 
 			// init relays
-			//relays = new List<Relay>(){
-			//	new Relay(){
-			//		id = 0,
-			//		X = 10,
-			//		Y = 10,
-			//		range = 11,
-			//		status = RelayStatus.Free
-			//	},
-			//	new Relay(){
-			//		id = 1,
-			//		X = 20,
-			//		Y = 10,
-			//		range = 11,
-			//		status = RelayStatus.Free
-			//	},
-			//	new Relay(){
-			//		id = 2,
-			//		X = 30,
-			//		Y = 10,
-			//		range = 11,
-			//		status = RelayStatus.Free
-			//	}
-			//};
 			relays = new List<Relay>();
+			// generate first batch
 			for (int i = 0; i < simulationParameters.n_nodes; i++) {
 				var relay = new Relay();
 				relay.id = i;
-				relay.X = RNG.rand() * simulationParameters.area_side;
-				relay.Y = RNG.rand() * simulationParameters.area_side;
 				relay.range = simulationParameters.range;
 				relay.status = RelayStatus.Free;
 				relays.Add(relay);
 			}
 
-			// calculate distances and neighbours
-			distances = new Dictionary<int, Dictionary<int, double>>();
-			foreach (var r1 in relays) {
-				distances[r1.id] = new Dictionary<int, double>();
-				foreach (var r2 in relays) {
-					if (r1 != r2) {
-						var dist = Math.Sqrt(Math.Pow(r1.X - r2.X, 2) + Math.Pow(r1.Y - r2.Y, 2));
-						if (dist < r1.range) {
-							r1.neighbours.Add(r2);
-						}
-						distances[r1.id][r2.id] = dist;
-					}
+			// move disconnected
+			Console.WriteLine("Placing relays");
+			var connected = false;
+			while (!connected) {
+				foreach (var relay in relays) {
+					relay.X = RNG.rand() * simulationParameters.area_side;
+					relay.Y = RNG.rand() * simulationParameters.area_side;
 				}
+
+				// calculate new neighbours
+				distances = GraphUtils.Distances(relays);
+				GraphUtils.SetNeighbours(relays, distances);
+				connected = GraphUtils.Connected(relays);
 			}
+			Console.WriteLine("Placed relays");
 
 			// init sim state
 			clock = 0;
 			eventQueue = new EventQueue();
 			eventQueue.Add(new StartEvent());
-			if (simulationParameters.debug_always == false) {
-				eventQueue.Add(new DebugEvent());
+			if (simulationParameters.debugType == DebugType.Interval) {
+				eventQueue.Add(new DebugEvent() {
+					time = simulationParameters.debug_interval
+				});
 			}
 			eventQueue.Add(new EndEvent(simulationParameters.max_time));
 
@@ -100,13 +80,25 @@ namespace GeRaF
 
 		public void Run() {
 			while (eventQueue.isEmpty == false) {
-				if (simulationParameters.debug_always) {
-					DebugEvent.DebugNow(this);
+				if (simulationParameters.debugType == DebugType.Always) {
+					DebugEvent.DebugNow(this, false);
 				}
 				var e = eventQueue.Pop();
 				this.clock = e.time;
 				e.Handle(this);
 			}
+
+			// stats
+			Console.WriteLine($"Number of packets: {finishedPackets.Count}");
+			var tot = (float)finishedPackets.Count;
+			var success = finishedPackets.Count(p => p.Result == Result.Success);
+			var channel_busy = finishedPackets.Count(p => p.Result == Result.Abort_channel_busy);
+			var max_attempts = finishedPackets.Count(p => p.Result == Result.Abort_max_attempts);
+			var no_start = finishedPackets.Count(p => p.Result == Result.No_start_relays);
+			Console.WriteLine($"Number of packets success: {success}, {success / tot * 100:F3}%");
+			Console.WriteLine($"Number of packets channel_busy: {channel_busy}, {channel_busy / tot * 100:F3}%");
+			Console.WriteLine($"Number of packets max_attempts: {max_attempts}, {max_attempts / tot * 100:F3}%");
+			Console.WriteLine($"Number of packets start_relays: {no_start}, {no_start / tot * 100:F3}%");
 
 			debugWriter.Write("\n]\n}");
 			debugWriter.Close();

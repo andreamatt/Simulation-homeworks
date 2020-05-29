@@ -8,7 +8,7 @@ namespace GeRaF
 {
 	static class RNG
 	{
-		static private Random random = new Random();
+		static private Random random = new Random((int)DateTime.Now.Ticks);
 		static public double rand() {
 			return random.NextDouble();
 		}

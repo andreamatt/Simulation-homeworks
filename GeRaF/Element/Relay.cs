@@ -28,7 +28,7 @@ namespace GeRaF
 		public double range = -1;
 
 		[JsonIgnore]
-		public List<Relay> neighbours = new List<Relay>();
+		public HashSet<Relay> neighbours = new HashSet<Relay>();
 		public List<int> neighboursIds => neighbours.Select(n => n.id).ToList();
 
 		public RelayStatus status = RelayStatus.Free;

@@ -41,7 +41,7 @@ namespace GeRaF
 					}
 					else {
 						// if sink in range, go back to sensing
-						if (sim.distances[relay.id][relay.packetToSend.sink.id] < relay.range) {
+						if (relay.neighbours.Contains(relay.packetToSend.sink)) {
 							var sense = new StartSensingEvent();
 							sense.time = sim.clock;
 							sense.relay = relay;

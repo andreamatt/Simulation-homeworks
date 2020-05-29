@@ -13,19 +13,19 @@ namespace GeRaF
 			var pp = new ProtocolParameters();
 			var sp = new SimulationParameters() {
 				area_side = 100,
-				debug_interval = 0.1,
-				debug_always = true,
+				debug_interval = 1,
+				debugType = DebugType.Never,
 				debug_file = "../../debug.json",
-				debug_file_compressed = "../../debug.7z",
-				max_time = 5,
+				max_time = 100000,
 				n_nodes = 100,
-				packet_rate = 10,
-				range = 20
+				packet_rate = 2,
+				range = 20,
+				min_distance = 7
 			};
 			var sim = new Simulation(sp, pp);
 			sim.Run();
 			Console.WriteLine("Finished");
-			//Console.ReadKey();
+			Console.ReadKey();
 		}
 	}
 }
