@@ -165,7 +165,8 @@ class Plot:
 		# matplotlib
 		Plot.last_time = 0
 		Plot.fig = plt.figure()
-		Plot.ax1 = Plot.fig.add_subplot(1, 1, 1)
+		Plot.ax1 = Plot.fig.add_subplot(2, 1, 1)
+		Plot.ax2 = Plot.fig.add_subplot(2, 1, 2)
 
 		Plot.fig.canvas.mpl_connect('key_press_event', Plot.KeyPress)
 		Plot.fig.canvas.mpl_connect('button_press_event', Plot.OnClick)
@@ -223,9 +224,13 @@ class Plot:
 	def plot():
 		time_before_draw = time.time()
 		Plot.fig.clf()
-		Plot.ax1 = Plot.fig.add_subplot(1, 1, 1)
+		Plot.ax1 = Plot.fig.add_subplot(2, 1, 1)
+		Plot.ax2 = Plot.fig.add_subplot(2, 1, 2)
 		frame_plotter = Frame_plotter(Plot.frames[Plot.frame_index])
 		frame_plotter.plot()
+
+		button = Button(Plot.ax2, "asd")
+		button.on_clicked(print_event)
 		
 		Plot.fig.canvas.draw()
 

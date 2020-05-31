@@ -41,11 +41,13 @@ namespace GeRaF
 				}
 			}
 
+			// copy packet
+			var packet = Packet.copy(senderRelay.packetToSend);
+
 			// free relay
 			relay.FreeNow(sim);
 
-			// copy packet
-			relay.packetToSend = Packet.copy(senderRelay.packetToSend);
+			relay.packetToSend = packet;
 
 			// if reached sink, stop
 			if (relay.packetToSend.sink == relay) {

@@ -59,7 +59,7 @@ namespace GeRaF
 			}
 
 			// increase PKT attempts
-			relay.ACK_count++;
+			relay.PKT_count++;
 
 			// schedule ACK_check
 			var ACK_check = new CheckACKEvent();

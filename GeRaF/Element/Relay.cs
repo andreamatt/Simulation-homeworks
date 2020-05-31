@@ -45,7 +45,7 @@ namespace GeRaF
 		public int COL_count = 0;   // number of collisions in that region during this attempt
 		public int SENSE_count = 0;
 		public int ATTEMPT_count = 0;
-		public int ACK_count = 0;
+		public int PKT_count = 0;
 
 		// sensing status
 		public bool isSensing = false;
@@ -91,6 +91,7 @@ namespace GeRaF
 			busyWith = null;
 			freeEvent = null;
 			status = RelayStatus.Free;
+			Reset();
 		}
 
 		public void FreeNow(Simulation sim) {
@@ -98,6 +99,15 @@ namespace GeRaF
 				sim.eventQueue.Remove(freeEvent);
 			}
 			Free();
+		}
+
+		public void Reset() {
+			packetToSend = null;
+			regionIndex = 0;
+			COL_count = 0;
+			SENSE_count = 0;
+			ATTEMPT_count = 0;
+			PKT_count = 0;
 		}
 	}
 }

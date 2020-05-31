@@ -22,7 +22,7 @@ namespace GeRaF
 			}
 			else {
 				// check ack count and resend
-				if (relay.ACK_count < sim.protocolParameters.n_max_ack) {
+				if (relay.PKT_count < sim.protocolParameters.n_max_pkt) {
 					// schedule PKT_start again
 					var PKT_start = new StartPKTEvent();
 					PKT_start.time = sim.clock;
@@ -31,7 +31,7 @@ namespace GeRaF
 					sim.eventQueue.Add(PKT_start);
 				}
 				else {
-					relay.ACK_count = 0;
+					relay.PKT_count = 0;
 					if (relay.COL_count < sim.protocolParameters.n_max_coll) {
 						var COL_start = new StartCOLEvent();
 						COL_start.time = sim.clock;

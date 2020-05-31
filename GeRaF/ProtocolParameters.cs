@@ -29,7 +29,7 @@ namespace GeRaF
 		public int n_max_attempts = 50; // number of attempts for searching a relay
 		public int n_max_coll = 6; // number of attempts for solving a collision
 		public int n_max_sensing = 10;
-		public int n_max_ack = 3;
+		public int n_max_pkt = 3;
 
 		public double t_delta = 0.00001; // small time delta
 
