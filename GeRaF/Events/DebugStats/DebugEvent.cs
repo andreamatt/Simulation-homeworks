@@ -9,7 +9,7 @@ namespace GeRaF.Events.DebugStats
 {
 	class DebugEvent : Event
 	{
-		public override void Handle(Simulation sim) {
+		public override void Handle() {
 			DebugNow(sim, false);
 
 			// schedule next debug

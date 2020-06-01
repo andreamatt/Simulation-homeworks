@@ -15,7 +15,7 @@ namespace GeRaF.Events.Intermediate
 		[JsonIgnore]
 		public Relay relay;
 		public int relayId => relay.id;
-		public override void Handle(Simulation sim) {
+		public override void Handle() {
 			relay.status = RelayStatus.Sensing;
 
 			relay.SENSE_count++;
@@ -27,10 +27,11 @@ namespace GeRaF.Events.Intermediate
 			}
 
 			// schedule sensing end
-			var end = new EndSensingEvent();
-			end.relay = relay;
-			end.time = sim.clock + sim.protocolParameters.t_sense;
-			sim.eventQueue.Add(end);
+			sim.eventQueue.Add(new EndSensingEvent {
+				relay = relay,
+				time = sim.clock + sim.protocolParameters.t_sense,
+				sim = sim
+			});
 		}
 	}
 
@@ -39,39 +40,39 @@ namespace GeRaF.Events.Intermediate
 		[JsonIgnore]
 		public Relay relay;
 		public int relayId => relay.id;
-		public override void Handle(Simulation sim) {
-
+		public override void Handle() {
 			if (relay.hasSensed) {
 				// check if sensingCount is less than max allowed
 				if (relay.SENSE_count < sim.protocolParameters.n_max_sensing) {
-					// reschedule with linear backoff
 					relay.status = RelayStatus.Backoff_Sensing;
-					var backOffSize = sim.protocolParameters.t_backoff;
-					var start = new StartSensingEvent();
-					start.time = sim.clock + backOffSize * RNG.rand();
-					start.relay = relay;
-					sim.eventQueue.Add(start);
+					sim.eventQueue.Add(new StartSensingEvent {
+						time = sim.clock + sim.protocolParameters.t_backoff * RNG.rand(),
+						relay = relay,
+						sim = sim
+					});
 				}
 				else {
 					// finish and free
 					relay.packetToSend.Finish(Result.Abort_max_sensing, sim);
-					relay.FreeNow(sim);
+					relay.FreeNow();
 				}
 			}
 			else {
 				// check if sink is in range
 				if (relay.neighbours.Contains(relay.packetToSend.sink)) {
-					var SINK_RTS_start = new StartSINKRTSEvent();
-					SINK_RTS_start.time = sim.clock;
-					SINK_RTS_start.relay = relay;
-					sim.eventQueue.Add(SINK_RTS_start);
+					sim.eventQueue.Add(new StartSINKRTSEvent {
+						time = sim.clock,
+						relay = relay,
+						actualDestination = relay.packetToSend.sink,
+						sim = sim
+					});
 				}
 				else {
-					// schedule RTS_start
-					var RTS_start = new StartRTSEvent();
-					RTS_start.time = sim.clock;
-					RTS_start.relay = relay;
-					sim.eventQueue.Add(RTS_start);
+					sim.eventQueue.Add(new StartRTSEvent {
+						time = sim.clock,
+						relay = relay,
+						sim = sim
+					});
 				}
 			}
 

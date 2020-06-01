@@ -12,8 +12,8 @@ namespace GeRaF.Network
 	enum Result
 	{
 		None,
-		No_start_relays,
 		Success,
+		No_start_relays,
 		//Abort_max_attempts,
 		Abort_max_region_cycle,
 		Abort_max_sensing,
@@ -27,14 +27,16 @@ namespace GeRaF.Network
 		private int _id;
 		public int Id => _id;
 		public double generationTime;
+
 		[JsonIgnore]
 		public Relay startRelay;
 		public int startRelayId => startRelay == null ? -1 : startRelay.id;
+
 		[JsonIgnore]
 		public Relay sink;
 		public int sinkId => sink == null ? -1 : sink.id;
-		private Result result = Result.None;
-		public Result Result => result;
+
+		public Result result = Result.None;
 
 		public Packet() {
 			_id = max_id;

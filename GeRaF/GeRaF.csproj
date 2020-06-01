@@ -73,6 +73,7 @@
     <Compile Include="Events\DutyCycle\FreeEvent.cs" />
     <Compile Include="Events\DutyCycle\SleepEvent.cs" />
     <Compile Include="Events\Intermediate\RegionProgressEvent.cs" />
+    <Compile Include="Events\Transmissions\SinkCOLEvent.cs" />
     <Compile Include="Events\Transmissions\TransmissionEvent.cs" />
     <Compile Include="Events\Intermediate\SensingEvent.cs" />
     <Compile Include="Events\Transmissions\PKTEvent.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="Events\Transmissions\CTSEvent.cs" />
     <Compile Include="Events\DebugStats\DebugStats.cs" />
     <Compile Include="Events\Event.cs" />
+    <Compile Include="Network\RelayHandler.cs" />
     <Compile Include="SimulationParameters.cs" />
     <Compile Include="Utils\EnumJsonConverter.cs" />
     <Compile Include="Utils\EventQueue.cs" />

@@ -75,7 +75,7 @@ namespace GeRaF.Utils
 				r1.neighbours.Clear();
 				foreach (var r2 in relays) {
 					if (r1 != r2) {
-						if (distances[r1.id][r2.id] < r1.range) {
+						if (distances[r1.id][r2.id] <= r1.range) {
 							r1.neighbours.Add(r2);
 						}
 					}

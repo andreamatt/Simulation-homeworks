@@ -16,45 +16,49 @@ namespace GeRaF.Events.Check
 		public Relay relay;
 		public int relayId => relay.id;
 
-		public override void Handle(Simulation sim) {
+		public override void Handle() {
 			// check CTS amount
-			if (relay.finishedTransmissions.Count == 0) {
-				var regionChange = new RegionProgressEvent();
-				regionChange.time = sim.clock;
-				regionChange.relay = relay;
-				sim.eventQueue.Add(regionChange);
+			if (relay.finishedCTSs.Count == 0) {
+				sim.eventQueue.Add(new RegionProgressEvent() {
+					time = sim.clock,
+					relay = relay,
+					sim = sim
+				});
 			}
 			else {
 				// if any have failed send COL or go to next region
-				if (relay.finishedTransmissions.Any(t => t.failed)) {
+				if (relay.finishedCTSs.Any(t => t.failed)) {
 					if (relay.COL_count < sim.protocolParameters.n_max_coll) {
 						relay.COL_count++;
-						var COL_start = new StartCOLEvent();
-						COL_start.time = sim.clock;
-						COL_start.relay = relay;
-						sim.eventQueue.Add(COL_start);
+						sim.eventQueue.Add(new StartCOLEvent() {
+							time = sim.clock,
+							relay = relay,
+							sim = sim
+						});
 					}
 					else {
-						var regionChange = new RegionProgressEvent();
-						regionChange.time = sim.clock;
-						regionChange.relay = relay;
-						sim.eventQueue.Add(regionChange);
+						sim.eventQueue.Add(new RegionProgressEvent() {
+							time = sim.clock,
+							relay = relay,
+							sim = sim
+						});
 					}
 				}
 				// else choose relay and send packet
 				else {
 					// choose random relay (choose first one, they are already in random order because of backoff (multiple CTSs without coll implies backoff))
-					var chosen = relay.finishedTransmissions.First().source;
-					var PKT_start = new StartPKTEvent();
-					PKT_start.time = sim.clock;
-					PKT_start.relay = relay;
-					PKT_start.chosenRelay = chosen;
-					sim.eventQueue.Add(PKT_start);
+					var chosen = relay.finishedCTSs.First().source;
+					sim.eventQueue.Add(new StartPKTEvent() {
+						time = sim.clock,
+						relay = relay,
+						actualDestination = chosen,
+						sim = sim
+					});
 				}
 			}
 
 			// clear finished
-			relay.finishedTransmissions.Clear();
+			relay.finishedCTSs.Clear();
 		}
 	}
 }

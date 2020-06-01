@@ -9,45 +9,34 @@ using System.Threading.Tasks;
 
 namespace GeRaF.Events.Transmissions
 {
-	class StartACKEvent : StartTransmissionEvent
+	class StartACKEvent : TransmissionEvent
 	{
-		[JsonIgnore]
-		public Relay senderRelay;
-		public int senderRelayId => senderRelay.id;
-		public override void Handle(Simulation sim) {
+		public override void Handle() {
 			relay.status = RelayStatus.Transmitting;
+			relay.transmissionType = TransmissionType.ACK;
 
-			var transmissions = sendTransmissions(TransmissionType.ACK, senderRelay);
-			// schedule ACK_end
-			var ACK_end = new EndACKEvent();
-			ACK_end.time = sim.clock + sim.protocolParameters.t_signal;
-			ACK_end.relay = relay;
-			ACK_end.senderRelay = senderRelay;
-			ACK_end.transmissions = transmissions;
-			sim.eventQueue.Add(ACK_end);
+			StartTransmission();
+
+			sim.eventQueue.Add(new EndACKEvent() {
+				time = sim.clock + sim.protocolParameters.t_signal,
+				relay = relay,
+				actualDestination = actualDestination,
+				sim = sim
+			});
 		}
 	}
 
-	class EndACKEvent : EndTransmissionEvent
+	class EndACKEvent : TransmissionEvent
 	{
-		[JsonIgnore]
-		public Relay senderRelay;
-		public int senderRelayId => senderRelay.id;
-		public override void Handle(Simulation sim) {
-			foreach (var t in transmissions) {
-				var n = t.destination;
-				n.activeTransmissions.Remove(t);
-				relay.activeTransmissions.Remove(t);
-				if (n == senderRelay && t.failed == false) {
-					n.finishedTransmissions.Add(t);
-				}
-			}
+		public override void Handle() {
 
-			// copy packet
-			var packet = Packet.copy(senderRelay.packetToSend);
+			EndTransmission();
+
+			// copy packet from sender (actual destination of ACK)
+			var packet = Packet.copy(actualDestination.packetToSend);
 
 			// free relay
-			relay.FreeNow(sim);
+			relay.FreeNow();
 
 			relay.packetToSend = packet;
 
@@ -56,12 +45,13 @@ namespace GeRaF.Events.Transmissions
 				relay.packetToSend.Finish(Result.Success, sim);
 			}
 			else {
+				// become sender
 				relay.SelfReserve();
-				// schedule SENSE_Start
-				var SENSE_start = new StartSensingEvent();
-				SENSE_start.time = sim.clock;
-				SENSE_start.relay = relay;
-				sim.eventQueue.Add(SENSE_start);
+				sim.eventQueue.Add(new StartSensingEvent {
+					time = sim.clock,
+					relay = relay,
+					sim = sim
+				});
 			}
 		}
 	}

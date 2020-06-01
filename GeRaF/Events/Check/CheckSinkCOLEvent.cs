@@ -16,33 +16,36 @@ namespace GeRaF.Events.Check
 		public Relay relay;
 		public int relayId => relay.id;
 
-		public override void Handle(Simulation sim) {
+		public override void Handle() {
 			// no CTS or CTS failed => back to sensing
-			if (relay.finishedTransmissions.Count == 0 || relay.finishedTransmissions.First().failed) {
+			if (relay.finishedCTSs.Count == 0 || relay.finishedCTSs.First().failed) {
 				if (relay.SINK_RTS_count < sim.protocolParameters.n_max_sink_rts) {
-					var sink_rts_start = new StartSINKRTSEvent();
-					sink_rts_start.time = sim.clock + RNG.rand() * sim.protocolParameters.t_backoff;
-					sink_rts_start.relay = relay;
-					sim.eventQueue.Add(sink_rts_start);
+					relay.status = RelayStatus.Backoff_SinkRTS;
+					sim.eventQueue.Add(new StartSINKRTSEvent {
+						time = sim.clock + RNG.rand() * sim.protocolParameters.t_backoff,
+						relay = relay,
+						sim = sim
+					});
 				}
 				else {
 					relay.packetToSend.Finish(Result.Abort_max_sink_rts, sim);
-					relay.FreeNow(sim);
+					relay.FreeNow();
 				}
 			}
-			// only sink replied successfully
+			// sink replied successfully
 			else {
 				// send packet to sink
 				var chosen = relay.packetToSend.sink;
-				var PKT_start = new StartPKTEvent();
-				PKT_start.time = sim.clock;
-				PKT_start.relay = relay;
-				PKT_start.chosenRelay = chosen;
-				sim.eventQueue.Add(PKT_start);
+				sim.eventQueue.Add(new StartPKTEvent {
+					time = sim.clock,
+					relay = relay,
+					actualDestination = chosen,
+					sim = sim
+				});
 			}
 
 			// clear finished
-			relay.finishedTransmissions.Clear();
+			relay.finishedCTSs.Clear();
 		}
 	}
 }

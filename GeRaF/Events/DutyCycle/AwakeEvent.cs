@@ -11,7 +11,7 @@ namespace GeRaF.Events.DutyCycle
 	{
 		public Relay relay;
 
-		public override void Handle(Simulation sim) {
+		public override void Handle() {
 			// set relay as free, schedule sleep, set awake_time (used in FreeEvent)
 		}
 	}

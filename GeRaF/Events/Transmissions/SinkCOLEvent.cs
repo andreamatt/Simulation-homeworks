@@ -1,5 +1,6 @@
 ﻿using GeRaF.Events.Check;
 using GeRaF.Network;
+using GeRaF.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,26 +9,23 @@ using System.Threading.Tasks;
 
 namespace GeRaF.Events.Transmissions
 {
-	class StartSINKRTSEvent : TransmissionEvent
+	class StartSinkCOLEvent : TransmissionEvent
 	{
 		public override void Handle() {
 			relay.status = RelayStatus.Transmitting;
-			relay.transmissionType = TransmissionType.SINK_RTS;
-
-			relay.SINK_RTS_count++;
+			relay.transmissionType = TransmissionType.SINK_COL;
 
 			StartTransmission();
 
-			sim.eventQueue.Add(new EndSINKRTSEvent {
-				time = sim.clock + sim.protocolParameters.t_signal,
+			sim.eventQueue.Add(new EndCOLEvent {
 				relay = relay,
-				actualDestination = actualDestination,
+				time = sim.clock + sim.protocolParameters.t_signal,
 				sim = sim
 			});
 		}
 	}
 
-	class EndSINKRTSEvent : TransmissionEvent
+	class EndSinkCOLEvent : TransmissionEvent
 	{
 		public override void Handle() {
 			relay.status = RelayStatus.Awaiting_Signal; // waits for CTS
@@ -36,10 +34,10 @@ namespace GeRaF.Events.Transmissions
 
 			sim.eventQueue.Add(new CheckSINKCOLEvent {
 				relay = relay,
-				// time + CTS_time + time delta to make sure CTS events come before COL check
 				time = sim.clock + sim.protocolParameters.t_signal + sim.protocolParameters.t_delta,
 				sim = sim
 			});
+
 		}
 	}
 }

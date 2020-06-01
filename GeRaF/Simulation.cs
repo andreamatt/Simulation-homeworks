@@ -38,11 +38,12 @@ namespace GeRaF
 			relays = new List<Relay>();
 			// generate first batch
 			for (int i = 0; i < simulationParameters.n_nodes; i++) {
-				var relay = new Relay();
-				relay.id = i;
-				relay.range = simulationParameters.range;
-				relay.status = RelayStatus.Free;
-				relays.Add(relay);
+				relays.Add(new Relay {
+					id = i,
+					range = simulationParameters.range,
+					status = RelayStatus.Free,  // generate based on duty cycle probability ???
+					sim = this
+				});
 			}
 
 			// move disconnected
@@ -64,13 +65,21 @@ namespace GeRaF
 			// init sim state
 			clock = 0;
 			eventQueue = new EventQueue();
-			eventQueue.Add(new StartEvent());
+			eventQueue.Add(new StartEvent() {
+				time = 0,
+				sim = this
+			});
+			eventQueue.Add(new EndEvent() {
+				time = simulationParameters.max_time,
+				sim = this
+			});
+
 			if (simulationParameters.debugType == DebugType.Interval) {
 				eventQueue.Add(new DebugEvent() {
-					time = simulationParameters.debug_interval
+					time = simulationParameters.debug_interval,
+					sim = this
 				});
 			}
-			eventQueue.Add(new EndEvent(simulationParameters.max_time));
 
 			// init debug state
 			debugWriter = new StreamWriter(simulationParameters.debug_file);
@@ -88,20 +97,24 @@ namespace GeRaF
 				}
 				var e = eventQueue.Pop();
 				this.clock = e.time;
-				e.Handle(this);
+				e.Handle();
 			}
 
 			// stats
 			Console.WriteLine($"Number of packets: {finishedPackets.Count}");
 			var tot = (float)finishedPackets.Count;
-			var success = finishedPackets.Count(p => p.Result == Result.Success);
-			var channel_busy = finishedPackets.Count(p => p.Result == Result.Abort_max_sensing);
-			var max_cycle = finishedPackets.Count(p => p.Result == Result.Abort_max_region_cycle);
-			var no_start = finishedPackets.Count(p => p.Result == Result.No_start_relays);
+			var success = finishedPackets.Count(p => p.result == Result.Success);
+			var max_sensing = finishedPackets.Count(p => p.result == Result.Abort_max_sensing);
+			var max_cycle = finishedPackets.Count(p => p.result == Result.Abort_max_region_cycle);
+			var no_start = finishedPackets.Count(p => p.result == Result.No_start_relays);
+			var max_sink_rts = finishedPackets.Count(p => p.result == Result.Abort_max_sink_rts);
+			var no_ack = finishedPackets.Count(p => p.result == Result.Abort_no_ack);
 			Console.WriteLine($"Number of packets success: {success}, {success / tot * 100:F3}%");
-			Console.WriteLine($"Number of packets channel_busy: {channel_busy}, {channel_busy / tot * 100:F3}%");
+			Console.WriteLine($"Number of packets no_start_relays: {no_start}, {no_start / tot * 100:F3}%");
 			Console.WriteLine($"Number of packets max_cycle: {max_cycle}, {max_cycle / tot * 100:F3}%");
-			Console.WriteLine($"Number of packets start_relays: {no_start}, {no_start / tot * 100:F3}%");
+			Console.WriteLine($"Number of packets max_sensing: {max_sensing}, {max_sensing / tot * 100:F3}%");
+			Console.WriteLine($"Number of packets max_sink_rts: {max_sink_rts}, {max_sink_rts / tot * 100:F3}%");
+			Console.WriteLine($"Number of packets no_ack: {no_ack}, {no_ack / tot * 100:F3}%");
 
 			debugWriter.Write("\n]\n}");
 			debugWriter.Close();

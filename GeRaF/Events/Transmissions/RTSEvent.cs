@@ -8,59 +8,35 @@ using System.Threading.Tasks;
 
 namespace GeRaF.Events.Transmissions
 {
-	class StartRTSEvent : StartTransmissionEvent
+	class StartRTSEvent : TransmissionEvent
 	{
-		public override void Handle(Simulation sim) {
+		public override void Handle() {
 			relay.status = RelayStatus.Transmitting;
+			relay.transmissionType = TransmissionType.RTS;
 
-			var transmissions = sendTransmissions(TransmissionType.RTS);
+			StartTransmission();
 
-			// schedule RTS_end
-			var end = new EndRTSEvent();
-			end.relay = relay;
-			end.transmissions = transmissions;
-			end.time = sim.clock + sim.protocolParameters.t_signal;
-			sim.eventQueue.Add(end);
+			sim.eventQueue.Add(new EndRTSEvent() {
+				relay = relay,
+				time = sim.clock + sim.protocolParameters.t_signal,
+				sim = sim
+			});
 		}
 	}
 
-	class EndRTSEvent : EndTransmissionEvent
+	class EndRTSEvent : TransmissionEvent
 	{
-		public override void Handle(Simulation sim) {
+		public override void Handle() {
 			relay.status = RelayStatus.Awaiting_Signal; // waits for CTS
 
-			var sink = relay.packetToSend.sink;
-			var sourceToSink = sim.distances[relay.id][sink.id];
-			var limitToSink = sourceToSink - relay.range;
-			var regionWidth = relay.range / sim.protocolParameters.n_regions;
-			var minDistance = limitToSink + regionWidth * relay.REGION_index;
-			var maxDistance = minDistance + regionWidth;
+			EndTransmission();
 
-			foreach (var t in transmissions) {
-				var n = t.destination;
-				if (n.status == RelayStatus.Free && t.failed == false) {
-					// if neigh relay is in correct region AND transmission has not failed AND is not in another contention, schedule CTS
-					var dist = sim.distances[n.id][sink.id];
-					if (dist > minDistance && dist < maxDistance) {
-						n.Reserve(relay, sim);
-						var CTS_start = new StartCTSEvent();
-						CTS_start.relay = n;
-						CTS_start.requesterRelay = relay;
-						CTS_start.time = sim.clock;
-						sim.eventQueue.Add(CTS_start);
-					}
-				}
-				// delete transmission
-				n.activeTransmissions.Remove(t);
-				relay.activeTransmissions.Remove(t);
-			}
-
-			// schedule COL_check
-			var COL_check = new CheckCOLEvent();
-			COL_check.relay = relay;
 			// time + CTS_time + time delta to make sure CTS events come before COL check
-			COL_check.time = sim.clock + sim.protocolParameters.t_signal + sim.protocolParameters.t_delta;
-			sim.eventQueue.Add(COL_check);
+			sim.eventQueue.Add(new CheckCOLEvent() {
+				relay = relay,
+				time = sim.clock + sim.protocolParameters.t_signal + sim.protocolParameters.t_delta,
+				sim = sim
+			});
 		}
 	}
 }

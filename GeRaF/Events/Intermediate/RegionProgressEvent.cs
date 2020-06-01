@@ -14,7 +14,7 @@ namespace GeRaF.Events.Intermediate
 		[JsonIgnore]
 		public Relay relay;
 		public int relayId => relay.id;
-		public override void Handle(Simulation sim) {
+		public override void Handle() {
 			// if max region reached
 			if (relay.REGION_index == sim.protocolParameters.n_regions - 1) {
 				// reset region, increase region cycle
@@ -23,24 +23,26 @@ namespace GeRaF.Events.Intermediate
 
 				if (relay.REGION_cycle < sim.protocolParameters.n_max_region_cycle) {
 					// schedule RTS immediately
-					var RTS_start = new StartRTSEvent();
-					RTS_start.time = sim.clock;
-					RTS_start.relay = relay;
-					sim.eventQueue.Add(RTS_start);
+					sim.eventQueue.Add(new StartRTSEvent {
+						time = sim.clock,
+						relay = relay,
+						sim = sim
+					});
 				}
 				else {
 					relay.packetToSend.Finish(Result.Abort_max_region_cycle, sim);
-					relay.FreeNow(sim);
+					relay.FreeNow();
 				}
 			}
 			// go next region
 			else {
 				relay.REGION_index++;
-				// schedule RTS
-				var RTS_start = new StartRTSEvent();
-				RTS_start.time = sim.clock;
-				RTS_start.relay = relay;
-				sim.eventQueue.Add(RTS_start);
+
+				sim.eventQueue.Add(new StartRTSEvent {
+					time = sim.clock,
+					relay = relay,
+					sim = sim
+				});
 			}
 		}
 	}

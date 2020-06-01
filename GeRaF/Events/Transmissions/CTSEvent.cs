@@ -8,44 +8,30 @@ using System.Threading.Tasks;
 
 namespace GeRaF.Events.Transmissions
 {
-	class StartCTSEvent : StartTransmissionEvent
+	class StartCTSEvent : TransmissionEvent
 	{
-		[JsonIgnore]
-		public Relay requesterRelay;
-		public int requesterRelayId => requesterRelay.id;
-		public override void Handle(Simulation sim) {
+		public override void Handle() {
 			relay.status = RelayStatus.Transmitting;
+			relay.transmissionType = TransmissionType.CTS;
 
-			var transmissions = sendTransmissions(TransmissionType.CTS, requesterRelay);
+			StartTransmission();
 
 			// schedule CTS_end
-			var end = new EndCTSEvent();
-			end.relay = relay;
-			end.requesterRelay = requesterRelay;
-			end.transmissions = transmissions;
-			end.time = sim.clock + sim.protocolParameters.t_signal;
-			sim.eventQueue.Add(end);
+			sim.eventQueue.Add(new EndCTSEvent() {
+				relay = relay,
+				actualDestination = actualDestination,
+				time = sim.clock + sim.protocolParameters.t_signal,
+				sim = sim
+			});
 		}
 	}
 
-	class EndCTSEvent : EndTransmissionEvent
+	class EndCTSEvent : TransmissionEvent
 	{
-		[JsonIgnore]
-		public Relay requesterRelay;
-		public int requesterRelayId => requesterRelay.id;
-		public override void Handle(Simulation sim) {
+		public override void Handle() {
 			relay.status = RelayStatus.Awaiting_Signal;
 
-			foreach (var t in transmissions) {
-				var n = t.destination;
-				// remove transmission
-				n.activeTransmissions.Remove(t);
-				relay.activeTransmissions.Remove(t);
-				if (n == requesterRelay) {
-					// move cts to finished
-					n.finishedTransmissions.Add(t);
-				}
-			}
+			EndTransmission();
 		}
 	}
 }

@@ -13,7 +13,7 @@ namespace GeRaF.Events.DutyCycle
 		[JsonIgnore]
 		public Relay relay;
 		public int relayId => relay.id;
-		public override void Handle(Simulation sim) {
+		public override void Handle() {
 			relay.Free();
 
 			// NEW IMPLEMENTATION

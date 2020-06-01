@@ -18,26 +18,28 @@ namespace GeRaF.Events.Check
 		[JsonIgnore]
 		public Relay chosenRelay;
 		public int chosenRelayId => chosenRelay.id;
-		public override void Handle(Simulation sim) {
-			if (relay.finishedTransmissions.Count == 1) {
-				relay.FreeNow(sim);
+
+		public override void Handle() {
+			if (relay.receivedACK) {
+				relay.FreeNow();
 			}
 			else {
-				// check ack count and resend
+				// check ack count and resend OR abort
 				if (relay.PKT_count < sim.protocolParameters.n_max_pkt) {
 					// schedule PKT_start again
-					var PKT_start = new StartPKTEvent();
-					PKT_start.time = sim.clock;
-					PKT_start.relay = relay;
-					PKT_start.chosenRelay = chosenRelay;
-					sim.eventQueue.Add(PKT_start);
+					sim.eventQueue.Add(new StartPKTEvent {
+						time = sim.clock,
+						relay = relay,
+						actualDestination = chosenRelay,
+						sim = sim
+					});
 				}
 				else {
 					relay.packetToSend.Finish(Result.Abort_no_ack, sim);
-					relay.FreeNow(sim);
+					relay.FreeNow();
 				}
 			}
-			relay.finishedTransmissions.Clear();
+			relay.receivedACK = false;
 		}
 	}
 }

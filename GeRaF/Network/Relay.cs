@@ -15,15 +15,20 @@ namespace GeRaF.Network
 	{
 		Asleep,
 		Free,   // awake with no task
+		Awaiting_region,
 		Transmitting,
 		Sensing,
 		Awaiting_Signal,
 		Backoff_Sensing,
-		Backoff_CTS
+		Backoff_CTS,
+		Backoff_SinkRTS
 	}
 
-	class Relay
+	partial class Relay
 	{
+		[JsonIgnore]
+		public Simulation sim;
+
 		public int id = -1;
 		public double X;
 		public double Y;
@@ -34,13 +39,20 @@ namespace GeRaF.Network
 		public List<int> neighboursIds => neighbours.Select(n => n.id).ToList();
 
 		public RelayStatus status = RelayStatus.Free;
+		// if transmitting, what is it transmitting?
+		public TransmissionType transmissionType = TransmissionType.RTS;
 
 		//[JsonIgnore]
 		public Packet packetToSend = null;
 		//public int packetToSendId => packetToSend == null ? -1 : packetToSend.Id;
 
-		public HashSet<Transmission> activeTransmissions = new HashSet<Transmission>();
-		public HashSet<Transmission> finishedTransmissions = new HashSet<Transmission>();
+		//public HashSet<Transmission> activeTransmissions = new HashSet<Transmission>();
+		//public HashSet<Transmission> finishedTransmissions = new HashSet<Transmission>();
+
+		// dictionary with [relay, hasFailed]
+		private Dictionary<Relay, bool> activeTransmissions = new Dictionary<Relay, bool>();
+		public List<Transmission> finishedCTSs = new List<Transmission>();
+		public bool receivedACK = false;
 
 		// iteration status
 		public int REGION_index = 0;
@@ -71,16 +83,18 @@ namespace GeRaF.Network
 		}
 
 		// called only if relay is either free or already busy with the reserver
-		public void Reserve(Relay reserver, Simulation sim) {
+		public void Reserve(Relay reserver) {
 			if (reserver == this) {
 				throw new Exception("Can't use Reserve on self, use SelfReserve instead");
 			}
 			else {
 				if (busyWith == null) {
 					busyWith = reserver;
-					freeEvent = new FreeEvent();
-					freeEvent.time = sim.clock + sim.protocolParameters.t_busy;
-					freeEvent.relay = this;
+					freeEvent = new FreeEvent {
+						time = sim.clock + sim.protocolParameters.t_busy,
+						relay = this,
+						sim = sim
+					};
 					sim.eventQueue.Add(freeEvent);
 				}
 				else {
@@ -98,7 +112,7 @@ namespace GeRaF.Network
 			Reset();
 		}
 
-		public void FreeNow(Simulation sim) {
+		public void FreeNow() {
 			if (busyWith != this) {
 				sim.eventQueue.Remove(freeEvent);
 			}
@@ -113,6 +127,79 @@ namespace GeRaF.Network
 			PKT_count = 0;
 			SINK_RTS_count = 0;
 			REGION_cycle = 0;
+		}
+
+		public void StartReceiving(Relay sender) {
+			bool interested = false;
+			switch (this.status) {
+				case RelayStatus.Sensing:
+					this.hasSensed = true;
+					break;
+				case RelayStatus.Free:
+					interested = true;
+					break;
+				case RelayStatus.Awaiting_Signal:
+					interested = true;
+					break;
+				case RelayStatus.Awaiting_region:
+					interested = true;
+					break;
+				case RelayStatus.Asleep:
+					break;
+				case RelayStatus.Transmitting:
+					break;
+				case RelayStatus.Backoff_Sensing:
+					break;
+				case RelayStatus.Backoff_CTS:
+					break;
+				case RelayStatus.Backoff_SinkRTS:
+					break;
+				default:
+					throw new Exception("Unexpected relay status");
+			}
+
+			if (interested) {
+				bool failed = activeTransmissions.Count > 0;
+				// every one else failes
+				foreach (var transmitter in activeTransmissions.Keys.ToList()) {
+					activeTransmissions[transmitter] = false;
+				}
+				this.activeTransmissions[sender] = failed;
+			}
+		}
+
+		public void EndReceiving(TransmissionType transmissionType, Relay sender, Relay actualDestination = null) {
+			// if i'm interested ( I was when started receiving )
+			if (this.activeTransmissions.ContainsKey(sender)) {
+				// decide what to do
+				switch (transmissionType) {
+					case TransmissionType.RTS:
+						this.HandleRTS(sender);
+						break;
+					case TransmissionType.SINK_RTS:
+						this.HandleSINKRTS(sender, actualDestination);
+						break;
+					case TransmissionType.CTS:
+						this.HandleCTS(sender, actualDestination);
+						break;
+					case TransmissionType.PKT:
+						this.HandlePKT(sender, actualDestination);
+						break;
+					case TransmissionType.ACK:
+						this.HandleACK(sender, actualDestination);
+						break;
+					case TransmissionType.COL:
+						this.HandleCOL(sender);
+						break;
+					case TransmissionType.SINK_COL:
+						this.HandleSINKCOL(sender, actualDestination);
+						break;
+					default:
+						break;
+				}
+
+				this.activeTransmissions.Remove(sender);
+			}
 		}
 	}
 }

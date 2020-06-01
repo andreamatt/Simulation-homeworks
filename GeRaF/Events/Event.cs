@@ -48,33 +48,29 @@ namespace GeRaF.Events
 
 	abstract class Event
 	{
+		[JsonIgnore]
+		public Simulation sim;
+
 		public double time;
 		public string type => this.GetType().Name;
 
-		public abstract void Handle(Simulation sim);
+		public abstract void Handle();
 	}
 
 	class StartEvent : Event
 	{
-		public StartEvent() {
-			time = 0;
-		}
-
-		public override void Handle(Simulation sim) {
+		public override void Handle() {
 			// add initial packet arrival
-			var p = new PacketGenerationEvent();
-			p.time = RNG.rand_expon(sim.simulationParameters.packet_rate);
-			sim.eventQueue.Add(p);
+			sim.eventQueue.Add(new PacketGenerationEvent {
+				time = RNG.rand_expon(sim.simulationParameters.packet_rate),
+				sim = sim
+			});
 		}
 	}
 
 	class EndEvent : Event
 	{
-		public EndEvent(double max_time) {
-			time = max_time;
-		}
-
-		public override void Handle(Simulation sim) {
+		public override void Handle() {
 			// dump debugstats to file
 			// clear event queue
 			sim.eventQueue.Clear();
@@ -87,11 +83,12 @@ namespace GeRaF.Events
 
 	class PacketGenerationEvent : Event
 	{
-		public override void Handle(Simulation sim) {
+		public override void Handle() {
 			// schedule next packet arrival
-			var p = new PacketGenerationEvent();
-			p.time = sim.clock + RNG.rand_expon(sim.simulationParameters.packet_rate);
-			sim.eventQueue.Add(p);
+			sim.eventQueue.Add(new PacketGenerationEvent {
+				time = sim.clock + RNG.rand_expon(sim.simulationParameters.packet_rate),
+				sim = sim
+			});
 
 			// give this packet to some relay or discard it if none are available
 			var freeRelays = sim.relays.Where(r => r.status == RelayStatus.Free).ToList();
@@ -102,23 +99,26 @@ namespace GeRaF.Events
 				var otherRelays = sim.relays.Where(r => r != chosen).ToList();
 				var sink = otherRelays[RNG.rand_int(0, otherRelays.Count)];
 
-				var packet = new Packet();
-				packet.generationTime = sim.clock;
-				packet.startRelay = chosen;
-				packet.sink = sink;
+				var packet = new Packet {
+					generationTime = sim.clock,
+					startRelay = chosen,
+					sink = sink
+				};
 				chosen.packetToSend = packet;
 				chosen.SelfReserve();
 
-				// schedule startSensingEvent
-				var sensing = new StartSensingEvent();
-				sensing.time = sim.clock;
-				sensing.relay = chosen;
-				sim.eventQueue.Add(sensing);
+				// schedule sensing
+				sim.eventQueue.Add(new StartSensingEvent {
+					time = sim.clock,
+					relay = chosen,
+					sim = sim
+				});
 			}
 			// no nodes available
 			else {
-				var packet = new Packet();
-				packet.generationTime = sim.clock;
+				var packet = new Packet {
+					generationTime = sim.clock
+				};
 				packet.Finish(Result.No_start_relays, sim);
 			}
 		}

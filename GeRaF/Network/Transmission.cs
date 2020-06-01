@@ -15,6 +15,7 @@ namespace GeRaF.Network
 		RTS,
 		CTS,
 		PKT,
+		SINK_COL,
 		COL,
 		ACK
 	}
