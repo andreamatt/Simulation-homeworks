@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using GeRaF.Utils;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,10 +27,12 @@ namespace GeRaF
 		public double t_signal = 0.00521; // signal packet transmission time (RTS and CTS ?)
 		public double t_busy; // slightly more than the max backoff + cts_time + col_time
 		public int n_regions = 4; // number of priority regions
-		public int n_max_attempts = 50; // number of attempts for searching a relay
+								  //public int n_max_attempts = 50; // number of attempts for searching a relay
 		public int n_max_coll = 6; // number of attempts for solving a collision
 		public int n_max_sensing = 10;
+		public int n_max_sink_rts = 10;
 		public int n_max_pkt = 3;
+		public int n_max_region_cycle = 5;
 
 		public double t_delta = 0.00001; // small time delta
 

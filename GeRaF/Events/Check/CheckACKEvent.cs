@@ -1,11 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using GeRaF.Events.Transmissions;
+using GeRaF.Network;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GeRaF
+namespace GeRaF.Events.Check
 {
 	class CheckACKEvent : Event
 	{
@@ -31,30 +33,8 @@ namespace GeRaF
 					sim.eventQueue.Add(PKT_start);
 				}
 				else {
-					relay.PKT_count = 0;
-					if (relay.COL_count < sim.protocolParameters.n_max_coll) {
-						var COL_start = new StartCOLEvent();
-						COL_start.time = sim.clock;
-						COL_start.relay = relay;
-						sim.eventQueue.Add(COL_start);
-						relay.COL_count++;
-					}
-					else {
-						// if sink in range, go back to sensing
-						if (relay.neighbours.Contains(relay.packetToSend.sink)) {
-							var sense = new StartSensingEvent();
-							sense.time = sim.clock;
-							sense.relay = relay;
-							sim.eventQueue.Add(sense);
-						}
-						else {
-							// try going to next region
-							var regionChange = new RegionProgressEvent();
-							regionChange.time = sim.clock;
-							regionChange.relay = relay;
-							sim.eventQueue.Add(regionChange);
-						}
-					}
+					relay.packetToSend.Finish(Result.Abort_no_ack, sim);
+					relay.FreeNow(sim);
 				}
 			}
 			relay.finishedTransmissions.Clear();

@@ -1,11 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using GeRaF.Events.Intermediate;
+using GeRaF.Network;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GeRaF
+namespace GeRaF.Events.Transmissions
 {
 	class StartACKEvent : StartTransmissionEvent
 	{

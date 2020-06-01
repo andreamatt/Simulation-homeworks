@@ -1,10 +1,13 @@
-﻿using System;
+﻿using GeRaF.Events.Check;
+using GeRaF.Network;
+using GeRaF.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GeRaF
+namespace GeRaF.Events.Transmissions
 {
 	class StartCOLEvent : StartTransmissionEvent
 	{

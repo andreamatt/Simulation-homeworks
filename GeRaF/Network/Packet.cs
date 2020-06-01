@@ -1,11 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using GeRaF.Utils;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GeRaF
+namespace GeRaF.Network
 {
 	[JsonConverter(typeof(EnumJsonConverter))]
 	enum Result
@@ -13,8 +14,11 @@ namespace GeRaF
 		None,
 		No_start_relays,
 		Success,
-		Abort_max_attempts,
-		Abort_channel_busy
+		//Abort_max_attempts,
+		Abort_max_region_cycle,
+		Abort_max_sensing,
+		Abort_max_sink_rts,
+		Abort_no_ack
 	}
 
 	class Packet

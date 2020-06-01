@@ -20,17 +20,17 @@ namespace GeRaF
 				t_signal = 0.00521, // signal packet transmission time (RTS and CTS ?)
 									//t_busy, // slightly more than the max backoff + cts_time + col_time
 				n_regions = 4, // number of priority regions
-				n_max_attempts = 50, // number of attempts for searching a relay
 				n_max_coll = 6, // number of attempts for solving a collision
 				n_max_sensing = 10,
-				n_max_pkt = 3
+				n_max_pkt = 3,
+				n_max_region_cycle = 1
 			};
 			var sp = new SimulationParameters() {
 				area_side = 100,
 				debug_interval = 1,
-				debugType = DebugType.Always,
+				debugType = DebugType.Never,
 				debug_file = "../../debug.json",
-				max_time = 2,
+				max_time = 20000,
 				n_nodes = 100,
 				packet_rate = 1,
 				range = 20,

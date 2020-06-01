@@ -1,4 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using GeRaF.Events.DebugStats;
+using GeRaF.Events.Intermediate;
+using GeRaF.Events.Transmissions;
+using GeRaF.Network;
+using GeRaF.Utils;
+using Newtonsoft.Json;
 using Priority_Queue;
 using System;
 using System.Collections.Generic;
@@ -6,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GeRaF
+namespace GeRaF.Events
 {
 	[JsonConverter(typeof(EnumJsonConverter))]
 	public enum EventType
@@ -115,50 +120,6 @@ namespace GeRaF
 				var packet = new Packet();
 				packet.generationTime = sim.clock;
 				packet.Finish(Result.No_start_relays, sim);
-			}
-		}
-	}
-
-	class FreeRelayEvent : Event
-	{
-		[JsonIgnore]
-		public Relay relay;
-		public int relayId => relay.id;
-		public override void Handle(Simulation sim) {
-			relay.Free();
-		}
-	}
-
-	class RegionProgressEvent : Event
-	{
-		[JsonIgnore]
-		public Relay relay;
-		public int relayId => relay.id;
-		public override void Handle(Simulation sim) {
-			// no more regions
-			if (relay.regionIndex == sim.protocolParameters.n_regions - 1) {
-				if (relay.ATTEMPT_count < sim.protocolParameters.n_max_attempts) {
-					relay.ATTEMPT_count++;
-					relay.regionIndex = 0;
-					// schedule sensing immediately
-					var SENSE_start = new StartSensingEvent();
-					SENSE_start.time = sim.clock;
-					SENSE_start.relay = relay;
-					sim.eventQueue.Add(SENSE_start);
-				}
-				else {
-					relay.packetToSend.Finish(Result.Abort_max_attempts, sim);
-					relay.FreeNow(sim);
-				}
-			}
-			// go next region
-			else {
-				relay.regionIndex++;
-				// schedule RTS
-				var RTS_start = new StartRTSEvent();
-				RTS_start.time = sim.clock;
-				RTS_start.relay = relay;
-				sim.eventQueue.Add(RTS_start);
 			}
 		}
 	}

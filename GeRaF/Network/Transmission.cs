@@ -1,11 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using GeRaF.Utils;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GeRaF
+namespace GeRaF.Network
 {
 	[JsonConverter(typeof(EnumJsonConverter))]
 	enum TransmissionType

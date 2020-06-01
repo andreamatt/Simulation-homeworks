@@ -1,4 +1,7 @@
-﻿using GeRaF.Utils;
+﻿using GeRaF.Events;
+using GeRaF.Events.DebugStats;
+using GeRaF.Network;
+using GeRaF.Utils;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -92,12 +95,12 @@ namespace GeRaF
 			Console.WriteLine($"Number of packets: {finishedPackets.Count}");
 			var tot = (float)finishedPackets.Count;
 			var success = finishedPackets.Count(p => p.Result == Result.Success);
-			var channel_busy = finishedPackets.Count(p => p.Result == Result.Abort_channel_busy);
-			var max_attempts = finishedPackets.Count(p => p.Result == Result.Abort_max_attempts);
+			var channel_busy = finishedPackets.Count(p => p.Result == Result.Abort_max_sensing);
+			var max_cycle = finishedPackets.Count(p => p.Result == Result.Abort_max_region_cycle);
 			var no_start = finishedPackets.Count(p => p.Result == Result.No_start_relays);
 			Console.WriteLine($"Number of packets success: {success}, {success / tot * 100:F3}%");
 			Console.WriteLine($"Number of packets channel_busy: {channel_busy}, {channel_busy / tot * 100:F3}%");
-			Console.WriteLine($"Number of packets max_attempts: {max_attempts}, {max_attempts / tot * 100:F3}%");
+			Console.WriteLine($"Number of packets max_cycle: {max_cycle}, {max_cycle / tot * 100:F3}%");
 			Console.WriteLine($"Number of packets start_relays: {no_start}, {no_start / tot * 100:F3}%");
 
 			debugWriter.Write("\n]\n}");

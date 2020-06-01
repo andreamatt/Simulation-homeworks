@@ -1,10 +1,12 @@
-﻿using System;
+﻿using GeRaF.Events.Check;
+using GeRaF.Network;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GeRaF
+namespace GeRaF.Events.Transmissions
 {
 	class StartRTSEvent : StartTransmissionEvent
 	{
@@ -31,7 +33,7 @@ namespace GeRaF
 			var sourceToSink = sim.distances[relay.id][sink.id];
 			var limitToSink = sourceToSink - relay.range;
 			var regionWidth = relay.range / sim.protocolParameters.n_regions;
-			var minDistance = limitToSink + regionWidth * relay.regionIndex;
+			var minDistance = limitToSink + regionWidth * relay.REGION_index;
 			var maxDistance = minDistance + regionWidth;
 
 			foreach (var t in transmissions) {

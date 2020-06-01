@@ -1,15 +1,19 @@
-﻿using System;
+﻿using GeRaF.Events.Check;
+using GeRaF.Network;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GeRaF
+namespace GeRaF.Events.Transmissions
 {
 	class StartSINKRTSEvent : StartTransmissionEvent
 	{
 		public override void Handle(Simulation sim) {
 			relay.status = RelayStatus.Transmitting;
+
+			relay.SINK_RTS_count++;
 
 			var transmissions = sendTransmissions(TransmissionType.SINK_RTS, relay.packetToSend.sink);
 
@@ -30,7 +34,7 @@ namespace GeRaF
 			var sink = relay.packetToSend.sink;
 			foreach (var t in transmissions) {
 				var n = t.destination;
-				if (n.status == RelayStatus.Free && n == sink) {
+				if (t.failed == false && n.status == RelayStatus.Free && n == sink) {
 					n.Reserve(relay, sim);
 					var CTS_start = new StartCTSEvent();
 					CTS_start.relay = n;

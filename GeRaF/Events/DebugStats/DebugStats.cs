@@ -1,7 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using GeRaF.Network;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace GeRaF
+namespace GeRaF.Events.DebugStats
 {
 	class DebugStats
 	{

@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using GeRaF.Events.DutyCycle;
+using GeRaF.Utils;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +8,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GeRaF
+namespace GeRaF.Network
 {
 	[JsonConverter(typeof(EnumJsonConverter))]
 	enum RelayStatus
@@ -41,11 +43,13 @@ namespace GeRaF
 		public HashSet<Transmission> finishedTransmissions = new HashSet<Transmission>();
 
 		// iteration status
-		public int regionIndex = 0;
+		public int REGION_index = 0;
 		public int COL_count = 0;   // number of collisions in that region during this attempt
 		public int SENSE_count = 0;
-		public int ATTEMPT_count = 0;
+		public int SINK_RTS_count = 0;
+		//public int ATTEMPT_count = 0;
 		public int PKT_count = 0;
+		public int REGION_cycle = 0;
 
 		// sensing status
 		public bool isSensing = false;
@@ -60,7 +64,7 @@ namespace GeRaF
 		public int BusyWithId => busyWith == null ? -1 : busyWith.id;
 
 		[JsonIgnore]
-		private FreeRelayEvent freeEvent = null;
+		private FreeEvent freeEvent = null;
 
 		public void SelfReserve() {
 			busyWith = this;
@@ -74,7 +78,7 @@ namespace GeRaF
 			else {
 				if (busyWith == null) {
 					busyWith = reserver;
-					freeEvent = new FreeRelayEvent();
+					freeEvent = new FreeEvent();
 					freeEvent.time = sim.clock + sim.protocolParameters.t_busy;
 					freeEvent.relay = this;
 					sim.eventQueue.Add(freeEvent);
@@ -103,11 +107,12 @@ namespace GeRaF
 
 		public void Reset() {
 			packetToSend = null;
-			regionIndex = 0;
+			REGION_index = 0;
 			COL_count = 0;
 			SENSE_count = 0;
-			ATTEMPT_count = 0;
 			PKT_count = 0;
+			SINK_RTS_count = 0;
+			REGION_cycle = 0;
 		}
 	}
 }

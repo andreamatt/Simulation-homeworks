@@ -1,11 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using GeRaF.Events.Check;
+using GeRaF.Network;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GeRaF
+namespace GeRaF.Events.Transmissions
 {
 	class StartPKTEvent : StartTransmissionEvent
 	{
@@ -15,6 +17,8 @@ namespace GeRaF
 
 		public override void Handle(Simulation sim) {
 			relay.status = RelayStatus.Transmitting;
+
+			relay.PKT_count++;
 
 			var transmissions = sendTransmissions(TransmissionType.PKT, chosenRelay);
 			// put other interested relays (not chosen) to sleep
@@ -45,7 +49,6 @@ namespace GeRaF
 					// if chosen one, schedule ACK
 					if (n == chosenRelay) {
 						// update busy
-						n.Reserve(relay, sim);
 						var ACK_start = new StartACKEvent();
 						ACK_start.time = sim.clock;
 						ACK_start.relay = n;
@@ -57,9 +60,6 @@ namespace GeRaF
 					}
 				}
 			}
-
-			// increase PKT attempts
-			relay.PKT_count++;
 
 			// schedule ACK_check
 			var ACK_check = new CheckACKEvent();

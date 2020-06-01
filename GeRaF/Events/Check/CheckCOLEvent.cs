@@ -1,11 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using GeRaF.Events.Intermediate;
+using GeRaF.Events.Transmissions;
+using GeRaF.Network;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GeRaF
+namespace GeRaF.Events.Check
 {
 	class CheckCOLEvent : Event
 	{
@@ -25,11 +28,11 @@ namespace GeRaF
 				// if any have failed send COL or go to next region
 				if (relay.finishedTransmissions.Any(t => t.failed)) {
 					if (relay.COL_count < sim.protocolParameters.n_max_coll) {
+						relay.COL_count++;
 						var COL_start = new StartCOLEvent();
 						COL_start.time = sim.clock;
 						COL_start.relay = relay;
 						sim.eventQueue.Add(COL_start);
-						relay.COL_count++;
 					}
 					else {
 						var regionChange = new RegionProgressEvent();

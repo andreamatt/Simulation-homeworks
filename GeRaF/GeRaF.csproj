@@ -65,32 +65,36 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Event\Check\EventCheckACK.cs" />
-    <Compile Include="Event\Check\EventCheckCOL.cs" />
-    <Compile Include="Event\Check\EventCheckSinkCOL.cs" />
-    <Compile Include="Event\DebugStats\DebugEvent.cs" />
-    <Compile Include="Event\EventTransmission.cs" />
-    <Compile Include="Event\EventSensing.cs" />
-    <Compile Include="Event\Transmission\EventPKT.cs" />
-    <Compile Include="Event\Transmission\EventACK.cs" />
-    <Compile Include="Event\Transmission\EventCOL.cs" />
-    <Compile Include="Event\Transmission\EventCTS.cs" />
-    <Compile Include="Event\DebugStats\DebugStats.cs" />
-    <Compile Include="Event\EventMain.cs" />
+    <Compile Include="Events\Check\CheckACKEvent.cs" />
+    <Compile Include="Events\Check\CheckCOLEvent.cs" />
+    <Compile Include="Events\Check\CheckSinkCOLEvent.cs" />
+    <Compile Include="Events\DebugStats\DebugEvent.cs" />
+    <Compile Include="Events\DutyCycle\AwakeEvent.cs" />
+    <Compile Include="Events\DutyCycle\FreeEvent.cs" />
+    <Compile Include="Events\DutyCycle\SleepEvent.cs" />
+    <Compile Include="Events\Intermediate\RegionProgressEvent.cs" />
+    <Compile Include="Events\Transmissions\TransmissionEvent.cs" />
+    <Compile Include="Events\Intermediate\SensingEvent.cs" />
+    <Compile Include="Events\Transmissions\PKTEvent.cs" />
+    <Compile Include="Events\Transmissions\ACKEvent.cs" />
+    <Compile Include="Events\Transmissions\COLEvent.cs" />
+    <Compile Include="Events\Transmissions\CTSEvent.cs" />
+    <Compile Include="Events\DebugStats\DebugStats.cs" />
+    <Compile Include="Events\Event.cs" />
     <Compile Include="SimulationParameters.cs" />
     <Compile Include="Utils\EnumJsonConverter.cs" />
     <Compile Include="Utils\EventQueue.cs" />
-    <Compile Include="Event\Transmission\EventSinkRTS.cs" />
-    <Compile Include="Element\Packet.cs" />
+    <Compile Include="Events\Transmissions\SinkRTSEvent.cs" />
+    <Compile Include="Network\Packet.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProtocolParameters.cs" />
     <Compile Include="Utils\GraphUtils.cs" />
     <Compile Include="Utils\RNG.cs" />
-    <Compile Include="Element\Relay.cs" />
-    <Compile Include="Event\Transmission\EventRTS.cs" />
+    <Compile Include="Network\Relay.cs" />
+    <Compile Include="Events\Transmissions\RTSEvent.cs" />
     <Compile Include="Simulation.cs" />
-    <Compile Include="Element\Transmission.cs" />
+    <Compile Include="Network\Transmission.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
