@@ -5,6 +5,9 @@
 
 debug.json
 
+graphic_debug/node_modules
+graphic_debug/dist
+
 # User-specific files
 *.rsuser
 *.suo
