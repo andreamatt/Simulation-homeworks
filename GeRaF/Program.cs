@@ -24,15 +24,16 @@ namespace GeRaF
 				n_max_region_cycle = 1
 			};
 			var sp = new SimulationParameters() {
-				area_side = 30,
+				area_side = 100,
 				debug_interval = 1,
-				debugType = DebugType.Always,
+				debugType = DebugType.Never,
 				debug_file = "../../debug.json",
-				max_time = 10,
-				n_nodes = 20,
-				packet_rate = 3,
+				max_time = 10000,
+				n_nodes = 200,
+				packet_rate = 2,
 				range = 20,
-				min_distance = 7
+				min_distance = 7,
+				percentages = 200
 			};
 			var sim = new Simulation(sp, pp);
 			sim.Run();

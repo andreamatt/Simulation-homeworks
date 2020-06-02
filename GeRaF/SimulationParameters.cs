@@ -23,6 +23,7 @@ namespace GeRaF
 		public double packet_rate;
 		public double debug_interval;
 		public DebugType debugType;
+		public int percentages;
 		public string debug_file;
 	}
 }
