@@ -20,7 +20,8 @@ namespace GeRaF.Events.Transmissions
 			sim.eventQueue.Add(new EndCOLEvent {
 				relay = relay,
 				time = sim.clock + sim.protocolParameters.t_signal,
-				sim = sim
+				sim = sim,
+				previous = this
 			});
 		}
 	}
@@ -35,7 +36,8 @@ namespace GeRaF.Events.Transmissions
 			sim.eventQueue.Add(new CheckSINKCOLEvent {
 				relay = relay,
 				time = sim.clock + sim.protocolParameters.t_signal + sim.protocolParameters.t_delta,
-				sim = sim
+				sim = sim,
+				previous = this
 			});
 
 		}

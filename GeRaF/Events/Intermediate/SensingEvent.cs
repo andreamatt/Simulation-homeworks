@@ -30,7 +30,8 @@ namespace GeRaF.Events.Intermediate
 			sim.eventQueue.Add(new EndSensingEvent {
 				relay = relay,
 				time = sim.clock + sim.protocolParameters.t_sense,
-				sim = sim
+				sim = sim,
+				previous = this
 			});
 		}
 	}
@@ -48,13 +49,14 @@ namespace GeRaF.Events.Intermediate
 					sim.eventQueue.Add(new StartSensingEvent {
 						time = sim.clock + sim.protocolParameters.t_backoff * RNG.rand(),
 						relay = relay,
-						sim = sim
+						sim = sim,
+						previous = this
 					});
 				}
 				else {
 					// finish and free
 					relay.packetToSend.Finish(Result.Abort_max_sensing, sim);
-					relay.FreeNow();
+					relay.FreeNow(this);
 				}
 			}
 			else {
@@ -64,14 +66,16 @@ namespace GeRaF.Events.Intermediate
 						time = sim.clock,
 						relay = relay,
 						actualDestination = relay.packetToSend.sink,
-						sim = sim
+						sim = sim,
+						previous = this
 					});
 				}
 				else {
 					sim.eventQueue.Add(new StartRTSEvent {
 						time = sim.clock,
 						relay = relay,
-						sim = sim
+						sim = sim,
+						previous = this
 					});
 				}
 			}

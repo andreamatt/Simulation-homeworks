@@ -10,19 +10,21 @@ namespace GeRaF.Events.DebugStats
 	class DebugEvent : Event
 	{
 		public override void Handle() {
-			DebugNow(sim, false);
+			DebugNow(sim, false, null);
 
 			// schedule next debug
-			var dbgEvent = new DebugEvent();
-			dbgEvent.time = sim.clock + sim.simulationParameters.debug_interval;
-			sim.eventQueue.Add(dbgEvent);
+			sim.eventQueue.Add(new DebugEvent {
+				time = sim.clock + sim.simulationParameters.debug_interval,
+				sim = sim,
+				previous = this
+			});
 		}
 
-		public static void DebugNow(Simulation sim, bool ending) {
+		public static void DebugNow(Simulation sim, bool ending, Event current) {
 			// dump simulation to file
 			var stats = new DebugStats() {
 				time = sim.clock,
-				events = sim.eventQueue.ToList(),
+				currentEvent = current,
 				relays = sim.relays
 			};
 

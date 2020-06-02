@@ -12,7 +12,7 @@ namespace GeRaF.Events.DutyCycle
 		public Relay relay;
 
 		public override void Handle() {
-			// how to free if transmissions incoming?
+			relay.Sleep(this);
 		}
 	}
 }

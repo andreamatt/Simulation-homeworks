@@ -24,12 +24,14 @@ namespace GeRaF.Events.Check
 					sim.eventQueue.Add(new StartSINKRTSEvent {
 						time = sim.clock + RNG.rand() * sim.protocolParameters.t_backoff,
 						relay = relay,
-						sim = sim
+						actualDestination = relay.packetToSend.sink,
+						sim = sim,
+						previous = this
 					});
 				}
 				else {
 					relay.packetToSend.Finish(Result.Abort_max_sink_rts, sim);
-					relay.FreeNow();
+					relay.FreeNow(this);
 				}
 			}
 			// sink replied successfully
@@ -40,7 +42,8 @@ namespace GeRaF.Events.Check
 					time = sim.clock,
 					relay = relay,
 					actualDestination = chosen,
-					sim = sim
+					sim = sim,
+					previous = this
 				});
 			}
 

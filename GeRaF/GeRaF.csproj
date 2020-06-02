@@ -82,7 +82,8 @@
     <Compile Include="Events\Transmissions\CTSEvent.cs" />
     <Compile Include="Events\DebugStats\DebugStats.cs" />
     <Compile Include="Events\Event.cs" />
-    <Compile Include="Network\RelayHandler.cs" />
+    <Compile Include="Network\RelayCycle.cs" />
+    <Compile Include="Network\RelayTransmission.cs" />
     <Compile Include="SimulationParameters.cs" />
     <Compile Include="Utils\EnumJsonConverter.cs" />
     <Compile Include="Utils\EventQueue.cs" />

@@ -21,7 +21,8 @@ namespace GeRaF.Events.Transmissions
 				time = sim.clock + sim.protocolParameters.t_signal,
 				relay = relay,
 				actualDestination = actualDestination,
-				sim = sim
+				sim = sim,
+				previous = this
 			});
 		}
 	}
@@ -35,22 +36,23 @@ namespace GeRaF.Events.Transmissions
 			// copy packet from sender (actual destination of ACK)
 			var packet = Packet.copy(actualDestination.packetToSend);
 
-			// free relay
-			relay.FreeNow();
-
 			relay.packetToSend = packet;
 
 			// if reached sink, stop
 			if (relay.packetToSend.sink == relay) {
 				relay.packetToSend.Finish(Result.Success, sim);
+				relay.FreeNow(this);
 			}
 			else {
 				// become sender
+				relay.FreeNow(this);
+				relay.packetToSend = packet;
 				relay.SelfReserve();
 				sim.eventQueue.Add(new StartSensingEvent {
 					time = sim.clock,
 					relay = relay,
-					sim = sim
+					sim = sim,
+					previous = this
 				});
 			}
 		}

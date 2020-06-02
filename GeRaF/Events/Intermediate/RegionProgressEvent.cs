@@ -26,12 +26,13 @@ namespace GeRaF.Events.Intermediate
 					sim.eventQueue.Add(new StartRTSEvent {
 						time = sim.clock,
 						relay = relay,
-						sim = sim
+						sim = sim,
+						previous = this
 					});
 				}
 				else {
 					relay.packetToSend.Finish(Result.Abort_max_region_cycle, sim);
-					relay.FreeNow();
+					relay.FreeNow(this);
 				}
 			}
 			// go next region
@@ -41,7 +42,8 @@ namespace GeRaF.Events.Intermediate
 				sim.eventQueue.Add(new StartRTSEvent {
 					time = sim.clock,
 					relay = relay,
-					sim = sim
+					sim = sim,
+					previous = this
 				});
 			}
 		}

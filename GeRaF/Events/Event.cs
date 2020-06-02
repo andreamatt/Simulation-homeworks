@@ -54,6 +54,9 @@ namespace GeRaF.Events
 		public double time;
 		public string type => this.GetType().Name;
 
+		[JsonIgnore]
+		public Event previous;
+
 		public abstract void Handle();
 	}
 
@@ -63,7 +66,8 @@ namespace GeRaF.Events
 			// add initial packet arrival
 			sim.eventQueue.Add(new PacketGenerationEvent {
 				time = RNG.rand_expon(sim.simulationParameters.packet_rate),
-				sim = sim
+				sim = sim,
+				previous = this
 			});
 		}
 	}
@@ -75,7 +79,7 @@ namespace GeRaF.Events
 			// clear event queue
 			sim.eventQueue.Clear();
 
-			DebugEvent.DebugNow(sim, true);
+			DebugEvent.DebugNow(sim, true, this);
 
 			return;
 		}
@@ -87,7 +91,8 @@ namespace GeRaF.Events
 			// schedule next packet arrival
 			sim.eventQueue.Add(new PacketGenerationEvent {
 				time = sim.clock + RNG.rand_expon(sim.simulationParameters.packet_rate),
-				sim = sim
+				sim = sim,
+				previous = this
 			});
 
 			// give this packet to some relay or discard it if none are available
@@ -111,7 +116,8 @@ namespace GeRaF.Events
 				sim.eventQueue.Add(new StartSensingEvent {
 					time = sim.clock,
 					relay = chosen,
-					sim = sim
+					sim = sim,
+					previous = this
 				});
 			}
 			// no nodes available

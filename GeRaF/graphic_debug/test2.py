@@ -1,21 +1,13 @@
-import time
-import plotly.graph_objects as go
+import plotly.express as px
+data = dict(
+    character=["Eve", "Cain", "Seth", "Enos", "Noam", "Abel", "Awan", "Enoch", "Azura"],
+    parent=["", "Eve", "Eve", "Seth", "Seth", "Eve", "Eve", "Awan", "Eve" ],
+    value=[10, 14, 12, 10, 2, 6, 6, 4, 4])
 
-data = [1,3,2,4,3,3,2,3]
-
-fig = go.FigureWidget()
-fig.add_scatter()
-
-fig
-
-# Method I
-for i in range(len(data)):
-	time.sleep(0.3)
-	fig.data[0].y = data[:i]
-
-
-# Method II
-# for i in range(len(data)):
-#     time.sleep(0.3)
-#     with fig.batch_update():
-#         fig.data[0].y = data[:i]
+fig =px.sunburst(
+    data,
+    names='character',
+    parents='parent',
+    values='value',
+)
+fig.show()

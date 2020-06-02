@@ -1,5 +1,6 @@
 ﻿using GeRaF.Events;
 using GeRaF.Events.DebugStats;
+using GeRaF.Events.DutyCycle;
 using GeRaF.Network;
 using GeRaF.Utils;
 using Newtonsoft.Json;
@@ -34,15 +35,45 @@ namespace GeRaF
 			this.simulationParameters = simulationParameters;
 			this.protocolParameters = protocolParameters;
 
-			// init relays
+			// init sim state
+			clock = 0;
+			eventQueue = new EventQueue();
+			eventQueue.Add(new StartEvent() {
+				time = 0,
+				sim = this,
+				previous = null
+			});
+			eventQueue.Add(new EndEvent() {
+				time = simulationParameters.max_time,
+				sim = this,
+				previous = null
+			});
+
+			if (simulationParameters.debugType == DebugType.Interval) {
+				eventQueue.Add(new DebugEvent() {
+					time = simulationParameters.debug_interval,
+					sim = this,
+					previous = null
+				});
+			}
+
+			// init relays as asleep and schedule random awake
 			relays = new List<Relay>();
-			// generate first batch
+			var initialCycleDuration = protocolParameters.t_sleep + protocolParameters.t_listen;
 			for (int i = 0; i < simulationParameters.n_nodes; i++) {
-				relays.Add(new Relay {
+				var relay = new Relay {
 					id = i,
 					range = simulationParameters.range,
-					status = RelayStatus.Free,  // generate based on duty cycle probability ???
+					status = RelayStatus.Asleep,
 					sim = this
+				};
+				relays.Add(relay);
+				eventQueue.Add(new AwakeEvent() {
+					relay = relay,
+					// could be at any point of its duty cycle
+					time = RNG.rand() * initialCycleDuration,
+					sim = this,
+					previous = null
 				});
 			}
 
@@ -62,25 +93,6 @@ namespace GeRaF
 			}
 			Console.WriteLine("Placed relays");
 
-			// init sim state
-			clock = 0;
-			eventQueue = new EventQueue();
-			eventQueue.Add(new StartEvent() {
-				time = 0,
-				sim = this
-			});
-			eventQueue.Add(new EndEvent() {
-				time = simulationParameters.max_time,
-				sim = this
-			});
-
-			if (simulationParameters.debugType == DebugType.Interval) {
-				eventQueue.Add(new DebugEvent() {
-					time = simulationParameters.debug_interval,
-					sim = this
-				});
-			}
-
 			// init debug state
 			debugWriter = new StreamWriter(simulationParameters.debug_file);
 			debugWriter.Write("{\n");
@@ -88,16 +100,20 @@ namespace GeRaF
 			debugWriter.Write($"\"ProtocolParameters\": {JsonConvert.SerializeObject(protocolParameters)},\n");
 			debugWriter.Write($"\"Distances\": {JsonConvert.SerializeObject(distances)},\n");
 			debugWriter.Write($"\"Frames\": [\n");
+
 		}
 
 		public void Run() {
 			while (eventQueue.isEmpty == false) {
-				if (simulationParameters.debugType == DebugType.Always) {
-					DebugEvent.DebugNow(this, false);
-				}
 				var e = eventQueue.Pop();
+				if (e.time < this.clock) {
+					throw new Exception("WTF");
+				}
 				this.clock = e.time;
 				e.Handle();
+				if (simulationParameters.debugType == DebugType.Always) {
+					DebugEvent.DebugNow(this, false, e);
+				}
 			}
 
 			// stats

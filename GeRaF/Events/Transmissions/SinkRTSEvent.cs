@@ -22,7 +22,8 @@ namespace GeRaF.Events.Transmissions
 				time = sim.clock + sim.protocolParameters.t_signal,
 				relay = relay,
 				actualDestination = actualDestination,
-				sim = sim
+				sim = sim,
+				previous = this
 			});
 		}
 	}
@@ -38,7 +39,8 @@ namespace GeRaF.Events.Transmissions
 				relay = relay,
 				// time + CTS_time + time delta to make sure CTS events come before COL check
 				time = sim.clock + sim.protocolParameters.t_signal + sim.protocolParameters.t_delta,
-				sim = sim
+				sim = sim,
+				previous = this
 			});
 		}
 	}

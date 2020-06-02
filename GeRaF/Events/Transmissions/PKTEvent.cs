@@ -24,7 +24,8 @@ namespace GeRaF.Events.Transmissions
 				time = sim.clock + sim.protocolParameters.t_data,
 				relay = relay,
 				actualDestination = actualDestination,
-				sim = sim
+				sim = sim,
+				previous = this
 			});
 		}
 	}
@@ -41,7 +42,8 @@ namespace GeRaF.Events.Transmissions
 				time = sim.clock + sim.protocolParameters.t_signal + sim.protocolParameters.t_delta,
 				relay = relay,
 				chosenRelay = actualDestination,
-				sim = sim
+				sim = sim,
+				previous = this
 			});
 		}
 	}

@@ -21,7 +21,7 @@ namespace GeRaF.Events.Check
 
 		public override void Handle() {
 			if (relay.receivedACK) {
-				relay.FreeNow();
+				relay.FreeNow(this);
 			}
 			else {
 				// check ack count and resend OR abort
@@ -31,12 +31,13 @@ namespace GeRaF.Events.Check
 						time = sim.clock,
 						relay = relay,
 						actualDestination = chosenRelay,
-						sim = sim
+						sim = sim,
+						previous = this
 					});
 				}
 				else {
 					relay.packetToSend.Finish(Result.Abort_no_ack, sim);
-					relay.FreeNow();
+					relay.FreeNow(this);
 				}
 			}
 			relay.receivedACK = false;

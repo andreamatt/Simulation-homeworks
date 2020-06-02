@@ -6,9 +6,10 @@ namespace GeRaF.Events.DebugStats
 {
 	class DebugStats
 	{
+		[JsonIgnore]
 		public static bool first = true;
 		public double time;
-		public List<Event> events;
+		public Event currentEvent;
 		public List<Relay> relays;
 		public List<Packet> finishedPackets;
 	}

@@ -22,7 +22,8 @@ namespace GeRaF.Events.Check
 				sim.eventQueue.Add(new RegionProgressEvent() {
 					time = sim.clock,
 					relay = relay,
-					sim = sim
+					sim = sim,
+					previous = this
 				});
 			}
 			else {
@@ -33,14 +34,16 @@ namespace GeRaF.Events.Check
 						sim.eventQueue.Add(new StartCOLEvent() {
 							time = sim.clock,
 							relay = relay,
-							sim = sim
+							sim = sim,
+							previous = this
 						});
 					}
 					else {
 						sim.eventQueue.Add(new RegionProgressEvent() {
 							time = sim.clock,
 							relay = relay,
-							sim = sim
+							sim = sim,
+							previous = this
 						});
 					}
 				}
@@ -52,7 +55,8 @@ namespace GeRaF.Events.Check
 						time = sim.clock,
 						relay = relay,
 						actualDestination = chosen,
-						sim = sim
+						sim = sim,
+						previous = this
 					});
 				}
 			}
