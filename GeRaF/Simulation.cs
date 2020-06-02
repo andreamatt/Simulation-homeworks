@@ -104,12 +104,18 @@ namespace GeRaF
 		}
 
 		public void Run() {
+			double lastPrintPercentage = 0;
 			while (eventQueue.isEmpty == false) {
 				var e = eventQueue.Pop();
 				if (e.time < this.clock) {
 					throw new Exception("WTF");
 				}
 				this.clock = e.time;
+				var percentage = this.clock / simulationParameters.max_time;
+				if (percentage > lastPrintPercentage) {
+					Console.WriteLine($"Simulating ... {lastPrintPercentage * 100:F3}%");
+					lastPrintPercentage += 1 / (double)simulationParameters.percentages;
+				}
 				e.Handle();
 				if (simulationParameters.debugType == DebugType.Always) {
 					DebugEvent.DebugNow(this, false, e);
@@ -134,23 +140,6 @@ namespace GeRaF
 
 			debugWriter.Write("\n]\n}");
 			debugWriter.Close();
-
-			//Console.WriteLine("Rewriting");
-
-			//dynamic allFile;
-			//using (var reader = new StreamReader(simulationParameters.debug_file)) {
-			//	allFile = JsonConvert.DeserializeObject(reader.ReadToEnd());
-			//}
-
-			//var formatted = JsonConvert.SerializeObject(allFile, Formatting.Indented);
-			//using (var writer = new StreamWriter(simulationParameters.debug_file)) {
-			//	writer.Write(formatted);
-			//}
-
-			//Console.WriteLine("Compressing");
-			//using (var writer = new StreamWriter(simulationParameters.debug_file_compressed)) {
-			//	writer.Write(StringCompress.Compress(formatted));
-			//}
 		}
 	}
 }
