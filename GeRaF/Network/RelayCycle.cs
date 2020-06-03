@@ -19,6 +19,14 @@ namespace GeRaF.Network
 		private FreeEvent freeEvent = null;
 		private SleepEvent sleepEvent = null;
 		private double awakeSince = 0;
+		private double lastSleep = 0;
+
+		public bool ShouldBeAwake {
+			get {
+				var since_sleep = (sim.clock - lastSleep) % sim.protocolParameters.t_cycle;
+				return since_sleep >= sim.protocolParameters.t_sleep;
+			}
+		}
 
 		public void SelfReserve() {
 			busyWith = this;
@@ -131,19 +139,37 @@ namespace GeRaF.Network
 			sim.eventQueue.Add(sleepEvent);
 		}
 
+		public void AwakeMidtime(Event cause) {
+			status = RelayStatus.Free;
+			var n_cycles = Math.Floor((sim.clock - lastSleep) / sim.protocolParameters.t_cycle);
+			lastSleep = lastSleep + n_cycles * sim.protocolParameters.t_cycle;
+			awakeSince = lastSleep + sim.protocolParameters.t_sleep;
+			sleepEvent = new SleepEvent() {
+				time = awakeSince + sim.protocolParameters.t_listen,
+				relay = this,
+				sim = sim,
+				previous = cause
+			};
+			if (sleepEvent.time < sim.clock) {
+				throw new Exception("no time travel plz");
+			}
+			sim.eventQueue.Add(sleepEvent);
+		}
+
 		public void Sleep(Event cause) {
+			lastSleep = sim.clock;
 			sleepEvent = null;
 			// how to free if transmissions incoming?
 			Reset();
 			receivingTransmissions.Clear();
 			status = RelayStatus.Asleep;
 			// schedule awake
-			sim.eventQueue.Add(new AwakeEvent() {
-				relay = this,
-				time = sim.clock + sim.protocolParameters.t_sleep,
-				sim = sim,
-				previous = cause
-			});
+			//sim.eventQueue.Add(new AwakeEvent() {
+			//	relay = this,
+			//	time = sim.clock + sim.protocolParameters.t_sleep,
+			//	sim = sim,
+			//	previous = cause
+			//});
 		}
 	}
 }

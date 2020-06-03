@@ -23,6 +23,7 @@ namespace GeRaF
 		public double t_backoff = 0.0219; // backoff interval length (constant?)
 		public double t_listen = 0.016; // listening time, must be quite higher than t_signal
 		public double t_sleep => t_listen * ((1 / duty_cycle) - 1); // 0.144000, sleep time
+		public double t_cycle => t_sleep + t_listen;
 		public double t_data = 0.0521; // data transmission time
 		public double t_signal = 0.00521; // signal packet transmission time (RTS and CTS ?)
 		public double t_busy => Math.Pow(2, n_max_coll) * t_backoff + 2 * t_signal + t_delta; // slightly more than the max backoff + cts_time + col_time

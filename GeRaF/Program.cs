@@ -11,7 +11,7 @@ namespace GeRaF
 	{
 		static void Main(string[] args) {
 			var pp = new ProtocolParameters() {
-				duty_cycle = 0.9, // NOT IN SECONDS: active time percentage (t_l / (t_l + t_s))
+				duty_cycle = 0.5, // NOT IN SECONDS: active time percentage (t_l / (t_l + t_s))
 				t_sense = 0.0521, // carrier sense duration (needs to be more than any signal duration)
 				t_backoff = 0.0219, // backoff interval length (constant?)
 				t_listen = 0.016, // listening time, must be quite higher than t_signal
@@ -26,11 +26,11 @@ namespace GeRaF
 			var sp = new SimulationParameters() {
 				area_side = 100,
 				debug_interval = 1,
-				debugType = DebugType.Never,
+				debugType = DebugType.Always,
 				debug_file = "../../debug.json",
-				max_time = 10000,
+				max_time = 5,
 				n_nodes = 200,
-				packet_rate = 2,
+				packet_rate = 10,
 				range = 20,
 				min_distance = 7,
 				percentages = 200
@@ -38,6 +38,11 @@ namespace GeRaF
 			var sim = new Simulation(sp, pp);
 			sim.Run();
 			Console.WriteLine("Finished");
+			Console.ReadKey();
+			Console.ReadKey();
+			Console.ReadKey();
+			Console.ReadKey();
+			Console.ReadKey();
 			Console.ReadKey();
 		}
 	}

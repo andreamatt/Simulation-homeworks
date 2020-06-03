@@ -12,6 +12,9 @@ namespace GeRaF.Network
 	partial class Relay
 	{
 		public void StartReceiving(Relay sender) {
+			if (this.status == RelayStatus.Asleep && this.ShouldBeAwake) {
+				this.AwakeMidtime(null);
+			}
 			bool interested = false;
 			switch (this.status) {
 				case RelayStatus.Sensing:
@@ -40,12 +43,13 @@ namespace GeRaF.Network
 					throw new Exception("Unexpected relay status");
 			}
 
+			// every one else failes anyway
+			foreach (var transmitter in receivingTransmissions.Keys.ToList()) {
+				receivingTransmissions[transmitter] = false;
+			}
+
 			if (interested) {
 				bool failed = receivingTransmissions.Count > 0;
-				// every one else failes
-				foreach (var transmitter in receivingTransmissions.Keys.ToList()) {
-					receivingTransmissions[transmitter] = false;
-				}
 				this.receivingTransmissions[sender] = failed;
 			}
 		}
@@ -107,7 +111,7 @@ namespace GeRaF.Network
 					});
 				}
 				// i'm early
-				else if (myIndex > sender.REGION_index) {
+				else if (myIndex > sender.REGION_index && myIndex < sim.protocolParameters.n_regions) {
 					this.Reserve(sender, cause);
 					this.status = RelayStatus.Awaiting_region;
 				}
