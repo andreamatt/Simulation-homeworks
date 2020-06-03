@@ -1,3 +1,5 @@
+import * as d3 from 'd3'
+import * as fs from 'fs'
 // global.d.ts
 // import * as _d3 from "d3"
 
@@ -169,8 +171,45 @@ class Relay {
   }
 }
 
+class Plot {
+  dot_radius: number = 1.6
+  ProtocolParameters: any
+
+  relay_colors = {
+    "Asleep": '#aaaaaa',  // grey
+    "Free": "#50bbaa",  // green
+    "Awaiting_region": 'brown',
+    "Transmitting": 'blue',
+    "Sensing": '#3399ff',  // lightblue
+    "Awaiting_Signal": 'yellow',
+    "Backoff_Sensing": 'red',
+    "Backoff_CTS": '#ff9900',  // orange
+    "Backoff_SinkRTS": '#ffb909'  // orange
+  }
+
+  signal_colors = {
+    "SINK_RTS": '#7bd1e2',  // lightblue
+    "RTS": 'blue',
+    "CTS": '#66ff66',  // light green
+    "PKT": '#ff00ff',  // fucsia
+    "SINK_COL": 'orange',
+    "COL": 'red',
+    "ACK": '#009933'  // dark green
+  }
+
+  // constructor(data) {
+  //   this.ProtocolParameters = new ProtocolParameters(data["ProtocolParameters"])
+  // }
+
+  load_JSON(file_path: string) {
+    let data_file: Buffer = fs.readFileSync(file_path)
+    let dataObj = JSON.parse(data_file.toString()) // __dirname
+    console.log(dataObj["SimulationParameters"])
+  }
+}
+
 // MAIN SCRIPT //
-import * as d3 from 'd3'
+
 
 d3
   .select(".target")
@@ -180,6 +219,9 @@ d3
   .select("body").append("span")
   .text("Hello, world!")
 
-d3.json("debug.json").then((data) => {
-  console.log(data)
-})
+// data = d3
+//   .json("debug.json")
+//   .then((data: JSON) => data)
+
+let plot = new Plot()
+plot.load_JSON("debug.json")

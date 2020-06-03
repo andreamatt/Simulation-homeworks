@@ -3,17 +3,11 @@
 		"noImplicitAny": true,
 		"removeComments": true,
 		"preserveConstEnums": true,
-		"skipLibCheck": true,
-		"outDir": "dist/",
-		"allowUmdGlobalAccess": true,
-		"target": "es5",
-		"sourceMap": true,
-		"declaration": true,
-		"module": "es2015",
-		"moduleResolution": "node"
+		"alwaysStrict": true,
+		"outDir": "dist/"
 	},
 	"include": [
-		"src"
+		"src/*"
 	],
 	"exclude": [
 		"node_modules"
