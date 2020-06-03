@@ -1,13 +1,5 @@
-import * as d3 from 'd3'
 import * as fs from 'fs'
-// global.d.ts
-// import * as _d3 from "d3"
-
-// declare global {
-//   const d3: typeof _d3
-// }
-
-// console.log("EDDAI")
+import * as d3 from 'd3'
 
 enum info_modality {
   off = 0,
@@ -17,14 +9,14 @@ enum info_modality {
 }
 
 class SimulationParameters {
-  max_time: string
-  area_side: string
-  range: string
-  min_distance: string
-  n_nodes: string
-  packet_rate: string
-  debug_interval: string
-  debugType: string
+  max_time: number
+  area_side: number
+  range: number
+  min_distance: number
+  n_nodes: number
+  packet_rate: number
+  debug_interval: number
+  debugType: number
   debug_file: string
 
   constructor(data: any) {
@@ -41,21 +33,21 @@ class SimulationParameters {
 }
 
 class ProtocolParameters {
-  duty_cycle: string
-  t_sense: string
-  t_backoff: string
-  t_listen: string
-  t_sleep: string
-  t_data: string
-  t_signal: string
-  t_busy: string
-  n_regions: string
-  n_max_coll: string
-  n_max_sensing: string
-  n_max_sink_rts: string
-  n_max_pkt: string
-  n_max_region_cycle: string
-  t_delta: string
+  duty_cycle: number
+  t_sense: number
+  t_backoff: number
+  t_listen: number
+  t_sleep: number
+  t_data: number
+  t_signal: number
+  t_busy: number
+  n_regions: number
+  n_max_coll: number
+  n_max_sensing: number
+  n_max_sink_rts: number
+  n_max_pkt: number
+  n_max_region_cycle: number
+  t_delta: number
   protocolVersion: string
 
   constructor(data: any) {
@@ -80,11 +72,11 @@ class ProtocolParameters {
 
 class Transmission {
   Type: string
-  failed: string
-  id: string
-  sourceId: string
-  destinationId: string
-  actualDestination: string
+  failed: boolean
+  id: number
+  sourceId: number
+  destinationId: number
+  actualDestination: boolean
 
   constructor(data: any) {
     this.Type = data['transmissionType']
@@ -134,10 +126,10 @@ class Relay {
   REGION_cycle: string
   isSensing: string
   hasSensed: string
-  neighboursIds: string
+  neighboursIds: string[]
   BusyWithId: string
-  finishedCTSs: string[]
-  packetToSend: string
+  finishedCTSs: Transmission[]
+  packetToSend: Packet
 
   constructor(data: any) {
     this.id = data['id']
@@ -157,13 +149,14 @@ class Relay {
     this.hasSensed = data['hasSensed']
     this.neighboursIds = data['neighboursIds']
     this.BusyWithId = data['BusyWithId']
-    this.finishedCTSs = []
-    // this.packetToSend = None if data['packetToSend'] == None else Packet(data['packetToSend'])
 
-    //   for item in data['finishedCTSs']:
-    // 		transmission = Transmission(item)
-    // 		self.finishedCTSs.append(transmission)
-    // }
+    if (data['packetToSend'] != null) {
+      this.packetToSend = new Packet(data['packetToSend'])
+    }
+
+    for (const item of data['finishedCTSs']) {
+      this.finishedCTSs.push(new Transmission(item))
+    }
 
     // __str__()
     // __repr__()
@@ -171,9 +164,18 @@ class Relay {
   }
 }
 
-class Plot {
+export class Plot {
   dot_radius: number = 1.6
-  ProtocolParameters: any
+  protocolParameters: ProtocolParameters
+  sim_params: SimulationParameters
+  distances: {}
+  //relay_details: any
+  //relay_markers: {}
+  show_Ids: boolean
+  frame_index: number
+  frames: any[]
+  show_dutyCicle: boolean
+  frame_plotter: Frame_plotter
 
   relay_colors = {
     "Asleep": '#aaaaaa',  // grey
@@ -197,31 +199,43 @@ class Plot {
     "ACK": '#009933'  // dark green
   }
 
-  // constructor(data) {
-  //   this.ProtocolParameters = new ProtocolParameters(data["ProtocolParameters"])
-  // }
+  constructor(data: any) {
+    this.protocolParameters = new ProtocolParameters(data["ProtocolParameters"])
+    this.sim_params = new SimulationParameters(data["SimulationParameters"])
+    this.distances = data['Distances']
+    //this.relay_details = { i: 0 for i in range(Plot.sim_params.n_nodes) }
+    //this.relay_markers = {}
+    this.show_Ids = false
+    this.show_dutyCicle = false
+    this.frames = data["Frames"]
+    this.frame_index = 0
 
-  load_JSON(file_path: string) {
-    let data_file: Buffer = fs.readFileSync(file_path)
-    let dataObj = JSON.parse(data_file.toString()) // __dirname
-    console.log(dataObj["SimulationParameters"])
+    this.frame_plotter = new Frame_plotter(this.frames[this.frame_index])
+  }
+
+}
+
+class Frame_plotter {
+  time: number
+  //currentEvent
+  finishedPackets: any
+  relays: Relay[]
+
+  constructor(frame: any) {
+    this.time = frame["time"]
+    //this.currentEvent = frame['currentEvent']
+    this.finishedPackets = frame['finishedPackets']
+    this.relays = []
+
+    for (const item of frame['relays']) {
+      this.relays.push(new Relay(item))
+    }
+
   }
 }
 
-// MAIN SCRIPT //
-
-
-d3
-  .select(".target")
-  .style("stroke-width", 6)
-
-d3
-  .select("body").append("span")
-  .text("Hello, world!")
-
-// data = d3
-//   .json("debug.json")
-//   .then((data: JSON) => data)
-
-let plot = new Plot()
-plot.load_JSON("debug.json")
+export const loadJSON = (path: string) => {
+  let data_file: Buffer = fs.readFileSync(path)
+  let data = JSON.parse(data_file.toString())
+  return data
+}
