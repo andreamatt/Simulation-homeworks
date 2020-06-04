@@ -1,5 +1,4 @@
-import * as fs from 'fs'
-import * as d3 from 'd3'
+//import * as d3 from 'd3'
 
 enum info_modality {
   off = 0,
@@ -164,7 +163,7 @@ class Relay {
   }
 }
 
-export class Plot {
+class Plot {
   dot_radius: number = 1.6
   protocolParameters: ProtocolParameters
   sim_params: SimulationParameters
@@ -234,8 +233,30 @@ class Frame_plotter {
   }
 }
 
-export const loadJSON = (path: string) => {
-  let data_file: Buffer = fs.readFileSync(path)
-  let data = JSON.parse(data_file.toString())
-  return data
+// export const loadJSON = (path: string) => {
+//   let data_file: Buffer = fs.readFileSync(path)
+//   let data = JSON.parse(data_file.toString())
+//   return data
+// }
+
+let data
+function readSingleFile(e: any) {
+  var file = e.target.files[0]
+  if (!file) {
+    return
+  }
+  var reader = new FileReader()
+  reader.onload = function (e) {
+    var contents = e.target.result
+    data = JSON.parse(contents.toString())
+  }
+  reader.readAsText(file)
 }
+
+function displayContents(contents: any) {
+  var element = document.getElementById('file-content')
+  element.textContent = contents
+}
+
+document.getElementById('file-input')
+  .addEventListener('change', readSingleFile, false)
