@@ -95,11 +95,16 @@ namespace GeRaF
 
 			// init debug state
 			debugWriter = new StreamWriter(simulationParameters.debug_file);
-			debugWriter.Write("{\n");
-			debugWriter.Write($"\"SimulationParameters\": {JsonConvert.SerializeObject(simulationParameters)},\n");
-			debugWriter.Write($"\"ProtocolParameters\": {JsonConvert.SerializeObject(protocolParameters)},\n");
-			debugWriter.Write($"\"Distances\": {JsonConvert.SerializeObject(distances)},\n");
-			debugWriter.Write($"\"Frames\": [\n");
+			debugWriter.WriteLine($"{JsonConvert.SerializeObject(simulationParameters)}");
+			debugWriter.WriteLine("#");
+			debugWriter.WriteLine($"{JsonConvert.SerializeObject(protocolParameters)}");
+			debugWriter.WriteLine("#");
+			foreach (var r in relays) {
+				debugWriter.WriteLine($"{r.id};{r.X};{r.Y};{r.range}");
+			}
+			debugWriter.WriteLine("#");
+			debugWriter.WriteLine($"{JsonConvert.SerializeObject(distances)}");
+			debugWriter.WriteLine("#");
 
 		}
 
@@ -138,7 +143,10 @@ namespace GeRaF
 			Console.WriteLine($"Number of packets max_sink_rts: {max_sink_rts}, {max_sink_rts / tot * 100:F3}%");
 			Console.WriteLine($"Number of packets no_ack: {no_ack}, {no_ack / tot * 100:F3}%");
 
-			debugWriter.Write("\n]\n}");
+			debugWriter.WriteLine("#");
+			foreach (var p in finishedPackets) {
+				debugWriter.WriteLine($"{JsonConvert.SerializeObject(p)}");
+			}
 			debugWriter.Close();
 		}
 	}

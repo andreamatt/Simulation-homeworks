@@ -63,5 +63,15 @@ namespace GeRaF.Network
 		// sensing status
 		public bool isSensing = false;
 		public bool hasSensed = false;
+
+		public string ToFrameString() {
+			var res = "";
+			res += $"{(int)status}|{(int)transmissionType}|{transmissionDestinationId}|";
+			res += $"{REGION_index}|{COL_count}|{SENSE_count}|{SINK_RTS_count}|";
+			res += $"{PKT_count}|{REGION_cycle}|{(isSensing ? 1 : 0)}|{(hasSensed ? 1 : 0)}|{BusyWithId}|{(ShouldBeAwake ? 1 : 0)}|";
+			if (packetToSend == null) res += "|";
+			else res += $"{packetToSend.content_id}|{packetToSend.copy_id}";
+			return res;
+		}
 	}
 }

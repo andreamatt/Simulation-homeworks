@@ -32,14 +32,8 @@ namespace GeRaF.Events.DebugStats
 				stats.finishedPackets = sim.finishedPackets;
 			}
 
-			var stats_to_string = JsonConvert.SerializeObject(stats, Formatting.Indented);
-			if (DebugStats.first) {
-				DebugStats.first = false;
-				sim.debugWriter.Write(stats_to_string);
-			}
-			else {
-				sim.debugWriter.Write(",\n" + stats_to_string);
-			}
+			var stats_to_string = stats.ConvertToFrameLine();
+			sim.debugWriter.WriteLine(stats_to_string);
 		}
 	}
 }

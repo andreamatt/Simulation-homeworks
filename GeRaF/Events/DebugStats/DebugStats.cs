@@ -6,11 +6,17 @@ namespace GeRaF.Events.DebugStats
 {
 	class DebugStats
 	{
-		[JsonIgnore]
-		public static bool first = true;
 		public double time;
 		public Event currentEvent;
 		public List<Relay> relays;
 		public List<Packet> finishedPackets;
+
+		public string ConvertToFrameLine() {
+			var line = $"{time};{JsonConvert.SerializeObject(currentEvent)}";
+			foreach (var r in relays) {
+				line += ";" + r.ToFrameString();
+			}
+			return line;
+		}
 	}
 }

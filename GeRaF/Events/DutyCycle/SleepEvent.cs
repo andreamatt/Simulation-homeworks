@@ -1,4 +1,5 @@
 ﻿using GeRaF.Network;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,9 @@ namespace GeRaF.Events.DutyCycle
 {
 	class SleepEvent : Event
 	{
+		[JsonIgnore]
 		public Relay relay;
+		public int relayId => relay.id;
 
 		public override void Handle() {
 			relay.Sleep(this);

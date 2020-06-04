@@ -23,9 +23,11 @@ namespace GeRaF.Network
 
 	class Packet
 	{
-		static private int max_id = 0;
-		private int _id;
-		public int Id => _id;
+		static private int next_content_id = 0;
+		static private Dictionary<int, int> next_copy_id = new Dictionary<int, int>();
+
+		public int content_id = 0;
+		public int copy_id;
 		public double generationTime;
 
 		[JsonIgnore]
@@ -36,24 +38,28 @@ namespace GeRaF.Network
 		public Relay sink;
 		public int sinkId => sink == null ? -1 : sink.id;
 
+		public List<int> hopsIds = new List<int>();
+
 		public Result result = Result.None;
 
 		public Packet() {
-			_id = max_id;
-			max_id++;
-		}
-
-		private Packet(int id) {
-			_id = id;
+			content_id = next_content_id;
+			next_content_id++;
+			copy_id = 0;
+			next_copy_id[content_id] = 1;
 		}
 
 		public static Packet copy(Packet packet) {
-			return new Packet(packet._id) {
+			var p = new Packet() {
+				content_id = packet.content_id,
 				generationTime = packet.generationTime,
 				startRelay = packet.startRelay,
 				sink = packet.sink,
-				result = packet.result
+				result = packet.result,
+				copy_id = next_copy_id[packet.content_id]
 			};
+			next_copy_id[p.content_id]++;
+			return p;
 		}
 
 		public void Finish(Result result, Simulation sim) {
