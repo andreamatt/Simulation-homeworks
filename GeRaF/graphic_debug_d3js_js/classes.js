@@ -2,11 +2,44 @@ function range(n) {
 	return [...Array(n).keys()]
 }
 
-const info_modality = {
+const InfoModality = {
 	off: 0,
 	active_transmissions: 1,
 	finished_transmissions: 2,
 	packet_info: 3
+}
+
+const RelayStatus = {
+	Asleep: 0,
+	Free: 1,   // awake with no task
+	Awaiting_region: 2,
+	Transmitting: 3,
+	Sensing: 4,
+	Awaiting_Signal: 5,
+	Backoff_Sensing: 6,
+	Backoff_CTS: 7,
+	Backoff_SinkRTS: 8
+}
+
+const Result = {
+	None: 0,
+	Success: 1,
+	No_start_relays: 2,
+	//Abort_max_attempts,
+	Abort_max_region_cycle: 3,
+	Abort_max_sensing: 4,
+	Abort_max_sink_rts: 5,
+	Abort_no_ack: 6
+}
+
+const TransmissionType = {
+	SINK_RTS: 0,
+	RTS: 1,
+	CTS: 2,
+	PKT: 3,
+	SINK_COL: 4,
+	COL: 5,
+	ACK: 6
 }
 
 class SimulationParameters {
@@ -80,15 +113,15 @@ class Packet {
 
 class Relay {
 
-	constructor(data){
+	constructor(data) {
 		let fields = data.split(";")
 		this.id = parseInt(fields[0])
-		this.X = Number(fields[1].replace(",","."))
-		this.Y = Number(fields[2].replace(",","."))
-		this.range = Number(fields[3].replace(",","."))
+		this.X = Number(fields[1].replace(",", "."))
+		this.Y = Number(fields[2].replace(",", "."))
+		this.range = Number(fields[3].replace(",", "."))
 	}
 
-	update(data) {
+	update(data, packets) {
 		let fields = data.split("|")
 		this.status = parseInt(fields[0])
 		this.transmissionType = parseInt(fields[1])
@@ -103,14 +136,17 @@ class Relay {
 		this.hasSensed = parseInt(fields[10])
 		this.BusyWithId = parseInt(fields[11])
 		this.ShouldBeAwake = parseInt(fields[12])
-		// this.neighboursIds = fields[0]
-		// this.finishedCTSs = []
-		// this.packetToSend = data['packetToSend'] == None ? None : Packet(data['packetToSend'])
+		this.packetContentId = fields[13] == "" ? -1 : parseInt(fields[13])
+		this.packetCopyId = fields[14] == "" ? -1 : parseInt(fields[14])
 
-		// for (item of data['finishedCTSs']) {
-		// 	this.finishedCTSs.append(Transmission(item))
-		// }
+		this.packetToSend = this.packetContentId == -1 ? null : packets[this.packetContentId][this.packetCopyId]
 	}
+
+	get actualStatus() {
+		if (this.status != 0) return this.status
+		return this.ShouldBeAwake
+	}
+
 	// def __str__(self):
 	// 	return f"{'{'}{self.id};({self.X} . {self.Y}); ACTIVE: {'}'}"
 

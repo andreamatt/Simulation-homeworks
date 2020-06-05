@@ -22,7 +22,7 @@ namespace GeRaF
 		// system state
 		public List<Relay> relays;
 		public Dictionary<int, Dictionary<int, double>> distances;
-		public List<Packet> finishedPackets = new List<Packet>();
+		public List<Packet> packetsFinished = new List<Packet>();
 
 		// simulation state
 		public double clock;
@@ -128,14 +128,14 @@ namespace GeRaF
 			}
 
 			// stats
-			Console.WriteLine($"Number of packets: {finishedPackets.Count}");
-			var tot = (float)finishedPackets.Count;
-			var success = finishedPackets.Count(p => p.result == Result.Success);
-			var max_sensing = finishedPackets.Count(p => p.result == Result.Abort_max_sensing);
-			var max_cycle = finishedPackets.Count(p => p.result == Result.Abort_max_region_cycle);
-			var no_start = finishedPackets.Count(p => p.result == Result.No_start_relays);
-			var max_sink_rts = finishedPackets.Count(p => p.result == Result.Abort_max_sink_rts);
-			var no_ack = finishedPackets.Count(p => p.result == Result.Abort_no_ack);
+			Console.WriteLine($"Number of packets: {packetsFinished.Count}");
+			var tot = (float)packetsFinished.Count;
+			var success = packetsFinished.Count(p => p.result == Result.Success);
+			var max_sensing = packetsFinished.Count(p => p.result == Result.Abort_max_sensing);
+			var max_cycle = packetsFinished.Count(p => p.result == Result.Abort_max_region_cycle);
+			var no_start = packetsFinished.Count(p => p.result == Result.No_start_relays);
+			var max_sink_rts = packetsFinished.Count(p => p.result == Result.Abort_max_sink_rts);
+			var no_ack = packetsFinished.Count(p => p.result == Result.Abort_no_ack);
 			Console.WriteLine($"Number of packets success: {success}, {success / tot * 100:F3}%");
 			Console.WriteLine($"Number of packets no_start_relays: {no_start}, {no_start / tot * 100:F3}%");
 			Console.WriteLine($"Number of packets max_cycle: {max_cycle}, {max_cycle / tot * 100:F3}%");
@@ -144,7 +144,7 @@ namespace GeRaF
 			Console.WriteLine($"Number of packets no_ack: {no_ack}, {no_ack / tot * 100:F3}%");
 
 			debugWriter.WriteLine("#");
-			foreach (var p in finishedPackets) {
+			foreach (var p in packetsFinished) {
 				debugWriter.WriteLine($"{JsonConvert.SerializeObject(p)}");
 			}
 			debugWriter.Close();

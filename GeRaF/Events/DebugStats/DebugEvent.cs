@@ -29,7 +29,7 @@ namespace GeRaF.Events.DebugStats
 			};
 
 			if (ending) {
-				stats.finishedPackets = sim.finishedPackets;
+				stats.finishedPackets = sim.packetsFinished;
 			}
 
 			var stats_to_string = stats.ConvertToFrameLine();

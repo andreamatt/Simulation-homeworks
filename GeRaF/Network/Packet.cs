@@ -13,6 +13,7 @@ namespace GeRaF.Network
 	{
 		None,
 		Success,
+		Passed,
 		No_start_relays,
 		//Abort_max_attempts,
 		Abort_max_region_cycle,
@@ -55,8 +56,9 @@ namespace GeRaF.Network
 				generationTime = packet.generationTime,
 				startRelay = packet.startRelay,
 				sink = packet.sink,
-				result = packet.result,
-				copy_id = next_copy_id[packet.content_id]
+				result = Result.None,
+				copy_id = next_copy_id[packet.content_id],
+				hopsIds = packet.hopsIds.ToList()
 			};
 			next_copy_id[p.content_id]++;
 			return p;
@@ -64,7 +66,7 @@ namespace GeRaF.Network
 
 		public void Finish(Result result, Simulation sim) {
 			this.result = result;
-			sim.finishedPackets.Add(this);
+			sim.packetsFinished.Add(this);
 		}
 	}
 }

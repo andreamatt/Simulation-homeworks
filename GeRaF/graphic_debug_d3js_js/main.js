@@ -1,18 +1,23 @@
 var data = [5, 10, 12]
-var width = 200,
-	scaleFactor = 10,
-	barHeight = 20
+var width = 600,
+	height = 600
 
 var graph = d3.select("#mainplot")
 	.attr("width", width)
-	.attr("height", barHeight * data.length)
+	.attr("height", height)
+
+graph.append('g').attr('class', 'circle_ranges')
+graph.append('g').attr('class', 'regions')
+graph.append('g').attr('class', 'circle_dots')
+graph.append('g').attr('class', 'sink_arrows')
+graph.append('g').attr('class', 'packet_arrows')
 
 function displayContents(contents) {
 	var element = document.getElementById('file-content')
 	element.textContent = contents
 }
 
-let plot
+let plot = null
 
 function readSingleFile(e) {
 	var file = e.target.files[0]

@@ -113,6 +113,7 @@ namespace GeRaF.Events
 					sink = sink
 				};
 				chosen.packetToSend = packet;
+				packet.hopsIds.Add(chosen.id);
 				chosen.SelfReserve();
 
 				// schedule sensing

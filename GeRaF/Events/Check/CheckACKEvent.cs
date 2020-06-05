@@ -21,6 +21,7 @@ namespace GeRaF.Events.Check
 
 		public override void Handle() {
 			if (relay.receivedACK) {
+				relay.packetToSend.Finish(Result.Passed, sim);
 				relay.FreeNow(this);
 			}
 			else {
