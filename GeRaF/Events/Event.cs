@@ -96,10 +96,10 @@ namespace GeRaF.Events
 			});
 
 			// give this packet to some relay or discard it if none are available
-			var freeRelays = sim.relays.Where(r => r.status == RelayStatus.Free || (r.status == RelayStatus.Asleep && r.ShouldBeAwake)).ToList();
+			var freeRelays = sim.relays.Where(r => r.status == RelayStatus.Free || (sim.simulationParameters.skipCycleEvents && r.status == RelayStatus.Asleep && r.ShouldBeAwake)).ToList();
 			if (freeRelays.Count > 0) {
 				var chosen = freeRelays[RNG.rand_int(0, freeRelays.Count)];
-				if (chosen.status == RelayStatus.Asleep && chosen.ShouldBeAwake) {
+				if (sim.simulationParameters.skipCycleEvents && chosen.status == RelayStatus.Asleep && chosen.ShouldBeAwake) {
 					chosen.AwakeMidtime(this);
 				}
 
@@ -112,6 +112,7 @@ namespace GeRaF.Events
 					startRelay = chosen,
 					sink = sink
 				};
+				sim.packetsGenerated.Add(packet);
 				chosen.packetToSend = packet;
 				packet.hopsIds.Add(chosen.id);
 				chosen.SelfReserve();

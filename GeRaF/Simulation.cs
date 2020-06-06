@@ -22,6 +22,7 @@ namespace GeRaF
 		// system state
 		public List<Relay> relays;
 		public Dictionary<int, Dictionary<int, double>> distances;
+		public List<Packet> packetsGenerated = new List<Packet>();
 		public List<Packet> packetsFinished = new List<Packet>();
 
 		// simulation state
@@ -113,7 +114,7 @@ namespace GeRaF
 			while (eventQueue.isEmpty == false) {
 				var e = eventQueue.Pop();
 				if (e.time < this.clock) {
-					throw new Exception("WTF");
+					throw new Exception("No time travel plz");
 				}
 				this.clock = e.time;
 				var percentage = this.clock / simulationParameters.max_time;
@@ -144,7 +145,7 @@ namespace GeRaF
 			Console.WriteLine($"Number of packets no_ack: {no_ack}, {no_ack / tot * 100:F3}%");
 
 			debugWriter.WriteLine("#");
-			foreach (var p in packetsFinished) {
+			foreach (var p in packetsGenerated) {
 				debugWriter.WriteLine($"{JsonConvert.SerializeObject(p)}");
 			}
 			debugWriter.Close();

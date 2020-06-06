@@ -35,6 +35,7 @@ namespace GeRaF.Events.Transmissions
 
 			// copy packet from sender (actual destination of ACK)
 			var packet = Packet.copy(actualDestination.packetToSend);
+			sim.packetsGenerated.Add(packet);
 			packet.hopsIds.Add(relay.id);
 
 			relay.packetToSend = packet;

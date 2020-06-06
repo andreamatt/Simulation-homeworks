@@ -12,9 +12,11 @@ namespace GeRaF.Network
 	partial class Relay
 	{
 		public void StartReceiving(Relay sender) {
-			if (this.status == RelayStatus.Asleep && this.ShouldBeAwake) {
+			// if skipping events, wake up as it receives any transmission (can be optimized to wake up only when actually necessary)
+			if (sim.simulationParameters.skipCycleEvents && this.status == RelayStatus.Asleep && this.ShouldBeAwake) {
 				this.AwakeMidtime(null);
 			}
+
 			bool interested = false;
 			switch (this.status) {
 				case RelayStatus.Sensing:

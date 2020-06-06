@@ -25,12 +25,12 @@ namespace GeRaF.Utils
 		}
 
 		public void Remove(Event e) {
-			if (queue.Count(ev => ev == e) != 1) throw new Exception("WTF");
+			if (queue.Count(ev => ev == e) != 1) throw new Exception("Double event?");
 			queue.Remove(e);
 		}
 
 		public void Reschedule(Event e) {
-			if (queue.Count(ev => ev == e) != 1) throw new Exception("WTF");
+			if (queue.Count(ev => ev == e) != 1) throw new Exception("Double event?");
 			queue.UpdatePriority(e, e.time);
 		}
 

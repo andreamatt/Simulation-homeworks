@@ -163,13 +163,17 @@ namespace GeRaF.Network
 			Reset();
 			receivingTransmissions.Clear();
 			status = RelayStatus.Asleep;
-			// schedule awake
-			//sim.eventQueue.Add(new AwakeEvent() {
-			//	relay = this,
-			//	time = sim.clock + sim.protocolParameters.t_sleep,
-			//	sim = sim,
-			//	previous = cause
-			//});
+
+			// skip duty cycle events improves simulation performance dramatically
+			if (sim.simulationParameters.skipCycleEvents == false) {
+				// schedule awake
+				sim.eventQueue.Add(new AwakeEvent() {
+					relay = this,
+					time = sim.clock + sim.protocolParameters.t_sleep,
+					sim = sim,
+					previous = cause
+				});
+			}
 		}
 	}
 }

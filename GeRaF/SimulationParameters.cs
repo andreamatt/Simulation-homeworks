@@ -21,6 +21,7 @@ namespace GeRaF
 		public double min_distance;
 		public int n_nodes;
 		public double packet_rate;
+		public bool skipCycleEvents;
 		public double debug_interval;
 		public DebugType debugType;
 		public int percentages;
