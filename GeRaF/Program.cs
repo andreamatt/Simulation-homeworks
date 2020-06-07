@@ -27,7 +27,7 @@ namespace GeRaF
 				area_side = 100,
 				debug_interval = 1,
 				debugType = DebugType.Always,
-				debug_file = "../../debug.csv",
+				debug_file = "../../graphic_debug/debug_data.js",
 				max_time = 20,
 				n_nodes = 200,
 				packet_rate = 2,

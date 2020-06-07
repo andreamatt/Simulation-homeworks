@@ -82,10 +82,10 @@ class Plot {
 		// arrow head marker
 		graph.append('marker')
 			.attr('id', 'arrow')
-			.attr('markerWidth', 1 * this.scale)
-			.attr('markerHeight', 1 * this.scale)
-			.attr('refX', 0.9 * this.scale)
-			.attr('refY', 0.3 * this.scale)
+			.attr('markerWidth', 10)
+			.attr('markerHeight', 10)
+			.attr('refX', 7)
+			.attr('refY', 3)
 			.attr('orient', 'auto')
 			.attr('markerUnits', 'strokeWidth')
 			.append('path')
@@ -95,7 +95,11 @@ class Plot {
 
 	updateIndex(i) {
 		if ((i >= 0) && (i < this.frame_lines.length)) {
-			this.frame_index = i
+			this.frame_index = parseInt(i)	// when "i" comes from slider, it's a string
+			d3.select("#frame_slider").property('value', this.frame_index)
+			// d3.select("#frame_slider").attr('value', this.frame_index) // updates default value
+			// $("#frame_slider").val(this.frame_index) // updates actual value
+			// $("#frame_slider")[0].value = this.frame_index // updates actual value
 		} else {
 			console.log('INVALID ARGUMENT: index out of boundaries')
 		}
@@ -154,10 +158,12 @@ class Plot {
 			.attr('r', r => 2 * this.scale)
 			.style('fill', r => this.relay_colors[r.actualStatus])
 			.attr('stroke', 'black')
+			.attr('opacity', r => r.actualStatus > 0 ? "ff" : "40")
 			.attr('stroke-width', 0.2 * this.scale)
 
 		circle_dots
 			.style('fill', r => this.relay_colors[r.actualStatus])
+			.attr('opacity', r => r.actualStatus > 0 ? "ff" : "40")
 
 		// pkt arrows
 		packet_arrows.exit().remove()

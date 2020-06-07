@@ -96,6 +96,7 @@ namespace GeRaF
 
 			// init debug state
 			debugWriter = new StreamWriter(simulationParameters.debug_file);
+			debugWriter.Write("debug_data=`");
 			debugWriter.WriteLine($"{JsonConvert.SerializeObject(simulationParameters)}");
 			debugWriter.WriteLine("#");
 			debugWriter.WriteLine($"{JsonConvert.SerializeObject(protocolParameters)}");
@@ -148,6 +149,7 @@ namespace GeRaF
 			foreach (var p in packetsGenerated) {
 				debugWriter.WriteLine($"{JsonConvert.SerializeObject(p)}");
 			}
+			debugWriter.Write("`");
 			debugWriter.Close();
 		}
 	}

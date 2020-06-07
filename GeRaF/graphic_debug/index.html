@@ -1,23 +1,77 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 
 <head>
-	<meta charset='utf-8'>
-	<meta http-equiv='X-UA-Compatible' content='IE=edge'>
-	<title>Page Title</title>
-	<meta name='viewport' content='width=device-width, initial-scale=1'>
+	<title>Title</title>
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<!-- Bootstrap CSS -->
 	<link rel='stylesheet' type='text/css' media='screen' href='main.css'>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 
 <body>
-	<input type="file" id="file-input" />
-	<div>
-		<svg id="mainplot"></svg>
-
-		<button type="button" onclick="plot.updateIndex(plot.frame_index-1)">Prev</button>
-		<button type="button" onclick="plot.updateIndex(plot.frame_index+1)">Next</button>
-		<button type="button" onclick="plot.startPlaying()">Play</button>
-		<button type="button" onclick="plot.stopPlaying()">Stop</button>
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+		<a class="navbar-brand" href="#">
+			<i class="fa fa-wifi" aria-hidden="true"></i>
+			GeRaF
+		</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+			aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+	</nav>
+	<div class="jumbotron">
+		<div class="container">
+			<h1 class="display-3">GeRaF graphic debugger</h1>
+			<p>Just load the CSV produced by the GeRaF simulator and play with the commands below to navigate and
+				analyze the simulation
+			</p>
+		</div>
+		<!-- <div class="row justify-content-end">
+			<div class="col col-lg-2">
+				<div class="input-group">
+					<div class="input-group-prepend">
+						<span class="input-group-text" id="inputGroupFileAddon01">
+							<i class="fa fa-upload" aria-hidden="true"></i>
+						</span>
+					</div>
+					<div class="custom-file">
+						<input type="file" id="file-input" class="custom-file-input" id="inputGroupFile01"
+							aria-describedby="inputGroupFileAddon01">
+						<label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+					</div>
+				</div>
+			</div>
+		</div> -->
+	</div>
+	<div class="container">
+		<!-- Example row of columns -->
+		<div class="col">
+			<div class="row">
+				<svg id="mainplot"></svg>
+			</div>
+			<button class="btn btn-primary btn-lg" href="#" role="button"
+				onclick="plot.updateIndex(plot.frame_index-1)">
+				<i class="fa fa-arrow-left" aria-hidden="true"></i>
+			</button>
+			<button class="btn btn-primary btn-lg" href="#" role="button" onclick="plot.startPlaying()">
+				<i class="fa fa-play" aria-hidden="true"></i>
+			</button>
+			<button class="btn btn-primary btn-lg" href="#" role="button" onclick="plot.stopPlaying()">
+				<i class="fa fa-stop" aria-hidden="true"></i>
+			</button>
+			<button class="btn btn-primary btn-lg" href="#" role="button"
+				onclick="plot.updateIndex(plot.frame_index+1)">
+				<i class="fa fa-arrow-right" aria-hidden="true"></i>
+			</button>
+		</div>
+		<input id="frame_slider" type="range" min="0" max="100" step="1" value="0"
+			oninput="plot.updateIndex(this.value)">
 		<br>
 		<p>Play mode</p>
 		<input type="radio" id="frameInterval" name="playMode" value="frameInterval" checked
@@ -32,7 +86,18 @@
 		<p id="speed_output" style="visibility: hidden;">Speed: 1x</p>
 		<input id="speed_slider" type="range" style="visibility: hidden;" min="1" max="1000" value="5"
 			oninput="plot.updateSpeed()">
+		<hr>
 	</div>
+	<footer class="page-footer font-small teal pt-4">
+		<div class="footer-copyright text-center py-3">© Andrea Mattè, Andrea Iossa & Andrei Diaconu - 2020 </div>
+	</footer>
+
+	<!-- Optional JavaScript -->
+	<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+	<script src="debug_data.js"></script>
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 	<script src='d3.js'></script>
 	<script src='classes.js'></script>
 	<script src='plot.js'></script>

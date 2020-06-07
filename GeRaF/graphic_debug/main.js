@@ -28,22 +28,12 @@ graph.append('g').attr('class', 'circle_dots')
 graph.append('g').attr('class', 'sink_arrows')
 graph.append('g').attr('class', 'packet_arrows')
 
-let plot = null
+console.log("Debug_data size: " + debug_data.length)
+let plot = new Plot(debug_data)
+d3.select("#frame_slider").attr('max', plot.frame_lines.length - 1)
+// $("#frame_slider").max = plot.frame_lines.length - 1 // no work
+// document.getElementById("frame_slider").max = plot.frame_lines.length - 1 // works, how?
+// console.log($("#frame_slider"))
+// $("#frame_slider")[0].max = plot.frame_lines.length - 1 // no work
 
-function readSingleFile(e) {
-	var file = e.target.files[0]
-	if (!file) {
-		return
-	}
-	var reader = new FileReader()
-	reader.onload = function (e) {
-		var contents = e.target.result
-		plot = new Plot(contents)
-		plot.plot()
-	}
-	reader.readAsText(file)
-}
-
-document.getElementById('file-input')
-	.addEventListener('change', readSingleFile, false)
-
+plot.plot()
