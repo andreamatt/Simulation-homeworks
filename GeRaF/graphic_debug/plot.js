@@ -91,6 +91,17 @@ class Plot {
 			.append('path')
 			.attr('d', 'M0,0 L0,6 L9,3 z')
 			.attr('fill', 'stroke')
+
+
+		this.dragHandler = d3.drag()
+			.on("drag", function (d) {
+				var x = d3.event.x;
+				var y = d3.event.y;
+				d3.select(this).attr("transform", "translate(" + x + "," + y + ")")
+					.select('line')
+					.attr('x2', r => r.X * plot.scale - x)
+					.attr('y2', r => r.Y * plot.scale - y)
+			})
 	}
 
 	updateIndex(i) {
@@ -140,7 +151,41 @@ class Plot {
 			.data(relays_regions, t => [t.rel.id, t.reg])
 		let id_labels = this.svg.select('#circle_labels').selectAll('.id_label')
 			.data(this.relays.filter(r => this.show_Ids), r => r.id)
+		let info_tooltips = this.svg.select('#info_tooltips').selectAll('.info_tooltip')
+			.data(this.relays.filter(r => r.info_modality != InfoModality.off), r => r.id)
 
+
+		info_tooltips.exit().remove()
+
+		let infoTool = info_tooltips.enter()
+			.append('g')
+			.attr('class', 'info_tooltip')
+			.attr('transform', r => `translate(${r.X * this.scale}, ${r.Y * this.scale})`)
+			.call(this.dragHandler)
+
+		infoTool.append('rect')
+			.attr('width', r => r.details().length * 3 * this.scale)
+			.attr('height', r => 4.2 * this.scale)
+			.style("fill", "lightsteelblue")
+			.attr('stroke', 'black')
+			.attr('opacity', r => r.actualStatus > 0 ? "ff" : "40")
+			.attr('stroke-width', 0.2 * this.scale)
+
+		infoTool.append('text')
+			.attr('dy', r => 4 * this.scale)
+			.text(r => r.details())
+
+		infoTool.append('line')
+			.attr('x1', r => 0)
+			.attr('y1', r => 0)
+			.attr('x2', r => 0)
+			.attr('y2', r => 0)
+			.attr('stroke', 'grey')
+			.attr('stroke-width', 0.2 * this.scale)
+			.attr('position', 'absolute')
+
+		info_tooltips.select('text').text(r => r.details())
+		info_tooltips.select('rect').attr('width', r => r.details().length * 3 * this.scale)
 
 
 
@@ -174,6 +219,10 @@ class Plot {
 			.attr('stroke', 'black')
 			.attr('opacity', r => r.actualStatus > 0 ? "ff" : "40")
 			.attr('stroke-width', 0.2 * this.scale)
+			.on('click', r => {
+				r.info_modality = (r.info_modality + 1) % 4
+				this.plot()
+			})
 
 		circle_dots
 			.style('fill', r => this.relay_colors[r.actualStatus])
@@ -269,7 +318,6 @@ class Plot {
 			// .attr('dx', r => r.X * this.scale)
 			.attr('dy', r => 4 * this.scale)
 			.text(r => r.id)
-
 
 
 		console.log('render time: ' + (Date.now() - time_before_draw))

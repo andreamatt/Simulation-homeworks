@@ -17,7 +17,7 @@ graph.append('g').attr('id', 'circle_dots')
 graph.append('g').attr('id', 'sink_arrows')
 graph.append('g').attr('id', 'packet_arrows')
 graph.append('g').attr('id', 'circle_labels')
-graph.append('g').attr('id', 'info_tooltip')
+graph.append('g').attr('id', 'info_tooltips')
 
 
 console.log("Debug_data size: " + debug_data.length)

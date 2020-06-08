@@ -133,7 +133,7 @@ class Relay {
 		this.BusyWithId = -1
 		this.packetContentId = -1
 		this.packetCopyId = -1
-		this.info_modality = false
+		this.info_modality = InfoModality.off
 	}
 
 	update(fields, packets) {
@@ -176,11 +176,10 @@ class Relay {
 	// def __repr__(self):
 	// 	return str(self)
 
-	// def details(self, modality):
-	// 	if modality == info_modality.active_transmissions.value:
-	// 		return f"ACTIVE: {self.ShouldBeAwake}"
-	// 	if modality == info_modality.finished_transmissions.value:
-	// 		return f"FINISHED: {self.finishedCTSs}"
-	// 	if modality == info_modality.packet_info.value:
-	// 		return f"PACKET: {self.packetToSend}"
+	details() {
+		if (this.info_modality == InfoModality.active_transmissions) return `ACTIVE`
+		if (this.info_modality == InfoModality.finished_transmissions) return `FINISHED`
+		if (this.info_modality == InfoModality.packet_info) return `PACKET: ${this.packetToSend}`
+
+	}
 }
