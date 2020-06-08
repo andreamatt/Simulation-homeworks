@@ -66,11 +66,15 @@ namespace GeRaF.Network
 
 		public string ToFrameString() {
 			var res = "";
-			res += $"{(int)status}|{(int)transmissionType}|{transmissionDestinationId}|";
-			res += $"{REGION_index}|{COL_count}|{SENSE_count}|{SINK_RTS_count}|";
-			res += $"{PKT_count}|{REGION_cycle}|{(isSensing ? 1 : 0)}|{(hasSensed ? 1 : 0)}|{BusyWithId}|{(ShouldBeAwake ? 1 : 0)}|";
-			if (packetToSend == null) res += "|";
-			else res += $"{packetToSend.content_id}|{packetToSend.copy_id}";
+			res += $"{id}|{(int)status}|{(ShouldBeAwake ? 1 : 0)}";
+			if (status != RelayStatus.Asleep && status != RelayStatus.Free && (status == RelayStatus.Transmitting || packetToSend != null)) {
+				res += $"|{(int)transmissionType}|{transmissionDestinationId}";
+				if (packetToSend != null) {
+					res += $"|{REGION_index}|{COL_count}|{SENSE_count}|{SINK_RTS_count}";
+					res += $"|{PKT_count}|{REGION_cycle}|{BusyWithId}";
+					res += $"|{packetToSend.content_id}|{packetToSend.copy_id}";
+				}
+			}
 			return res;
 		}
 	}

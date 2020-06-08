@@ -69,7 +69,7 @@ class Plot {
 		this.svg = graph	// d3.select(#mainplot)
 
 		// limit square
-		this.svg.select('.area_limit')
+		this.svg.select('#area_limit')
 			.append('rect')
 			.attr('x', 0)
 			.attr('y', 0)
@@ -113,24 +113,37 @@ class Plot {
 		// update relays based on index
 		let frame = this.frame_lines[this.frame_index]
 		let frame_sections = frame.split(';')
-		this.frame_time = frame_sections[0]
+		this.time = Number(frame_sections[0].replace(",", "."))
 
 		this.frame_event = JSON.parse(frame_sections[1])
-		for (let r of this.relays) {
-			r.update(frame_sections[parseInt(r.id) + 2], this.packets)
+		for (let s of frame_sections.slice(2)) {
+			let fields = s.split('|')
+			let r_id = parseInt(fields[0])
+			this.relays[r_id].update(fields, this.packets)
 		}
-		// console.log(this.relays)
+		let relays_regions = []
+		for (let rel of this.relays.filter(r => r.status == RelayStatus.Transmitting && r.transmissionType == TransmissionType.RTS)) {
+			for (let reg of range(this.protocol_params.n_regions)) {
+				relays_regions.push({ rel: rel, reg: reg })
+			}
+		}
 
-		let circle_dots = this.svg.select('.circle_dots').selectAll('.circle_dot')
+		let circle_dots = this.svg.select('#circle_dots').selectAll('.circle_dot')
 			.data(this.relays, r => r.id)
-		let circle_ranges = this.svg.select('.circle_ranges').selectAll('.circle_range')
+		let circle_ranges = this.svg.select('#circle_ranges').selectAll('.circle_range')
 			.data(this.relays.filter(r => r.actualStatus == RelayStatus.Transmitting), r => r.id)
-		let packet_arrows = this.svg.select('.packet_arrows').selectAll('.packet_arrow')
+		let packet_arrows = this.svg.select('#packet_arrows').selectAll('.packet_arrow')
 			.data(this.relays.filter(r => r.actualStatus == RelayStatus.Transmitting && r.transmissionType == TransmissionType.PKT), r => r.id)
-		let sink_arrows = this.svg.select('.sink_arrows').selectAll('.sink_arrow')
+		let sink_arrows = this.svg.select('#sink_arrows').selectAll('.sink_arrow')
 			.data(this.relays.filter(r => r.packetToSend != null && this.relay_details[r.id] == InfoModality.packet_info), r => r.id)
-		let regions = this.svg.select('.regions').selectAll('.region')
-			.data(this.relays.filter(r => r.actualStatus == RelayStatus.Transmitting && r.transmissionType == TransmissionType.RTS), r => r.id)
+		let regions = this.svg.select('#regions').selectAll('.region')
+			.data(relays_regions, t => [t.rel.id, t.reg])
+		let id_labels = this.svg.select('#circle_labels').selectAll('.id_label')
+			.data(this.relays.filter(r => this.show_Ids), r => r.id)
+
+
+
+
 
 		// transmission ranges
 		circle_ranges.exit().remove()
@@ -143,6 +156,7 @@ class Plot {
 			.attr('cy', r => r.Y * this.scale)
 			.attr('r', r => r.range * this.scale)
 			.style('fill', r => this.signal_colors[r.transmissionType] + '20')
+
 
 		circle_ranges
 			.style('fill', r => this.signal_colors[r.transmissionType] + '20')
@@ -204,44 +218,67 @@ class Plot {
 		let region_groups = regions.enter()
 			.append('g')
 			.attr('class', 'region')
-			.attr('relay_id', r => r.id)
+			.attr('relay_id_reg', t => `${t.rel.id}_${t.reg}`)
 
-		let region_indeces = range(this.protocol_params.n_regions)
-		for (let i of region_indeces) {
-			let masks = region_groups
-				.append('mask')
-				.attr('id', r => `mask_${r.id}_${i}`)
+		let masks = region_groups
+			.append('mask')
+			.attr('id', t => `mask_${t.rel.id}_${t.reg}`)
 
-			// mask with relay range
-			masks.append('circle')
-				.attr('cx', r => r.X * this.scale)
-				.attr('cy', r => r.Y * this.scale)
-				.attr('r', r => r.range * this.scale)
-				.style('stroke', 'none')
-				.style('fill', '#ffffff')
+		// mask with relay range
+		masks.append('circle')
+			.attr('cx', t => t.rel.X * this.scale)
+			.attr('cy', t => t.rel.Y * this.scale)
+			.attr('r', t => t.rel.range * this.scale)
+			.style('stroke', 'none')
+			.style('fill', '#ffffff')
 
-			// mask with sink range
-			masks.append('circle')
-				.attr('cx', r => this.relays_dict[r.packetToSend.sinkId].X * this.scale)
-				.attr('cy', r => this.relays_dict[r.packetToSend.sinkId].Y * this.scale)
-				.attr('r', r => (this.distances[r.id][r.packetToSend.sinkId] - r.range + i * r.range / this.protocol_params.n_regions) * this.scale)
-				.style('stroke', 'none')
-				.style('fill', '#000000')
+		// mask with sink range
+		masks.append('circle')
+			.attr('cx', t => this.relays_dict[t.rel.packetToSend.sinkId].X * this.scale)
+			.attr('cy', t => this.relays_dict[t.rel.packetToSend.sinkId].Y * this.scale)
+			.attr('r', t => (this.distances[t.rel.id][t.rel.packetToSend.sinkId] - t.rel.range + t.reg * t.rel.range / this.protocol_params.n_regions) * this.scale)
+			.style('stroke', 'none')
+			.style('fill', '#000000')
 
-			// circle that fills
-			region_groups.append('circle')
-				.attr('cx', r => this.relays_dict[r.packetToSend.sinkId].X * this.scale)
-				.attr('cy', r => this.relays_dict[r.packetToSend.sinkId].Y * this.scale)
-				.attr('r', r => (this.distances[r.id][r.packetToSend.sinkId] - r.range + (i + 1) * r.range / this.protocol_params.n_regions) * this.scale)
-				.attr('mask', r => `url(#mask_${r.id}_${i})`)
-				.style('fill', r => r.REGION_index == i ? '#00e00080' : '#0000e080')
-		}
+		// circle that fills
+		region_groups.append('circle')
+			.attr('cx', t => this.relays_dict[t.rel.packetToSend.sinkId].X * this.scale)
+			.attr('cy', t => this.relays_dict[t.rel.packetToSend.sinkId].Y * this.scale)
+			.attr('r', t => (this.distances[t.rel.id][t.rel.packetToSend.sinkId] - t.rel.range + (t.reg + 1) * t.rel.range / this.protocol_params.n_regions) * this.scale)
+			.attr('mask', t => `url(#mask_${t.rel.id}_${t.reg})`)
+			.style('fill', t => t.rel.REGION_index == t.reg ? '#00e00080' : '#0000e080')
+
+
+		// LABELS
+		id_labels.exit().remove()
+
+		let idLabels = id_labels.enter()
+			.append('g')
+			.attr('class', 'id_label')
+			.attr('transform', r => `translate(${r.X * this.scale}, ${r.Y * this.scale})`)
+			.attr('opacity', 0.7)
+
+		idLabels.append('rect')
+			// .attr('x', r => r.X * this.scale)
+			// .attr('y', r => r.Y * this.scale - 10)
+			.attr('width', r => String(r.id).length * 3 * this.scale)
+			.attr('height', r => 4.2 * this.scale)
+			.style("fill", "lightsteelblue")
+
+		idLabels.append('text')
+			// .attr('dx', r => r.X * this.scale)
+			.attr('dy', r => 4 * this.scale)
+			.text(r => r.id)
+
 
 
 		console.log('render time: ' + (Date.now() - time_before_draw))
 	}
 
 	startPlaying() {
+		if (this.interval) {
+			this.stopPlaying()
+		}
 		if (this.playMode == PlayMode.FrameTime) {
 			if (this.frameTime == undefined) {
 				this.frameTime = parseInt(document.getElementById('frame_time_slider').value)
@@ -254,16 +291,40 @@ class Plot {
 			}, this.frameTime)
 		}
 		else {
-			if (this.frameTime == undefined) {
-				this.frameTime = parseInt(document.getElementById('frame_time_slider').value)
+			if (this.speed == undefined) {
+				this.speed = Number(document.getElementById('speed_slider').value)
 			}
-
+			let getAwaitTime = () => {
+				let t1 = this.time
+				let next_line = this.frame_lines[this.frame_index + 1]
+				let t2 = Number(next_line.substring(0, next_line.indexOf(';')).replace(",", "."))
+				let time = (t2 - t1) * 1000 / this.speed // convert in milliseconds
+				// console.log("Await time: " + time)
+				return time
+			}
+			let redoTimeout = () => {
+				this.updateIndex(this.frame_index + 1)
+				if (this.frame_index == this.frame_lines.length - 1) {
+					this.interval.stop()
+				}
+				else {
+					this.interval = d3.timeout(redoTimeout, getAwaitTime())
+				}
+			}
+			this.interval = d3.timeout(time => redoTimeout(), getAwaitTime())
 		}
 	}
 
 	stopPlaying() {
-		this.interval.stop()
-		this.interval = undefined
+		if (this.interval) {
+			this.interval.stop()
+			this.interval = undefined
+		}
+	}
+
+	updateInfo() {
+		this.show_Ids = !this.show_Ids
+		this.plot()
 	}
 
 	updateFrameTime() {
@@ -283,7 +344,7 @@ class Plot {
 		var slider = document.getElementById('speed_slider')
 		var output = document.getElementById('speed_output')
 		output.innerHTML = 'Speed: ' + slider.value + 'x'
-		this.frameTime = parseInt(slider.value)
+		this.speed = Number(slider.value)
 
 		// restart playing
 		if (this.interval) {
@@ -295,16 +356,16 @@ class Plot {
 	changePlayMode() {
 		this.playMode = d3.select('#frameInterval').property('checked') ? PlayMode.FrameTime : PlayMode.Speed
 		if (this.playMode == PlayMode.FrameTime) {
-			d3.select('#speed_slider').style('visibility', 'hidden')
-			d3.select('#speed_output').style('visibility', 'hidden')
-			d3.select('#frame_time_slider').style('visibility', 'visible')
-			d3.select('#frame_time_output').style('visibility', 'visible')
+			d3.select('#speed_slider').style('display', 'none')
+			d3.select('#speed_output').style('display', 'none')
+			d3.select('#frame_time_slider').style('display', '')
+			d3.select('#frame_time_output').style('display', '')
 		}
 		else {
-			d3.select('#frame_time_slider').style('visibility', 'hidden')
-			d3.select('#frame_time_output').style('visibility', 'hidden')
-			d3.select('#speed_slider').style('visibility', 'visible')
-			d3.select('#speed_output').style('visibility', 'visible')
+			d3.select('#frame_time_slider').style('display', 'none')
+			d3.select('#frame_time_output').style('display', 'none')
+			d3.select('#speed_slider').style('display', '')
+			d3.select('#speed_output').style('display', '')
 		}
 
 		if (this.interval) {

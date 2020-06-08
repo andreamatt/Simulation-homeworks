@@ -81,11 +81,26 @@ namespace GeRaF
 			// move disconnected
 			Console.WriteLine("Placing relays");
 			var connected = false;
+			int n_slots = (int)Math.Floor(simulationParameters.area_side / simulationParameters.min_distance) - 1;
 			while (!connected) {
+				// check wether the grid slot is available
+				var slotBusy = new bool[n_slots, n_slots];
 				foreach (var relay in relays) {
-					relay.X = RNG.rand() * simulationParameters.area_side;
-					relay.Y = RNG.rand() * simulationParameters.area_side;
+					var X_slot = RNG.rand_int(0, n_slots);
+					var Y_slot = RNG.rand_int(0, n_slots);
+					// while slot is busy, change slot
+					while (slotBusy[X_slot, Y_slot]) {
+						X_slot = RNG.rand_int(0, n_slots);
+						Y_slot = RNG.rand_int(0, n_slots);
+					}
+					// take slot
+					slotBusy[X_slot, Y_slot] = true;
+					// assign actual position
+					relay.X = X_slot * simulationParameters.min_distance + simulationParameters.min_distance;
+					relay.Y = Y_slot * simulationParameters.min_distance + simulationParameters.min_distance;
 				}
+
+				Console.WriteLine("Checking connected relays");
 
 				// calculate new neighbours
 				distances = GraphUtils.Distances(relays);

@@ -85,6 +85,7 @@
     <Compile Include="Network\RelayCycle.cs" />
     <Compile Include="Network\RelayTransmission.cs" />
     <Compile Include="SimulationParameters.cs" />
+    <Compile Include="SimulationStats.cs" />
     <Compile Include="Utils\EnumJsonConverter.cs" />
     <Compile Include="Utils\EventQueue.cs" />
     <Compile Include="Events\Transmissions\SinkRTSEvent.cs" />

@@ -119,26 +119,49 @@ class Relay {
 		this.X = Number(fields[1].replace(",", "."))
 		this.Y = Number(fields[2].replace(",", "."))
 		this.range = Number(fields[3].replace(",", "."))
+
+		this.status = 0
+		this.ShouldBeAwake = 0
+		this.transmissionType = 0
+		this.transmissionDestinationId = -1
+		this.REGION_index = 0
+		this.COL_count = 0
+		this.SENSE_count = 0
+		this.SINK_RTS_count = 0
+		this.PKT_count = 0
+		this.REGION_cycle = 0
+		this.BusyWithId = -1
+		this.packetContentId = -1
+		this.packetCopyId = -1
+		this.info_modality = false
 	}
 
-	update(data, packets) {
-		let fields = data.split("|")
-		this.status = parseInt(fields[0])
-		this.transmissionType = parseInt(fields[1])
-		this.transmissionDestinationId = parseInt(fields[2])
-		this.REGION_index = parseInt(fields[3])
-		this.COL_count = parseInt(fields[4])
-		this.SENSE_count = parseInt(fields[5])
-		this.SINK_RTS_count = parseInt(fields[6])
-		this.PKT_count = parseInt(fields[7])
-		this.REGION_cycle = parseInt(fields[8])
-		this.isSensing = parseInt(fields[9])
-		this.hasSensed = parseInt(fields[10])
-		this.BusyWithId = parseInt(fields[11])
-		this.ShouldBeAwake = parseInt(fields[12])
-		this.packetContentId = fields[13] == "" ? -1 : parseInt(fields[13])
-		this.packetCopyId = fields[14] == "" ? -1 : parseInt(fields[14])
-
+	update(fields, packets) {
+		this.status = parseInt(fields[1])
+		this.ShouldBeAwake = parseInt(fields[2])
+		if (fields.length > 3) {
+			this.transmissionType = parseInt(fields[3])
+			this.transmissionDestinationId = parseInt(fields[4])
+			if (fields.length > 5) {
+				this.REGION_index = parseInt(fields[5])
+				this.COL_count = parseInt(fields[6])
+				this.SENSE_count = parseInt(fields[7])
+				this.SINK_RTS_count = parseInt(fields[8])
+				this.PKT_count = parseInt(fields[9])
+				this.REGION_cycle = parseInt(fields[10])
+				this.BusyWithId = parseInt(fields[11])
+				this.packetContentId = fields[12] == "" ? -1 : parseInt(fields[12])
+				this.packetCopyId = fields[13] == "" ? -1 : parseInt(fields[13])
+			}
+		}
+		if (this.packetContentId != -1) {
+			if (packets[this.packetContentId] == undefined) {
+				console.log("Missing packet contentID: " + this.packetContentId)
+			}
+			else if (packets[this.packetContentId][this.packetCopyId] == undefined) {
+				console.log("Missing packet copyID: " + this.packetContentId + "." + this.packetCopyId)
+			}
+		}
 		this.packetToSend = this.packetContentId == -1 ? null : packets[this.packetContentId][this.packetCopyId]
 	}
 
