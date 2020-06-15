@@ -30,7 +30,8 @@ class Packet:
 		self.startRelayId = int(infos[3])
 		self.sinkId = int(infos[4])
 		self.hopsIds = [int(i) for i in infos[5].split(',')]
-		self.result = Packet.results[int(infos[6])]
+		self.receivedTimes = [float(i) for i in infos[6].split(',')]
+		self.result = Packet.results[int(infos[7])]
 
 
 class SimulationParameters:

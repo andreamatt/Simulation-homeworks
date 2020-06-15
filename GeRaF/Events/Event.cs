@@ -119,6 +119,7 @@ namespace GeRaF.Events
 				}
 				chosen.packetToSend = packet;
 				packet.hopsIds.Add(chosen.id);
+				packet.receivedTimes.Add(sim.clock);
 				chosen.SelfReserve();
 
 				// schedule sensing

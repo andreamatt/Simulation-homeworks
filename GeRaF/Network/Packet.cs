@@ -37,6 +37,7 @@ namespace GeRaF.Network
 		public int sinkId => sink == null ? -1 : sink.id;
 
 		public List<int> hopsIds = new List<int>();
+		public List<double> receivedTimes = new List<double>();
 
 		public Result result = Result.None;
 
@@ -57,7 +58,8 @@ namespace GeRaF.Network
 				sink = packet.sink,
 				result = Result.None,
 				copy_id = gen.next_copy_id[packet.content_id],
-				hopsIds = packet.hopsIds.ToList()
+				hopsIds = packet.hopsIds.ToList(),
+				receivedTimes = packet.receivedTimes.ToList()
 			};
 			gen.next_copy_id[p.content_id]++;
 			return p;
@@ -69,7 +71,7 @@ namespace GeRaF.Network
 		}
 
 		public override string ToString() {
-			return $"{content_id}|{copy_id}|{generationTime}|{startRelayId}|{sinkId}|{String.Join(",", hopsIds)}|{(int)result}";
+			return $"{content_id}|{copy_id}|{generationTime}|{startRelayId}|{sinkId}|{String.Join(",", hopsIds)}|{String.Join(",", receivedTimes)}|{(int)result}";
 		}
 	}
 

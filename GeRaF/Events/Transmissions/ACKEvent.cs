@@ -39,6 +39,7 @@ namespace GeRaF.Events.Transmissions
 				sim.debugWriter.WriteLine($"P;{packet}");
 			}
 			packet.hopsIds.Add(relay.id);
+			packet.receivedTimes.Add(sim.clock - sim.protocolParameters.t_signal);  // time before transmitting ack
 
 			relay.packetToSend = packet;
 
