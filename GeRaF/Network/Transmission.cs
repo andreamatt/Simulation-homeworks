@@ -23,13 +23,6 @@ namespace GeRaF.Network
 	class Transmission
 	{
 		[JsonIgnore]
-		static private int max_id = 0;
-
-		[JsonIgnore]
-		private int _id;
-		public int Id => _id;
-
-		[JsonIgnore]
 		public Relay source;
 		public int sourceId => source.id;
 
@@ -40,10 +33,5 @@ namespace GeRaF.Network
 		public TransmissionType transmissionType;
 		public bool failed;
 		public bool actualDestination;
-
-		public Transmission() {
-			_id = max_id;
-			max_id++;
-		}
 	}
 }

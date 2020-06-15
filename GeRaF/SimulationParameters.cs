@@ -9,6 +9,7 @@ namespace GeRaF
 	public enum DebugType
 	{
 		Never,
+		End,
 		Interval,
 		Always
 	}

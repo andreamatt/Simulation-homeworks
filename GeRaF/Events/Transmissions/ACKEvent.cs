@@ -34,8 +34,10 @@ namespace GeRaF.Events.Transmissions
 			EndTransmission();
 
 			// copy packet from sender (actual destination of ACK)
-			var packet = Packet.copy(actualDestination.packetToSend);
-			sim.packetsGenerated.Add(packet);
+			var packet = Packet.copy(actualDestination.packetToSend, sim.packetGenerator);
+			if (sim.simulationParameters.debugType != DebugType.Never) {
+				sim.debugWriter.WriteLine($"P;{packet}");
+			}
 			packet.hopsIds.Add(relay.id);
 
 			relay.packetToSend = packet;

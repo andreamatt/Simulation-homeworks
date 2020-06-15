@@ -65,7 +65,7 @@ namespace GeRaF.Events
 		public override void Handle() {
 			// add initial packet arrival
 			sim.eventQueue.Add(new PacketGenerationEvent {
-				time = RNG.rand_expon(sim.simulationParameters.packet_rate),
+				time = sim.clock + RNG.rand_expon(sim.simulationParameters.packet_rate),
 				sim = sim,
 				previous = this
 			});
@@ -79,7 +79,9 @@ namespace GeRaF.Events
 			// clear event queue
 			sim.eventQueue.Clear();
 
-			DebugEvent.DebugNow(sim, true, this);
+			if (sim.simulationParameters.debugType != DebugType.Never) {
+				DebugEvent.DebugNow(sim, true, this);
+			}
 
 			return;
 		}
@@ -107,12 +109,14 @@ namespace GeRaF.Events
 				var otherRelays = sim.relays.Where(r => r != chosen).ToList();
 				var sink = otherRelays[RNG.rand_int(0, otherRelays.Count)];
 
-				var packet = new Packet {
+				var packet = new Packet(sim.packetGenerator) {
 					generationTime = sim.clock,
 					startRelay = chosen,
 					sink = sink
 				};
-				sim.packetsGenerated.Add(packet);
+				if (sim.simulationParameters.debugType != DebugType.Never) {
+					sim.debugWriter.WriteLine($"P;{packet}");
+				}
 				chosen.packetToSend = packet;
 				packet.hopsIds.Add(chosen.id);
 				chosen.SelfReserve();
@@ -127,7 +131,7 @@ namespace GeRaF.Events
 			}
 			// no nodes available
 			else {
-				var packet = new Packet {
+				var packet = new Packet(sim.packetGenerator) {
 					generationTime = sim.clock
 				};
 				packet.Finish(Result.No_start_relays, sim);

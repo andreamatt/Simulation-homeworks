@@ -14,12 +14,15 @@ namespace GeRaF
 		public double Y;
 		public double awakeTime;
 		public double asleepTime;
+
+		public override string ToString() {
+			return $"{id}|{X}|{Y}|{awakeTime}|{asleepTime}";
+		}
 	}
 
 	class SimulationStats
 	{
-		public List<RelayInfo> relays;
-		public List<Packet> finishedPackets;
-		public SimulationParameters simulationParameters;
+		public string relayInfos;
+		public string finishedPackets;
 	}
 }

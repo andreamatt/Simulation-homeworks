@@ -41,10 +41,12 @@ class Plot {
 		this.relays = Object.values(this.relays_dict)
 
 		this.distances = JSON.parse(data_sections[3])
-		this.frame_lines = data_sections[4].split(/\r?\n/).map(d => d.trim())
+		let other_lines = data_sections[4].split(/\r?\n/).map(d => d.trim())
+		this.frame_lines = other_lines.filter(l => l[0] == 'F').map(l => l.substring(2))
 
+		let packet_lines = other_lines.filter(l => l[0] == 'P').map(l => l.substring(2))
 		this.packets = {}
-		for (let l of data_sections[5].split(/\r?\n/)) {
+		for (let l of packet_lines) {
 			let p = JSON.parse(l)
 			let content_id = parseInt(p['content_id'])
 			if (!(content_id in this.packets)) {

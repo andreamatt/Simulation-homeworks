@@ -10,15 +10,21 @@ namespace GeRaF.Utils
 	{
 		static private Random random = new Random((int)DateTime.Now.Ticks);
 		static public double rand() {
-			return random.NextDouble();
+			lock (random) {
+				return random.NextDouble();
+			}
 		}
 
 		static public double rand_expon(double lambda) {
-			return -Math.Log(rand()) / lambda;
+			lock (random) {
+				return -Math.Log(rand()) / lambda;
+			}
 		}
 
 		static public int rand_int(int min, int max) {
-			return random.Next(min, max);
+			lock (random) {
+				return random.Next(min, max);
+			}
 		}
 	}
 }

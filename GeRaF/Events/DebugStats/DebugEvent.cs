@@ -33,7 +33,7 @@ namespace GeRaF.Events.DebugStats
 			}
 
 			var stats_to_string = stats.ConvertToFrameLine();
-			sim.debugWriter.WriteLine(stats_to_string);
+			sim.debugWriter.WriteLine("F;" + stats_to_string);
 		}
 	}
 }

@@ -24,9 +24,6 @@ namespace GeRaF.Network
 
 	class Packet
 	{
-		static private int next_content_id = 0;
-		static private Dictionary<int, int> next_copy_id = new Dictionary<int, int>();
-
 		public int content_id = 0;
 		public int copy_id;
 		public double generationTime;
@@ -43,24 +40,26 @@ namespace GeRaF.Network
 
 		public Result result = Result.None;
 
-		public Packet() {
-			content_id = next_content_id;
-			next_content_id++;
+		private Packet() { }
+
+		public Packet(PacketGenerator gen) {
+			content_id = gen.next_content_id;
+			gen.next_content_id++;
 			copy_id = 0;
-			next_copy_id[content_id] = 1;
+			gen.next_copy_id[content_id] = 1;
 		}
 
-		public static Packet copy(Packet packet) {
+		public static Packet copy(Packet packet, PacketGenerator gen) {
 			var p = new Packet() {
 				content_id = packet.content_id,
 				generationTime = packet.generationTime,
 				startRelay = packet.startRelay,
 				sink = packet.sink,
 				result = Result.None,
-				copy_id = next_copy_id[packet.content_id],
+				copy_id = gen.next_copy_id[packet.content_id],
 				hopsIds = packet.hopsIds.ToList()
 			};
-			next_copy_id[p.content_id]++;
+			gen.next_copy_id[p.content_id]++;
 			return p;
 		}
 
@@ -68,5 +67,15 @@ namespace GeRaF.Network
 			this.result = result;
 			sim.packetsFinished.Add(this);
 		}
+
+		public override string ToString() {
+			return $"{content_id}|{copy_id}|{generationTime}|{startRelayId}|{sinkId}|{String.Join(",", hopsIds)}|{(int)result}";
+		}
+	}
+
+	class PacketGenerator
+	{
+		public int next_content_id = 0;
+		public Dictionary<int, int> next_copy_id = new Dictionary<int, int>();
 	}
 }
