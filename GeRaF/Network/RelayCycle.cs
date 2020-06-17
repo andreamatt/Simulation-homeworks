@@ -20,6 +20,7 @@ namespace GeRaF.Network
 		private SleepEvent sleepEvent = null;
 		private double awakeSince = 0;
 		private double lastSleep = 0;
+		public double totalAwake = 0;
 
 		public bool ShouldBeAwake {
 			get {
@@ -126,7 +127,16 @@ namespace GeRaF.Network
 			REGION_cycle = 0;
 		}
 
+		public void UpdateAwakeTime() {
+			var n_cycles = (int)Math.Floor((sim.clock - lastSleep) / sim.protocolParameters.t_cycle);
+			totalAwake += n_cycles * sim.protocolParameters.t_listen;
+		}
+
 		public void Awake(Event cause) {
+			// no need for UpdateAwakeTime because the cause is a sleep event
+			if (cause.GetType() != typeof(StartEvent) && cause.GetType() != typeof(AwakeEvent)) {
+				throw new Exception("Awake with no reason");
+			}
 			// set relay as free, schedule sleep, set awake_time (used in FreeEvent)
 			status = RelayStatus.Free;
 			awakeSince = sim.clock;
@@ -140,6 +150,9 @@ namespace GeRaF.Network
 		}
 
 		public void AwakeMidtime(Event cause) {
+			// update awake time, useful only when using skipCycle
+			UpdateAwakeTime();
+
 			status = RelayStatus.Free;
 			var n_cycles = Math.Floor((sim.clock - lastSleep) / sim.protocolParameters.t_cycle);
 			lastSleep = lastSleep + n_cycles * sim.protocolParameters.t_cycle;
@@ -174,6 +187,9 @@ namespace GeRaF.Network
 					previous = cause
 				});
 			}
+
+			// update awake time stat
+			totalAwake += sim.clock - awakeSince;
 		}
 	}
 }

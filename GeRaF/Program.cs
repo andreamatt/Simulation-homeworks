@@ -1,19 +1,23 @@
-﻿using Newtonsoft.Json;
+﻿using GeRaF.StatsGeneration.Base;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GeRaF
 {
 	class Program
 	{
+		public static int simulationNumber;
+		public static int maxParallel;
+
 		static void Main(string[] args) {
 			System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
 			customCulture.NumberFormat.NumberDecimalSeparator = ".";
 			System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
+			maxParallel = Environment.ProcessorCount - 1;
+			Console.WriteLine("Max parallel sims: " + maxParallel);
 
 
 			var pp = new ProtocolParameters() {
@@ -39,45 +43,25 @@ namespace GeRaF
 				packet_rate = 5,
 				range = 20,
 				min_distance = 2,
-				percentages = 200,
 				skipCycleEvents = true
 			};
 
-			int simulationNumber = 100;
-			var simResults = new List<SimulationStats>();
-			var maxParallel = Environment.ProcessorCount - 1;
-			Console.WriteLine("Max parallel sims: " + maxParallel);
-			var options = new ParallelOptions() { MaxDegreeOfParallelism = maxParallel };
-			Parallel.For(0, simulationNumber, options, i => {
-				var id = i;
-				var sim = new Simulation(sp, pp);
-				var simResult = sim.Run();
-				lock (simResults) {
-					simResults.Add(simResult);
-				}
-				Console.WriteLine($"Finished simulation {id}, {simResults.Count * 100f / simulationNumber}%");
-			});
+			simulationNumber = 20;
+
+			var runResults = new RunResult {
+				basePP = pp,
+				baseSP = sp,
+				dutyLambdas = DutyLambda.Generate(pp, sp, new List<double>() { 0.1, 0.5, 0.9 }, new List<double> { 1, 5, 10 }),
+				lambdaNs = LambdaN.Generate(pp, sp, new List<double> { 1, 5, 10 }, new List<int> { 180, 200, 300, 400, 500, 1000, 2000 })
+			};
 
 			Console.WriteLine("Finished simulating");
 
-			// write results to file
-			var runResults = new RunResults() {
-				protocolParameters = pp,
-				simulationParameters = sp,
-				simulationStats = simResults
-			};
 			using (var writer = new StreamWriter("../../stats/runResults.json")) {
 				writer.WriteLine(JsonConvert.SerializeObject(runResults, Formatting.Indented));
 			}
 			Console.WriteLine("Saved results");
 			Console.ReadKey();
 		}
-	}
-
-	class RunResults
-	{
-		public ProtocolParameters protocolParameters;
-		public SimulationParameters simulationParameters;
-		public List<SimulationStats> simulationStats;
 	}
 }

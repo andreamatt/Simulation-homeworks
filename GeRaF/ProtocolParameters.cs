@@ -16,7 +16,7 @@ namespace GeRaF
 		Plus_2
 	}
 
-	class ProtocolParameters
+	class ProtocolParameters : ICloneable
 	{
 		public double duty_cycle = 0.1; // NOT IN SECONDS: active time percentage (t_l / (t_l + t_s))
 		public double t_sense = 0.0521; // carrier sense duration (needs to be more than any signal duration)
@@ -38,5 +38,15 @@ namespace GeRaF
 		public double t_delta = 0.00001; // small time delta
 
 		public ProtocolVersion protocolVersion = ProtocolVersion.Base;
+
+		public object Clone() {
+			return MemberwiseClone();
+		}
+
+		//public ProtocolParameters ProtocolParameters(ProtocolParameters pp) {
+		//	return new ProtocolParameters() {
+		//		duty_cycle = pp.du
+		//	};
+		//}
 	}
 }

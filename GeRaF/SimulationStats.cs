@@ -20,9 +20,29 @@ namespace GeRaF
 		}
 	}
 
-	class SimulationStats
+	class RunResult
 	{
-		public string relayInfos;
-		public string finishedPackets;
+		public ProtocolParameters basePP;
+		public SimulationParameters baseSP;
+		public List<DutyLambdaStat> dutyLambdas;
+		public List<LambdaNStat> lambdaNs;
+	}
+
+	class DutyLambdaStat
+	{
+		public double duty;
+		public double lambda;
+		public List<double> delay = new List<double>();
+		public List<double> success = new List<double>();
+		public List<double> energy = new List<double>();
+	}
+
+	class LambdaNStat
+	{
+		public double lambda;
+		public double N;
+		public List<double> delay = new List<double>();
+		public List<double> success = new List<double>();
+		public List<double> energy = new List<double>();
 	}
 }

@@ -129,7 +129,7 @@ namespace GeRaF
 
 		public double progressRate => this.clock / simulationParameters.max_time;
 
-		public SimulationStats Run() {
+		public void Run() {
 			while (eventQueue.isEmpty == false) {
 				var e = eventQueue.Pop();
 				if (e.time < this.clock) {
@@ -142,32 +142,15 @@ namespace GeRaF
 				}
 			}
 
+			// force update awake time
+			foreach (var r in relays) {
+				r.UpdateAwakeTime();
+			}
+
 			if (simulationParameters.debugType != DebugType.Never) {
 				debugWriter.Write("`");
 				debugWriter.Close();
 			}
-
-			// stats
-			var simStats = new SimulationStats() {
-				finishedPackets = String.Join(";", packetsFinished.Select(p => p.ToString())),
-				relayInfos = String.Join(";", relays.Select(r => new RelayInfo() {
-					id = r.id,
-					X = r.X,
-					Y = r.Y,
-					asleepTime = 0,
-					awakeTime = 0
-				}.ToString()))
-			};
-
-			return simStats;
-
-			//var tot = (float)packetsFinished.Count;
-			//var success = packetsFinished.Count(p => p.result == Result.Success);
-			//var max_sensing = packetsFinished.Count(p => p.result == Result.Abort_max_sensing);
-			//var max_cycle = packetsFinished.Count(p => p.result == Result.Abort_max_region_cycle);
-			//var no_start = packetsFinished.Count(p => p.result == Result.No_start_relays);
-			//var max_sink_rts = packetsFinished.Count(p => p.result == Result.Abort_max_sink_rts);
-			//var no_ack = packetsFinished.Count(p => p.result == Result.Abort_no_ack);
 		}
 	}
 }

@@ -14,7 +14,7 @@ namespace GeRaF
 		Always
 	}
 
-	class SimulationParameters
+	class SimulationParameters : ICloneable
 	{
 		public double max_time;
 		public int area_side;
@@ -25,7 +25,10 @@ namespace GeRaF
 		public bool skipCycleEvents;
 		public double debug_interval;
 		public DebugType debugType;
-		public int percentages;
 		public string debug_file;
+
+		public object Clone() {
+			return MemberwiseClone();
+		}
 	}
 }
