@@ -61,5 +61,5 @@ class RunResult:
 	def __init__(self, data):
 		self.basePP = ProtocolParamaters(data['basePP'])
 		self.baseSP = SimulationParameters(data['baseSP'])
-		# self.DLstats = [DutyLambda(s) for s in data['dutyLambdas']]
+		self.DLstats = [DutyLambda(s) for s in data['dutyLambdas']]
 		self.LNstats = [LambdaN(s) for s in data['lambdaNs']]

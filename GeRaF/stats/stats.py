@@ -4,6 +4,7 @@ import json
 from classes import *
 from plot_delay import *
 from plot_success import *
+from plot_energy import *
 
 
 jsonFile = open("runResults.json")
@@ -12,6 +13,12 @@ runResult = RunResult(data)
 
 # plot_outcomes(sim_stats)
 # plot_success_over_distance(sim_stats)
-# plot_avgdelay_over_lambda_and_duty(runResult)
-# plot_avgdelay_over_lambda_and_n(runResult)
-plot_success_over_lambda_and_n(runResult)
+
+# plot_delay_over_lambda_and_duty(runResult)
+# plot_delay_over_lambda_and_n(runResult)
+
+# plot_success_over_lambda_and_n(runResult)
+# plot_success_over_lambda_and_duty(runResult)
+
+# plot_energy_over_lambda_and_n(runResult)
+plot_energy_over_lambda_and_duty(runResult)
