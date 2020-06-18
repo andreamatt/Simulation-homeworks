@@ -51,7 +51,7 @@ namespace GeRaF
 			var runResults = new RunResult {
 				basePP = pp,
 				baseSP = sp,
-				//dutyLambdas = DutyLambda.Generate(pp, sp, new List<double>() { 0.1, 0.5, 0.9 }, new List<double> { 0.1, 1, 5, 10, 20 })
+				dutyLambdas = DutyLambda.Generate(pp, sp, new List<double>() { 0.1, 0.5, 0.9 }, new List<double> { 0.1, 1, 5, 10, 20 }),
 				lambdaNs = LambdaN.Generate(pp, sp, new List<double> { 1, 5, 10, 20, 100, 500 }, new List<int> { 50, 100, 200, 500 })
 			};
 

@@ -48,7 +48,7 @@ namespace GeRaF.StatsGeneration.Base
 							stat.success.Add(success);
 							stat.delay.Add(delay);
 							stat.energy.Add(energy);
-							Console.WriteLine($"Simulating LN ... {(stats.Count * simulationNumber + stat.success.Count) * 100f / totalSimulations}%, l={l} n={n}");
+							Console.WriteLine($"Simulating LN ... {(stats.Count * simulationNumber + stat.success.Count) * 100f / totalSimulations:##.00}%, l={l} n={n}");
 						}
 					});
 
