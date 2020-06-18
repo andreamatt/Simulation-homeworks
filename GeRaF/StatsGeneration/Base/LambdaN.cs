@@ -28,24 +28,27 @@ namespace GeRaF.StatsGeneration.Base
 
 					// simulate
 					Parallel.For(0, simulationNumber, options, i => {
-						var sim = new Simulation(sp, pp);
+						var sim = new Simulation(new_sp, new_pp);
 						sim.Run();
 
 						var packetsSuccess = sim.packetsFinished.Where(p => p.result == Network.Result.Success).ToList();
 						var success = packetsSuccess.Count / (float)sim.packetsFinished.Count;
-						var delay = packetsSuccess.Average(p => {
-							var startTime = p.receivedTimes.First();
-							var endTime = p.receivedTimes.Last();
-							var dist = sim.distances[p.startRelayId][p.sinkId];
-							return (endTime - startTime) / dist;
-						});
+						double delay = 0;
+						if (packetsSuccess.Count > 0) {
+							delay = packetsSuccess.Average(p => {
+								var startTime = p.receivedTimes.First();
+								var endTime = p.receivedTimes.Last();
+								var dist = sim.distances[p.startRelayId][p.sinkId];
+								return (endTime - startTime) / dist;
+							});
+						}
 						var energy = sim.relays.Average(r => r.totalAwake);
 
 						lock (stat) {
 							stat.success.Add(success);
 							stat.delay.Add(delay);
 							stat.energy.Add(energy);
-							Console.WriteLine($"Simulating LN ... {(stats.Count * simulationNumber + stat.success.Count) * 100f / totalSimulations}%");
+							Console.WriteLine($"Simulating LN ... {(stats.Count * simulationNumber + stat.success.Count) * 100f / totalSimulations}%, l={l} n={n}");
 						}
 					});
 
