@@ -37,17 +37,18 @@ namespace GeRaF
 			var sp = new SimulationParameters() {
 				area_side = 100,
 				debug_interval = 1,
-				debugType = DebugType.Never,
+				debugType = DebugType.Always,
 				debug_file = "../../graphic_debug/debug_data.js",
-				max_time = 50,
+				max_time = 5,
 				n_nodes = 200,
 				packet_rate = 5,
 				range = 20,
 				min_distance = 2,
+				emptyRegionType = EmptyRegionType.None,
 				skipCycleEvents = true
 			};
 
-			simulationNumber = 50;
+			simulationNumber = 1;
 
 			var runResults = new RunResult {
 				basePP = pp,

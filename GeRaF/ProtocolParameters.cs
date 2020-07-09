@@ -11,9 +11,9 @@ namespace GeRaF
 	[JsonConverter(typeof(EnumJsonConverter))]
 	enum ProtocolVersion
 	{
-		Base,
-		Plus,
-		Plus_2
+		Base
+		//Plus,
+		//Plus_2
 	}
 
 	class ProtocolParameters : ICloneable

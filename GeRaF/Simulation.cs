@@ -87,18 +87,36 @@ namespace GeRaF
 				// check wether the grid slot is available
 				var slotBusy = new bool[n_slots, n_slots];
 				foreach (var relay in relays) {
-					var X_slot = RNG.rand_int(0, n_slots);
-					var Y_slot = RNG.rand_int(0, n_slots);
-					// while slot is busy, change slot
-					while (slotBusy[X_slot, Y_slot]) {
+					var X_slot = 0;
+					var Y_slot = 0;
+					var validRegion = false;
+					do {
 						X_slot = RNG.rand_int(0, n_slots);
 						Y_slot = RNG.rand_int(0, n_slots);
+
+						// assign actual position
+						relay.X = X_slot * simulationParameters.min_distance + simulationParameters.min_distance;
+						relay.Y = Y_slot * simulationParameters.min_distance + simulationParameters.min_distance;
+
+						// calculate if in region
+						switch (simulationParameters.emptyRegionType) {
+							case EmptyRegionType.None:
+								validRegion = true;
+								break;
+							case EmptyRegionType.Circle:
+								var dx = relay.X - simulationParameters.area_side / 2;
+								var dy = relay.Y - simulationParameters.area_side / 2;
+								var distanceToCenter = Math.Sqrt(dx * dx + dy * dy);
+								validRegion = distanceToCenter >= simulationParameters.emptyRegionSize;
+								break;
+							case EmptyRegionType.Square:
+								break;
+						}
 					}
+					while (slotBusy[X_slot, Y_slot] || !validRegion);
+
 					// take slot
 					slotBusy[X_slot, Y_slot] = true;
-					// assign actual position
-					relay.X = X_slot * simulationParameters.min_distance + simulationParameters.min_distance;
-					relay.Y = Y_slot * simulationParameters.min_distance + simulationParameters.min_distance;
 				}
 
 				//Console.WriteLine("Checking connected relays");

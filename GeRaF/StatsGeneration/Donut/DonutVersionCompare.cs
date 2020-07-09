@@ -20,6 +20,8 @@ namespace GeRaF.StatsGeneration.Donut
 				var new_pp = (ProtocolParameters)pp.Clone();
 				new_pp.protocolVersion = version;
 				var new_sp = (SimulationParameters)sp.Clone();
+				new_sp.emptyRegionType = EmptyRegionType.Circle;
+				new_sp.emptyRegionSize = new_sp.area_side / 6;  // radius
 
 				var stat = new DonutStat() {
 					protocolVersion = version

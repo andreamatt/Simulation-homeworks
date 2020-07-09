@@ -16,6 +16,7 @@ namespace GeRaF
 
 	public enum EmptyRegionType
 	{
+		None,
 		Circle,
 		Square
 	}

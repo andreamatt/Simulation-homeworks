@@ -98,10 +98,13 @@ class Transmission {
 
 class Packet {
 	constructor(data) {
-		this.generationTime = data['generationTime']
-		this.Id = data['Id']
-		this.startRelayId = data['startRelayId']
-		this.sinkId = data['sinkId']
+		let fields = data.split("|")
+		this.content_id = parseInt(fields[0])
+		this.copy_id = parseInt(fields[1])
+		this.generationTime = Number(fields[2])
+		this.startRelayId = parseInt(fields[3])
+		this.sinkId = parseInt(fields[4])
+		this.hopsIds
 		this.result = data['result']
 	}
 	// def __str__(self) -> str:
