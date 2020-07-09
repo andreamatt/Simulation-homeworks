@@ -14,12 +14,20 @@ namespace GeRaF
 		Always
 	}
 
+	public enum EmptyRegionType
+	{
+		Circle,
+		Square
+	}
+
 	class SimulationParameters : ICloneable
 	{
 		public double max_time;
 		public int area_side;
 		public double range;
 		public double min_distance;
+		public EmptyRegionType emptyRegionType;
+		public double emptyRegionSize;
 		public int n_nodes;
 		public double packet_rate;
 		public bool skipCycleEvents;

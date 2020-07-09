@@ -12,6 +12,7 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -88,6 +89,7 @@
     <Compile Include="SimulationStats.cs" />
     <Compile Include="StatsGeneration\Base\DutyLambda.cs" />
     <Compile Include="StatsGeneration\Base\LambdaN.cs" />
+    <Compile Include="StatsGeneration\Donut\VersionCompare.cs" />
     <Compile Include="Utils\EnumJsonConverter.cs" />
     <Compile Include="Utils\EventQueue.cs" />
     <Compile Include="Events\Transmissions\SinkRTSEvent.cs" />
