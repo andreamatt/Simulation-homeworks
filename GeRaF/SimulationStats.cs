@@ -26,23 +26,30 @@ namespace GeRaF
 		public SimulationParameters baseSP;
 		public List<DutyLambdaStat> dutyLambdas;
 		public List<LambdaNStat> lambdaNs;
+		public List<DonutStat> donuts;
 	}
 
-	class DutyLambdaStat
+	abstract class BaseStat
+	{
+		public List<double> delay = new List<double>();
+		public List<double> success = new List<double>();
+		public List<double> energy = new List<double>();
+	}
+
+	class DutyLambdaStat : BaseStat
 	{
 		public double duty;
 		public double lambda;
-		public List<double> delay = new List<double>();
-		public List<double> success = new List<double>();
-		public List<double> energy = new List<double>();
 	}
 
-	class LambdaNStat
+	class LambdaNStat : BaseStat
 	{
 		public double lambda;
 		public double N;
-		public List<double> delay = new List<double>();
-		public List<double> success = new List<double>();
-		public List<double> energy = new List<double>();
+	}
+
+	class DonutStat : BaseStat
+	{
+		public ProtocolVersion protocolVersion;
 	}
 }
