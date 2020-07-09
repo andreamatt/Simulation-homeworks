@@ -104,14 +104,24 @@ class Packet {
 		this.generationTime = Number(fields[2])
 		this.startRelayId = parseInt(fields[3])
 		this.sinkId = parseInt(fields[4])
-		this.hopsIds
-		this.result = data['result']
-	}
-	// def __str__(self) -> str:
-	// 	return f"{'{'}{self.Id};SINK_{self.sinkId};{self.result}{'}'}"
+		this.hops = []
+		this.receivedTimes = []
+		this.result = parseInt(fields[7])
 
-	// def __repr__(self) -> str:
-	// 	return str(self)
+
+		let hops_list = fields[5].split(",")
+		for (const h in hops_list) {
+			let element = parseInt(h);
+			this.hops.push(element)
+		}
+
+		let received_list = fields[6].split(",")
+		for (const r in received_list) {
+			let element = parseFloat(r);
+			this.hops.push(element)
+		}
+	}
+
 }
 
 class Relay {

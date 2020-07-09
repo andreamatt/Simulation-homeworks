@@ -47,12 +47,11 @@ class Plot {
 		let packet_lines = other_lines.filter(l => l[0] == 'P').map(l => l.substring(2))
 		this.packets = {}
 		for (let l of packet_lines) {
-			let p = JSON.parse(l)
-			let content_id = parseInt(p['content_id'])
-			if (!(content_id in this.packets)) {
-				this.packets[content_id] = {}
+			let p = new Packet(l)
+			if (!(p.content_id in this.packets)) {
+				this.packets[p.content_id] = {}
 			}
-			this.packets[content_id][parseInt(p['copy_id'])] = p
+			this.packets[p.content_id][p.copy_id] = p
 		}
 
 		this.relay_details = {}
