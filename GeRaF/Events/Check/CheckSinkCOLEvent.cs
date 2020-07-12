@@ -31,6 +31,11 @@ namespace GeRaF.Events.Check
 				}
 				else {
 					relay.packetToSend.Finish(Result.Abort_max_sink_rts, sim);
+					if (relay.packetToSend.hopsIds.Count > 1) {
+						var previousRelayId = relay.packetToSend.hopsIds[relay.packetToSend.hopsIds.Count - 2];
+						var previousRelay = sim.relayById[previousRelayId];
+						relay.failuresFromNeighbour[previousRelay]++;
+					}
 					relay.FreeNow(this);
 				}
 			}

@@ -26,12 +26,14 @@ namespace GeRaF
 		public SimulationParameters baseSP;
 		public List<DutyLambdaStat> dutyLambdas = new List<DutyLambdaStat>();
 		public List<LambdaNStat> lambdaNs = new List<LambdaNStat>();
-		public List<VersionStat> donuts = new List<VersionStat>();
-		public List<VersionStat> squares = new List<VersionStat>();
+		public List<BaseStat> normals = new List<BaseStat>();
+		public List<BaseStat> donuts = new List<BaseStat>();
+		public List<BaseStat> squares = new List<BaseStat>();
 	}
 
-	abstract class BaseStat
+	class BaseStat
 	{
+		public ProtocolVersion protocolVersion;
 		public List<double> delay = new List<double>();
 		public List<double> success = new List<double>();
 		public List<double> energy = new List<double>();
@@ -49,10 +51,5 @@ namespace GeRaF
 	{
 		public double lambda;
 		public double N;
-	}
-
-	class VersionStat : BaseStat
-	{
-		public ProtocolVersion protocolVersion;
 	}
 }

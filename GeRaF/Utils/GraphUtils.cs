@@ -73,10 +73,14 @@ namespace GeRaF.Utils
 		static public void SetNeighbours(List<Relay> relays, Dictionary<int, Dictionary<int, double>> distances) {
 			foreach (var r1 in relays) {
 				r1.neighbours.Clear();
+				r1.successesFromNeighbour.Clear();
+				r1.failuresFromNeighbour.Clear();
 				foreach (var r2 in relays) {
 					if (r1 != r2) {
 						if (distances[r1.id][r2.id] <= r1.range) {
 							r1.neighbours.Add(r2);
+							r1.successesFromNeighbour[r2] = 0;
+							r1.failuresFromNeighbour[r2] = 0;
 						}
 					}
 				}

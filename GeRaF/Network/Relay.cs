@@ -37,6 +37,8 @@ namespace GeRaF.Network
 		[JsonIgnore]
 		public HashSet<Relay> neighbours = new HashSet<Relay>();
 		public List<int> neighboursIds => neighbours.Select(n => n.id).ToList();
+		public Dictionary<Relay, int> successesFromNeighbour = new Dictionary<Relay, int>();
+		public Dictionary<Relay, int> failuresFromNeighbour = new Dictionary<Relay, int>();
 
 		// for transmitting
 		public TransmissionType transmissionType = TransmissionType.RTS;

@@ -46,6 +46,7 @@ namespace GeRaF.Events.Transmissions
 			// if reached sink, stop
 			if (relay.packetToSend.sink == relay) {
 				relay.packetToSend.Finish(Result.Success, sim);
+				// don't modify successesFromNeighbour because it's only for forwarding
 				relay.FreeNow(this);
 			}
 			else {

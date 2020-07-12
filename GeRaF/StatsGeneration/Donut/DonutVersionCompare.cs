@@ -9,14 +9,14 @@ namespace GeRaF.StatsGeneration.Donut
 {
 	static class DonutVersionCompare
 	{
-		static public List<VersionStat> Generate(ProtocolParameters pp, SimulationParameters sp) {
+		static public List<BaseStat> Generate(ProtocolParameters pp, SimulationParameters sp) {
 			var simulationNumber = Program.simulationNumber;
 			var options = new ParallelOptions() { MaxDegreeOfParallelism = Program.maxParallel };
 
 			var versions = Enum.GetValues(typeof(ProtocolVersion)).Cast<ProtocolVersion>().ToList();
 			var totalSimulations = simulationNumber * versions.Count;
 
-			var stats = new List<VersionStat>();
+			var stats = new List<BaseStat>();
 			foreach (var version in versions) {
 				var new_pp = (ProtocolParameters)pp.Clone();
 				new_pp.protocolVersion = version;
@@ -24,7 +24,7 @@ namespace GeRaF.StatsGeneration.Donut
 				new_sp.emptyRegionType = EmptyRegionType.Circle;
 				new_sp.emptyRegionSize = new_sp.area_side / 6;  // radius
 
-				var stat = new VersionStat() {
+				var stat = new BaseStat() {
 					protocolVersion = version
 				};
 				for (int x = 0; x < new_sp.binsCount; x++) {
@@ -80,8 +80,8 @@ namespace GeRaF.StatsGeneration.Donut
 						stat.energy.Add(energy);
 						for (int x = 0; x < new_sp.binsCount; x++) {
 							for (int y = 0; y < new_sp.binsCount; y++) {
-								stat.traffic[x][y] += traffic[x][y] / (double)packetsForTraffic.Count;
-								stat.failurePoints[x][y] += failures[x][y] / (double)packetsForFailures.Count;
+								stat.traffic[x][y] += traffic[x][y];// / (double)packetsForTraffic.Count;
+								stat.failurePoints[x][y] += failures[x][y];// / (double)packetsForFailures.Count;
 							}
 						}
 						Console.WriteLine($"Simulating Donut ... {(stats.Count * simulationNumber + stat.success.Count) * 100f / totalSimulations:##.00}%, v={version}");

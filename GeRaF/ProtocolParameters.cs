@@ -11,8 +11,8 @@ namespace GeRaF
 	[JsonConverter(typeof(EnumJsonConverter))]
 	enum ProtocolVersion
 	{
-		Base
-		//Plus,
+		Base,
+		Plus // CTS contains forward probability. Sender chooses best probability available
 		//Plus_2
 	}
 

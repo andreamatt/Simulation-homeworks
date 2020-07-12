@@ -16,7 +16,7 @@ def plot_success_over_lambda_and_duty(runResult):
 
 		line = plt.plot(lambdas, avg_succ, '-', marker=".", lw=1) 
 		color = line[0].get_color()
-		legend_patches.append(patches.Patch(color=color, label=f' = {duty}'))
+		legend_patches.append(patches.Patch(color=color, label=f'd = {duty}'))
 
 	plt.legend(handles=legend_patches)
 	plt.title('Percentage of packets successfully delivered to the sink, N=?')
