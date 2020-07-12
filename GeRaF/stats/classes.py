@@ -1,5 +1,5 @@
 from math import sqrt
-
+from enum import Enum
 
 class SimulationParameters:
 	def __init__(self, data):
@@ -16,7 +16,6 @@ class SimulationParameters:
 		# self.debugType = data[8]
 		# self.percentages = data[9]
 		# self.debug_file = data[10]
-		
 
 class ProtocolParamaters:
 	def __init__(self, data):
@@ -56,6 +55,15 @@ class LambdaN:
 		self.delay = [float(s) for s in data['delay']]
 		self.energy = [float(s) for s in data['energy']]
 
+		
+class VersionStat:
+	def __init__(self, data):
+		self.success = [float(s) for s in data['success']]
+		self.delay = [float(s) for s in data['delay']]
+		self.energy = [float(s) for s in data['energy']]
+		self.traffic = data['traffic']
+		self.failurePoints = data['failurePoints']
+
 
 class RunResult:
 	def __init__(self, data):
@@ -63,3 +71,5 @@ class RunResult:
 		self.baseSP = SimulationParameters(data['baseSP'])
 		self.DLstats = [DutyLambda(s) for s in data['dutyLambdas']]
 		self.LNstats = [LambdaN(s) for s in data['lambdaNs']]
+		self.DonutStats = [VersionStat(s) for s in data['donuts']]
+		self.SquareStats = [VersionStat(s) for s in data['squares']]

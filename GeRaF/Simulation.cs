@@ -21,6 +21,7 @@ namespace GeRaF
 
 		// system state
 		public List<Relay> relays;
+		public Dictionary<int, Relay> relayById;
 		public Dictionary<int, Dictionary<int, double>> distances;
 		public List<Packet> packetsFinished = new List<Packet>();
 		public PacketGenerator packetGenerator = new PacketGenerator();
@@ -62,6 +63,7 @@ namespace GeRaF
 
 			// init relays as asleep and schedule random awake
 			relays = new List<Relay>();
+			relayById = new Dictionary<int, Relay>();
 			for (int i = 0; i < simulationParameters.n_nodes; i++) {
 				var relay = new Relay {
 					id = i,
@@ -70,6 +72,7 @@ namespace GeRaF
 					sim = this
 				};
 				relays.Add(relay);
+				relayById[relay.id] = relay;
 				eventQueue.Add(new AwakeEvent() {
 					relay = relay,
 					// could be at any point of its duty cycle
@@ -82,7 +85,7 @@ namespace GeRaF
 			// move disconnected
 			//Console.WriteLine("Placing relays");
 			var connected = false;
-			int n_slots = (int)Math.Floor(simulationParameters.area_side / simulationParameters.min_distance) - 1;
+			int n_slots = simulationParameters.binsCount;
 			while (!connected) {
 				// check wether the grid slot is available
 				var slotBusy = new bool[n_slots, n_slots];
@@ -95,21 +98,24 @@ namespace GeRaF
 						Y_slot = RNG.rand_int(0, n_slots);
 
 						// assign actual position
-						relay.X = X_slot * simulationParameters.min_distance + simulationParameters.min_distance;
-						relay.Y = Y_slot * simulationParameters.min_distance + simulationParameters.min_distance;
+						relay.X = slotToX(X_slot);
+						relay.Y = slotToX(Y_slot);
 
 						// calculate if in region
+						var dx = relay.X - simulationParameters.area_side / 2;
+						var dy = relay.Y - simulationParameters.area_side / 2;
 						switch (simulationParameters.emptyRegionType) {
 							case EmptyRegionType.None:
 								validRegion = true;
 								break;
 							case EmptyRegionType.Circle:
-								var dx = relay.X - simulationParameters.area_side / 2;
-								var dy = relay.Y - simulationParameters.area_side / 2;
 								var distanceToCenter = Math.Sqrt(dx * dx + dy * dy);
-								validRegion = distanceToCenter >= simulationParameters.emptyRegionSize;
+								var radius = simulationParameters.emptyRegionSize;
+								validRegion = distanceToCenter >= radius;
 								break;
 							case EmptyRegionType.Square:
+								var side = simulationParameters.emptyRegionSize;
+								validRegion = (Math.Abs(dx) >= side / 2) || (Math.Abs(dy) >= side / 2);
 								break;
 						}
 					}
@@ -169,6 +175,14 @@ namespace GeRaF
 				debugWriter.Write("`");
 				debugWriter.Close();
 			}
+		}
+
+		public double slotToX(int slot) {
+			return slot * simulationParameters.min_distance + simulationParameters.min_distance;
+		}
+
+		public int xToSlot(double x) {
+			return (int)Math.Round((x - simulationParameters.min_distance) / simulationParameters.min_distance);
 		}
 	}
 }

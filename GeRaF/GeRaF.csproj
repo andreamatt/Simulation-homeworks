@@ -89,6 +89,7 @@
     <Compile Include="SimulationStats.cs" />
     <Compile Include="StatsGeneration\Base\DutyLambda.cs" />
     <Compile Include="StatsGeneration\Base\LambdaN.cs" />
+    <Compile Include="StatsGeneration\Square\SquareVersionCompare.cs" />
     <Compile Include="StatsGeneration\Donut\DonutVersionCompare.cs" />
     <Compile Include="Utils\EnumJsonConverter.cs" />
     <Compile Include="Utils\EventQueue.cs" />

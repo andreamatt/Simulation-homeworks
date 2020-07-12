@@ -5,6 +5,7 @@ from classes import *
 from plot_delay import *
 from plot_success import *
 from plot_energy import *
+from plot_heatmaps import *
 
 
 jsonFile = open("runResults.json")
@@ -21,4 +22,6 @@ runResult = RunResult(data)
 # plot_success_over_lambda_and_duty(runResult)
 
 # plot_energy_over_lambda_and_n(runResult)
-plot_energy_over_lambda_and_duty(runResult)
+# plot_energy_over_lambda_and_duty(runResult)
+
+plot_heatmaps(runResult)

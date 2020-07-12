@@ -70,7 +70,7 @@ namespace GeRaF.Utils
 			return distances;
 		}
 
-		public static void SetNeighbours(List<Relay> relays, Dictionary<int, Dictionary<int, double>> distances) {
+		static public void SetNeighbours(List<Relay> relays, Dictionary<int, Dictionary<int, double>> distances) {
 			foreach (var r1 in relays) {
 				r1.neighbours.Clear();
 				foreach (var r2 in relays) {

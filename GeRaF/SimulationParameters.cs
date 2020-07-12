@@ -35,6 +35,7 @@ namespace GeRaF
 		public double debug_interval;
 		public DebugType debugType;
 		public string debug_file;
+		public int binsCount => (int)Math.Floor(area_side / min_distance) - 1;
 
 		public object Clone() {
 			return MemberwiseClone();

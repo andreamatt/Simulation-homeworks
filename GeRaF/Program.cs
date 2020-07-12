@@ -18,6 +18,7 @@ namespace GeRaF
 			customCulture.NumberFormat.NumberDecimalSeparator = ".";
 			System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
 			maxParallel = Environment.ProcessorCount - 1;
+			maxParallel = 20;
 			Console.WriteLine("Max parallel sims: " + maxParallel);
 
 
@@ -35,27 +36,28 @@ namespace GeRaF
 				n_max_region_cycle = 1
 			};
 			var sp = new SimulationParameters() {
-				area_side = 100,
+				area_side = 200,
 				debug_interval = 1,
-				debugType = DebugType.Always,
+				debugType = DebugType.Never,
 				debug_file = "../../graphic_debug/debug_data.js",
-				max_time = 5,
+				max_time = 50,
 				n_nodes = 200,
 				packet_rate = 5,
 				range = 20,
-				min_distance = 2,
+				min_distance = 1,
 				emptyRegionType = EmptyRegionType.None,
 				skipCycleEvents = true
 			};
 
-			simulationNumber = 1;
+			simulationNumber = 1000;
 
 			var runResults = new RunResult {
 				basePP = pp,
 				baseSP = sp,
 				//dutyLambdas = DutyLambda.Generate(pp, sp, new List<double>() { 0.1, 0.5, 0.9 }, new List<double> { 0.1, 1, 5, 10, 20 }),
 				//lambdaNs = LambdaN.Generate(pp, sp, new List<double> { 1, 5, 10, 20, 100, 500 }, new List<int> { 50, 100, 200, 500 }),
-				donuts = DonutVersionCompare.Generate(pp, sp)
+				donuts = DonutVersionCompare.Generate(pp, sp),
+				squares = SquareVersionCompare.Generate(pp, sp)
 			};
 
 			Console.WriteLine("Finished simulating");
@@ -64,7 +66,7 @@ namespace GeRaF
 				writer.WriteLine(JsonConvert.SerializeObject(runResults, Formatting.Indented));
 			}
 			Console.WriteLine("Saved results");
-			Console.ReadKey();
+			//Console.ReadKey();
 		}
 	}
 }
