@@ -56,7 +56,6 @@ namespace GeRaF
 				baseSP = sp,
 				//dutyLambdas = DutyLambda.Generate(pp, sp, new List<double>() { 0.1, 0.5, 0.9 }, new List<double> { 0.1, 1, 5, 10 })
 				//lambdaNs = LambdaN.Generate(pp, sp, new List<double> { 1, 5, 10, 20, 100, 500 }, new List<int> { 50, 100, 200, 500 }),
-				//normals = NormalVersionCompare.Generate(pp, sp),
 				donuts = DonutVersionCompare.Generate(pp, sp),
 				squares = SquareVersionCompare.Generate(pp, sp)
 			};

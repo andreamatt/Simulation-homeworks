@@ -26,7 +26,6 @@ namespace GeRaF
 		public SimulationParameters baseSP;
 		public List<DutyLambdaStat> dutyLambdas = new List<DutyLambdaStat>();
 		public List<LambdaNStat> lambdaNs = new List<LambdaNStat>();
-		public List<BaseStat> normals = new List<BaseStat>();
 		public List<BaseStat> donuts = new List<BaseStat>();
 		public List<BaseStat> squares = new List<BaseStat>();
 	}

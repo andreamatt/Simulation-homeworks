@@ -93,7 +93,6 @@
     <Compile Include="Network\RelayTransmission.cs" />
     <Compile Include="SimulationParameters.cs" />
     <Compile Include="SimulationStats.cs" />
-    <Compile Include="StatsGeneration\Base\NormalVersionCompare.cs" />
     <Compile Include="StatsGeneration\Base\DutyLambda.cs" />
     <Compile Include="StatsGeneration\Base\LambdaN.cs" />
     <Compile Include="StatsGeneration\Square\SquareVersionCompare.cs" />
