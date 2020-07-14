@@ -38,38 +38,26 @@ class ProtocolParamaters:
 		self.t_cycle = float(data[15])
 		self.t_busy = float(data[16])
 
-class DutyLambda:
-	def __init__(self, data):
-		self.duty = float(data['duty'])
-		self.lam = float(data['lambda'])
-		self.success = [float(s) for s in data['success']]
-		self.delay = [float(s) for s in data['delay']]
-		self.energy = [float(s) for s in data['energy']]
 
-		
-class LambdaN:
+class BaseStat:
 	def __init__(self, data):
+		self.version = data["protocolVersion"]
+		self.duty = data["duty"]
+		self.lam = float(data['lambda'])
 		self.N = float(data['N'])
-		self.lam = float(data['lambda'])
-		self.success = [float(s) for s in data['success']]
 		self.delay = [float(s) for s in data['delay']]
-		self.energy = [float(s) for s in data['energy']]
-
-		
-class VersionStat:
-	def __init__(self, data):
 		self.success = [float(s) for s in data['success']]
-		self.delay = [float(s) for s in data['delay']]
 		self.energy = [float(s) for s in data['energy']]
 		self.traffic = data['traffic']
 		self.failurePoints = data['failurePoints']
+	
 
 
 class RunResult:
 	def __init__(self, data):
 		self.basePP = ProtocolParamaters(data['basePP'])
 		self.baseSP = SimulationParameters(data['baseSP'])
-		self.DLstats = [DutyLambda(s) for s in data['dutyLambdas']]
-		self.LNstats = [LambdaN(s) for s in data['lambdaNs']]
-		self.DonutStats = [VersionStat(s) for s in data['donuts']]
-		self.SquareStats = [VersionStat(s) for s in data['squares']]
+		self.DLstats = [BaseStat(s) for s in data['dutyLambdas']]
+		self.LNstats = [BaseStat(s) for s in data['lambdaNs']]
+		self.DonutStats = [BaseStat(s) for s in data['donuts']]
+		self.SquareStats = [BaseStat(s) for s in data['squares']]

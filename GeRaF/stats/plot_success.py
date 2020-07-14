@@ -7,16 +7,33 @@ def plot_success_over_lambda_and_duty(runResult):
 	
 	legend_patches = []
 	for duty in duty_cycles:
-		avg_succ = []
-		lambdas = []
-		stats = list(filter(lambda s : s.duty == duty, runResult.DLstats))
-		for stat in stats:
-			avg_succ.append(np.mean(stat.success))
-			lambdas.append(stat.lam)
+		avg_succ_base = []
+		avg_succ_plus = []
+		avg_succ_plus_2 = []
+		lambdas_base = []
+		lambdas_plus = []
+		lambdas_plus_2 = []
 
-		line = plt.plot(lambdas, avg_succ, '-', marker=".", lw=1) 
-		color = line[0].get_color()
+		stats_base = list(filter(lambda s : s.duty == duty and s.version == 'Base', runResult.DLstats))
+		stats_plus = list(filter(lambda s : s.duty == duty and s.version == 'Plus', runResult.DonutStats))
+		stats_plus_2 = list(filter(lambda s : s.duty == duty and s.version == 'Plus_2', runResult.SquareStats))
+		for stat in stats_base:
+			avg_succ_base.append(np.mean(stat.success))
+			lambdas_base.append(stat.lam)
+		for stat in stats_plus:
+			avg_succ_plus.append(np.mean(stat.success))
+			lambdas_plus.append(stat.lam)
+		for stat in stats_plus_2:
+			avg_succ_plus_2.append(np.mean(stat.success))
+			lambdas_plus_2.append(stat.lam)
+
+		line_base = plt.plot(lambdas_base, avg_succ_base, '-', marker=".", lw=1)
+		color = line_base[0].get_color()
+		line_plus = plt.plot(lambdas_plus, avg_succ_plus, ':', marker=".", lw=1, color=color)
+		line_plus_2 = plt.plot(lambdas_plus_2, avg_succ_plus_2, '-.', marker=".", lw=1, color=color) 
+		
 		legend_patches.append(patches.Patch(color=color, label=f'd = {duty}'))
+	
 
 	plt.legend(handles=legend_patches)
 	plt.title('Percentage of packets successfully delivered to the sink, N=?')
@@ -24,8 +41,8 @@ def plot_success_over_lambda_and_duty(runResult):
 	plt.ylabel('% success delivery')
 	plt.show()
 
-def plot_success_over_lambda_and_n(runResult):
-	Ns = sorted(set([stat.N for stat in runResult.LNstats]))
+def plot_success_over_lambda_and_n(ax, LNstats):
+	Ns = sorted(set([stat.N for stat in LNstats]))
 
 	legend_patches = []
 	for n in Ns:
@@ -40,8 +57,16 @@ def plot_success_over_lambda_and_n(runResult):
 		color = line[0].get_color()
 		legend_patches.append(patches.Patch(color=color, label=f'N = {n}'))
 	
-	plt.legend(handles=legend_patches)
-	plt.title('Percentage of packets successfully delivered to the sink, D=?')
-	plt.xlabel('$\lambda$')
-	plt.ylabel('% success delivery')
-	plt.show()
+	ax.legend(handles=legend_patches)
+	ax.title('Percentage of packets successfully delivered to the sink, D=?')
+	ax.xlabel('$\lambda$')
+	ax.ylabel('% success delivery')
+	ax.show()
+
+
+
+	ax.legend(handles=legend_patches)
+	ax.title('Percentage of packets successfully delivered to the sink, N=?')
+	ax.xlabel('$\lambda$')
+	ax.ylabel('% success delivery')
+

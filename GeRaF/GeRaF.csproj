@@ -93,10 +93,8 @@
     <Compile Include="Network\RelayTransmission.cs" />
     <Compile Include="SimulationParameters.cs" />
     <Compile Include="SimulationStats.cs" />
-    <Compile Include="StatsGeneration\Base\DutyLambda.cs" />
-    <Compile Include="StatsGeneration\Base\LambdaN.cs" />
-    <Compile Include="StatsGeneration\Square\SquareVersionCompare.cs" />
-    <Compile Include="StatsGeneration\Donut\DonutVersionCompare.cs" />
+    <Compile Include="StatsGeneration\General.cs" />
+    <Compile Include="StatsGeneration\GeneralParameters.cs" />
     <Compile Include="Utils\EnumJsonConverter.cs" />
     <Compile Include="Utils\EventQueue.cs" />
     <Compile Include="Events\Transmissions\SinkRTSEvent.cs" />

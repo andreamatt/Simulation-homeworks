@@ -24,8 +24,8 @@ namespace GeRaF
 	{
 		public ProtocolParameters basePP;
 		public SimulationParameters baseSP;
-		public List<DutyLambdaStat> dutyLambdas = new List<DutyLambdaStat>();
-		public List<LambdaNStat> lambdaNs = new List<LambdaNStat>();
+		public List<BaseStat> dutyLambdas = new List<BaseStat>();
+		public List<BaseStat> lambdaNs = new List<BaseStat>();
 		public List<BaseStat> donuts = new List<BaseStat>();
 		public List<BaseStat> squares = new List<BaseStat>();
 	}
@@ -33,22 +33,13 @@ namespace GeRaF
 	class BaseStat
 	{
 		public ProtocolVersion protocolVersion;
+		public double duty;
+		public double lambda;
+		public double N;
 		public List<double> delay = new List<double>();
 		public List<double> success = new List<double>();
 		public List<double> energy = new List<double>();
 		public List<List<double>> traffic = new List<List<double>>();
 		public List<List<double>> failurePoints = new List<List<double>>();
-	}
-
-	class DutyLambdaStat : BaseStat
-	{
-		public double duty;
-		public double lambda;
-	}
-
-	class LambdaNStat : BaseStat
-	{
-		public double lambda;
-		public double N;
 	}
 }

@@ -1,5 +1,4 @@
-﻿using GeRaF.StatsGeneration.Base;
-using GeRaF.StatsGeneration.Donut;
+﻿using GeRaF.StatsGeneration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,7 +9,6 @@ namespace GeRaF
 {
 	class Program
 	{
-		public static int simulationNumber;
 		public static int maxParallel;
 
 		static void Main(string[] args) {
@@ -49,15 +47,44 @@ namespace GeRaF
 				skipCycleEvents = true
 			};
 
-			simulationNumber = 1000;
+			var versions = Enum.GetValues(typeof(ProtocolVersion)).Cast<ProtocolVersion>().ToList();
+			var shapes = Enum.GetValues(typeof(EmptyRegionType)).Cast<EmptyRegionType>().ToList();
+
+			var dutyLambdas = General.Generate("DL", sp, pp, new GeneralParameters() {
+				lambdas = new List<double> { 0.1, 1, 5, 10 },
+				dutyCycles = new List<double>() { 0.1, 0.5, 0.9 },
+				versions = versions,
+				simulations = 20
+			});
+
+			var lambdaNs = General.Generate("LN", sp, pp, new GeneralParameters() {
+				lambdas = new List<double> { 1, 5, 10, 20, 100, 500 },
+				Ns = new List<int> { 50, 100, 200, 500 },
+				versions = versions,
+				simulations = 20
+			});
+
+			var donuts = General.Generate("donuts", sp, pp, new GeneralParameters() {
+				lambdas = new List<double> { 5, 20 },
+				versions = versions,
+				emptyRegionTypes = new List<EmptyRegionType> { EmptyRegionType.Circle },
+				simulations = 50
+			});
+
+			var squares = General.Generate("squares", sp, pp, new GeneralParameters() {
+				lambdas = new List<double> { 5, 20 },
+				versions = versions,
+				emptyRegionTypes = new List<EmptyRegionType> { EmptyRegionType.Square },
+				simulations = 50
+			});
 
 			var runResults = new RunResult {
 				basePP = pp,
 				baseSP = sp,
-				//dutyLambdas = DutyLambda.Generate(pp, sp, new List<double>() { 0.1, 0.5, 0.9 }, new List<double> { 0.1, 1, 5, 10 })
-				//lambdaNs = LambdaN.Generate(pp, sp, new List<double> { 1, 5, 10, 20, 100, 500 }, new List<int> { 50, 100, 200, 500 }),
-				donuts = DonutVersionCompare.Generate(pp, sp),
-				squares = SquareVersionCompare.Generate(pp, sp)
+				dutyLambdas = dutyLambdas,
+				lambdaNs = lambdaNs,
+				donuts = donuts,
+				squares = squares
 			};
 
 			Console.WriteLine("Finished simulating");
