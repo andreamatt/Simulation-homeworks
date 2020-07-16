@@ -12,8 +12,8 @@ namespace GeRaF
 	enum ProtocolVersion
 	{
 		Base,
-		Plus // CTS contains forward probability. Sender chooses best probability available
-		//Plus_2
+		Plus, // CTS contains forward probability. Sender chooses best probability available
+		Plus_2
 	}
 
 	class ProtocolParameters : ICloneable
@@ -42,11 +42,5 @@ namespace GeRaF
 		public object Clone() {
 			return MemberwiseClone();
 		}
-
-		//public ProtocolParameters ProtocolParameters(ProtocolParameters pp) {
-		//	return new ProtocolParameters() {
-		//		duty_cycle = pp.du
-		//	};
-		//}
 	}
 }

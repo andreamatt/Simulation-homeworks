@@ -56,11 +56,7 @@ namespace GeRaF.Events.Intermediate
 				else {
 					// finish and free
 					relay.packetToSend.Finish(Result.Abort_max_sensing, sim);
-					if (relay.packetToSend.hopsIds.Count > 1) {
-						var previousRelayId = relay.packetToSend.hopsIds[relay.packetToSend.hopsIds.Count - 2];
-						var previousRelay = sim.relayById[previousRelayId];
-						relay.failuresFromNeighbour[previousRelay]++;
-					}
+					relay.OnPacketFinished();
 					relay.FreeNow(this);
 				}
 			}

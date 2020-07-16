@@ -39,6 +39,42 @@ namespace GeRaF.Network
 		public List<int> neighboursIds => neighbours.Select(n => n.id).ToList();
 		public Dictionary<Relay, int> successesFromNeighbour = new Dictionary<Relay, int>();
 		public Dictionary<Relay, int> failuresFromNeighbour = new Dictionary<Relay, int>();
+		public Dictionary<Relay, float> markovFromNeighbour = new Dictionary<Relay, float>();
+
+		public void OnPacketFinished() {
+			if (packetToSend.hopsIds.Count > 1) {
+				var previousRelayId = packetToSend.hopsIds[packetToSend.hopsIds.Count - 2];
+				var previousRelay = sim.relayById[previousRelayId];
+				var val = markovFromNeighbour[previousRelay];
+				switch (packetToSend.result) {
+					case Result.None:
+						break;
+					case Result.Success:
+						break;
+					case Result.Passed:
+						successesFromNeighbour[previousRelay]++;
+						markovFromNeighbour[previousRelay] = val + (1 - val) / 2;
+						break;
+					default:
+						failuresFromNeighbour[previousRelay]++;
+						markovFromNeighbour[previousRelay] = val / 2;
+						break;
+				}
+			}
+		}
+
+		public void UpdateMarkov() {
+			if (packetToSend.hopsIds.Count > 1) {
+				var previousRelayId = packetToSend.hopsIds[packetToSend.hopsIds.Count - 2];
+				var previousRelay = sim.relayById[previousRelayId];
+
+				var ctsSenders = finishedCTSs.Select(t => t.source);
+				var markovValues = ctsSenders.Select(r => r.markovFromNeighbour[this]);
+
+				var val = markovFromNeighbour[previousRelay];
+				markovFromNeighbour[previousRelay] = (val + markovValues.Average()) / 2;
+			}
+		}
 
 		// for transmitting
 		public TransmissionType transmissionType = TransmissionType.RTS;
@@ -68,7 +104,7 @@ namespace GeRaF.Network
 
 		public string ToFrameString() {
 			var res = "";
-			res += $"{id}|{(int)status}|{(ShouldBeAwake ? 1 : 0)}";
+			res += $"{id}|{(int)status}|{(ShouldBeAwake ? 1 : 0)}|{string.Join("_", markovFromNeighbour.Select(m => $"{m.Key.id}:{m.Value}"))}";
 			if (status != RelayStatus.Asleep && status != RelayStatus.Free && (status == RelayStatus.Transmitting || packetToSend != null)) {
 				res += $"|{(int)transmissionType}|{transmissionDestinationId}";
 				if (packetToSend != null) {

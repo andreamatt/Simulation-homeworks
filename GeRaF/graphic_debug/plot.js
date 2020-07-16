@@ -221,7 +221,7 @@ class Plot {
 			.attr('opacity', r => r.actualStatus > 0 ? "ff" : "40")
 			.attr('stroke-width', 0.2 * this.scale)
 			.on('click', r => {
-				r.info_modality = (r.info_modality + 1) % 4
+				r.info_modality = (r.info_modality + 1) % 5
 				this.plot()
 			})
 
@@ -318,7 +318,7 @@ class Plot {
 		idLabels.append('text')
 			// .attr('dx', r => r.X * this.scale)
 			.attr('dy', r => 4 * this.scale)
-			.text(r => r.id)
+			.text(r => `${r.id}`)
 
 
 		console.log('render time: ' + (Date.now() - time_before_draw))

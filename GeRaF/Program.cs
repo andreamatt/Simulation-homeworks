@@ -34,15 +34,15 @@ namespace GeRaF
 				n_max_region_cycle = 1
 			};
 			var sp = new SimulationParameters() {
-				area_side = 100,
+				area_side = 50,
 				debug_interval = 1,
 				debugType = DebugType.Never,
 				debug_file = "../../graphic_debug/debug_data.js",
-				max_time = 100,
-				n_nodes = 100,
-				packet_rate = 5,
-				range = 20,
-				min_distance = 2,
+				max_time = 2000,
+				n_nodes = 25,
+				packet_rate = 2,
+				range = 10,
+				min_distance = 4,
 				emptyRegionType = EmptyRegionType.None,
 				skipCycleEvents = true
 			};
@@ -50,39 +50,39 @@ namespace GeRaF
 			var versions = Enum.GetValues(typeof(ProtocolVersion)).Cast<ProtocolVersion>().ToList();
 			var shapes = Enum.GetValues(typeof(EmptyRegionType)).Cast<EmptyRegionType>().ToList();
 
-			var dutyLambdas = General.Generate("DL", sp, pp, new GeneralParameters() {
-				lambdas = new List<double> { 0.1, 1, 5, 10 },
-				dutyCycles = new List<double>() { 0.1, 0.5, 0.9 },
-				versions = versions,
-				simulations = 20
-			});
+			//var dutyLambdas = General.Generate("DL", sp, pp, new GeneralParameters() {
+			//	lambdas = new List<double> { 0.1, 1, 5, 10 },
+			//	dutyCycles = new List<double>() { 0.1, 0.5, 0.9 },
+			//	versions = versions,
+			//	simulations = 20
+			//});
 
-			var lambdaNs = General.Generate("LN", sp, pp, new GeneralParameters() {
-				lambdas = new List<double> { 1, 5, 10, 20, 100, 500 },
-				Ns = new List<int> { 50, 100, 200, 500 },
-				versions = versions,
-				simulations = 20
-			});
+			//var lambdaNs = General.Generate("LN", sp, pp, new GeneralParameters() {
+			//	lambdas = new List<double> { 1, 5, 10, 20, 100, 500 },
+			//	Ns = new List<int> { 50, 100, 200, 500 },
+			//	versions = versions,
+			//	simulations = 20
+			//});
 
 			var donuts = General.Generate("donuts", sp, pp, new GeneralParameters() {
-				lambdas = new List<double> { 5, 20 },
+				//lambdas = new List<double> { 5, 20 },
 				versions = versions,
 				emptyRegionTypes = new List<EmptyRegionType> { EmptyRegionType.Circle },
-				simulations = 50
+				simulations = 10
 			});
 
 			var squares = General.Generate("squares", sp, pp, new GeneralParameters() {
-				lambdas = new List<double> { 5, 20 },
+				//lambdas = new List<double> { 5, 20 },
 				versions = versions,
 				emptyRegionTypes = new List<EmptyRegionType> { EmptyRegionType.Square },
-				simulations = 50
+				simulations = 2000
 			});
 
 			var runResults = new RunResult {
 				basePP = pp,
 				baseSP = sp,
-				dutyLambdas = dutyLambdas,
-				lambdaNs = lambdaNs,
+				//dutyLambdas = dutyLambdas,
+				//lambdaNs = lambdaNs,
 				donuts = donuts,
 				squares = squares
 			};

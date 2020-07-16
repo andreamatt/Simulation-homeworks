@@ -75,12 +75,14 @@ namespace GeRaF.Utils
 				r1.neighbours.Clear();
 				r1.successesFromNeighbour.Clear();
 				r1.failuresFromNeighbour.Clear();
+				r1.markovFromNeighbour.Clear();
 				foreach (var r2 in relays) {
 					if (r1 != r2) {
 						if (distances[r1.id][r2.id] <= r1.range) {
 							r1.neighbours.Add(r2);
 							r1.successesFromNeighbour[r2] = 0;
 							r1.failuresFromNeighbour[r2] = 0;
+							r1.markovFromNeighbour[r2] = 1;
 						}
 					}
 				}

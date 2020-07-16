@@ -21,9 +21,10 @@ runResult = RunResult(data)
 # plot_delay_over_lambda_and_n(runResult)
 
 # plot_success_over_lambda_and_n(runResult)
-plot_success_over_lambda_and_duty(runResult)
+# plot_success_over_lambda_and_duty(runResult)
 
 # plot_energy_over_lambda_and_n(runResult)
 # plot_energy_over_lambda_and_duty(runResult)
 
-# plot_heatmaps(runResult)
+plot_heatmaps(runResult)
+plot_heatmaps_hist(runResult)

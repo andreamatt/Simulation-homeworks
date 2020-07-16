@@ -22,11 +22,7 @@ namespace GeRaF.Events.Check
 		public override void Handle() {
 			if (relay.receivedACK) {
 				relay.packetToSend.result = Result.Passed;
-				if(relay.packetToSend.hopsIds.Count > 1){
-					var previousRelayId = relay.packetToSend.hopsIds[relay.packetToSend.hopsIds.Count - 2];
-					var previousRelay = sim.relayById[previousRelayId];
-					relay.successesFromNeighbour[previousRelay]++;
-				}
+				relay.OnPacketFinished();
 				relay.FreeNow(this);
 			}
 			else {
@@ -43,11 +39,7 @@ namespace GeRaF.Events.Check
 				}
 				else {
 					relay.packetToSend.Finish(Result.Abort_no_ack, sim);
-					if (relay.packetToSend.hopsIds.Count > 1) {
-						var previousRelayId = relay.packetToSend.hopsIds[relay.packetToSend.hopsIds.Count - 2];
-						var previousRelay = sim.relayById[previousRelayId];
-						relay.failuresFromNeighbour[previousRelay]++;
-					}
+					relay.OnPacketFinished();
 					relay.FreeNow(this);
 				}
 			}
