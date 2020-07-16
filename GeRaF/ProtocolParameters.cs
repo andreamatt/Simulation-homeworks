@@ -12,8 +12,7 @@ namespace GeRaF
 	enum ProtocolVersion
 	{
 		Base,
-		Plus, // CTS contains forward probability. Sender chooses best probability available
-		Plus_2
+		Plus // Calculate regions based on next hop direction instead of sink direction. Next hop direction is included in RTS
 	}
 
 	class ProtocolParameters : ICloneable

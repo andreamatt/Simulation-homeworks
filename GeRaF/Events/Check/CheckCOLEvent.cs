@@ -50,25 +50,8 @@ namespace GeRaF.Events.Check
 				}
 				// else choose relay and send packet
 				else {
-					Relay chosen = null;
-					if (sim.protocolParameters.protocolVersion == ProtocolVersion.Base) {
-						// choose random relay (choose first one, they are already in random order because of backoff (multiple CTSs without coll implies backoff))
-						chosen = relay.finishedCTSs.First().source;
-					}
-					else if (sim.protocolParameters.protocolVersion == ProtocolVersion.Plus) {
-						// choose relay with highest success / (success+failure+1) ratio
-						chosen = relay.finishedCTSs.Select(t => t.source)
-						.MaxBy(r => {
-							var success = r.successesFromNeighbour[relay];
-							var failure = r.failuresFromNeighbour[relay];
-							return success / (float)(success + failure + 1);
-						}).First();
-					}
-					else if (sim.protocolParameters.protocolVersion == ProtocolVersion.Plus_2) {
-						chosen = relay.finishedCTSs.Select(t => t.source)
-						.MaxBy(r => r.markovFromNeighbour[relay]).First();
-						relay.UpdateMarkov();
-					}
+					Relay chosen = relay.finishedCTSs.First().source;
+
 					sim.eventQueue.Add(new StartPKTEvent() {
 						time = sim.clock,
 						relay = relay,

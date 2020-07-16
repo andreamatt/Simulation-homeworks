@@ -94,12 +94,31 @@ namespace GeRaF.Network
 			bool failed = this.receivingTransmissions[sender];
 			// if free or awaiting for ITS correct region
 			if (failed == false && (this.status == RelayStatus.Free || (this.status == RelayStatus.Awaiting_region && this.busyWith == sender))) {
-				var sink = sender.packetToSend.sink;
-				var sourceToSink = sim.distances[sender.id][sink.id];
-				var limitToSink = sourceToSink - sender.range;
-				var regionWidth = sender.range / sim.protocolParameters.n_regions;
-				var dist = sim.distances[this.id][sink.id];
-				var myIndex = (int)Math.Floor((dist - limitToSink) / regionWidth);
+				int myIndex = -1;
+				switch (sim.protocolParameters.protocolVersion) {
+					case ProtocolVersion.Plus: {
+							// Calculate regions based on next hop direction instead of sink direction
+							var sink = sender.packetToSend.sink;
+							var direction = sender.directionForSink[sink];
+							var aimX = direction.Item1;
+							var aimY = direction.Item2;
+							var sourceToSink = sim.distances[sender.id][sink.id]; // same distance as sink, by design
+							var limitToSink = sourceToSink - sender.range;
+							var regionWidth = sender.range / sim.protocolParameters.n_regions;
+							var dist = Math.Sqrt(Math.Pow(X - aimX, 2) + Math.Pow(Y - aimY, 2));
+							myIndex = (int)Math.Floor((dist - limitToSink) / regionWidth);
+							break;
+						}
+					default: {
+							var sink = sender.packetToSend.sink;
+							var sourceToSink = sim.distances[sender.id][sink.id];
+							var limitToSink = sourceToSink - sender.range;
+							var regionWidth = sender.range / sim.protocolParameters.n_regions;
+							var dist = sim.distances[this.id][sink.id];
+							myIndex = (int)Math.Floor((dist - limitToSink) / regionWidth);
+							break;
+						}
+				}
 
 				// if I'm in the correct region
 				if (myIndex == sender.REGION_index) {

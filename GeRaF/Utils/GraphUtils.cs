@@ -73,17 +73,63 @@ namespace GeRaF.Utils
 		static public void SetNeighbours(List<Relay> relays, Dictionary<int, Dictionary<int, double>> distances) {
 			foreach (var r1 in relays) {
 				r1.neighbours.Clear();
-				r1.successesFromNeighbour.Clear();
-				r1.failuresFromNeighbour.Clear();
-				r1.markovFromNeighbour.Clear();
 				foreach (var r2 in relays) {
 					if (r1 != r2) {
 						if (distances[r1.id][r2.id] <= r1.range) {
 							r1.neighbours.Add(r2);
-							r1.successesFromNeighbour[r2] = 0;
-							r1.failuresFromNeighbour[r2] = 0;
-							r1.markovFromNeighbour[r2] = 1;
 						}
+					}
+				}
+			}
+		}
+
+		static public void FloydWarshall(List<Relay> relays, Dictionary<int, Dictionary<int, double>> distances) {
+			var pathLength = new Dictionary<Relay, Dictionary<Relay, double>>();
+			var maxLength = relays.Count;
+			var nextHop = new Dictionary<Relay, Dictionary<Relay, Relay>>();
+			foreach (var r1 in relays) {
+				pathLength[r1] = new Dictionary<Relay, double>();
+				nextHop[r1] = new Dictionary<Relay, Relay>();
+				foreach (var r2 in relays) {
+					if (r1 == r2) {
+						pathLength[r1][r1] = 0;
+						nextHop[r1][r1] = r1;
+					}
+					else {
+						pathLength[r1][r2] = maxLength;
+						if (r1.neighbours.Contains(r2)) {
+							pathLength[r1][r2] = 1;
+							nextHop[r1][r2] = r2;
+						}
+					}
+				}
+			}
+
+			foreach(var k in relays){
+				foreach(var i in relays){
+					foreach(var j in relays){
+						if(pathLength[i][j] > pathLength[i][k] + pathLength[k][j]){
+							pathLength[i][j] = pathLength[i][k] + pathLength[k][j];
+							nextHop[i][j] = nextHop[i][k];
+						}
+					}
+				}
+			}
+
+			foreach(var r1 in relays){
+				foreach(var r2 in relays){
+					if(r1!=r2 && !r1.neighbours.Contains(r2)){
+						var distToSink = distances[r1.id][r2.id];
+						var hop = nextHop[r1][r2];
+						var distToHop = distances[r1.id][hop.id];
+
+						var dx = r2.X - r1.X;
+						var dy = r2.Y - r1.Y;
+
+						// aim in the same direction as nextHop, but at sink distance (different region radius/shape)
+						var aimX = r1.X + dx * distToSink / distToHop;
+						var aimY = r1.Y + dy * distToSink / distToHop;
+						r1.directionForSink[r2] = (aimX, aimY);
 					}
 				}
 			}

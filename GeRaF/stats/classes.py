@@ -41,6 +41,7 @@ class ProtocolParamaters:
 
 class BaseStat:
 	def __init__(self, data):
+		self.shape = data['shape']
 		self.version = data["protocolVersion"]
 		self.duty = data["duty"]
 		self.lam = float(data['lambda'])
@@ -59,5 +60,5 @@ class RunResult:
 		self.baseSP = SimulationParameters(data['baseSP'])
 		self.DLstats = [BaseStat(s) for s in data['dutyLambdas']]
 		self.LNstats = [BaseStat(s) for s in data['lambdaNs']]
-		self.DonutStats = [BaseStat(s) for s in data['donuts']]
-		self.SquareStats = [BaseStat(s) for s in data['squares']]
+		self.ShapeStats = [BaseStat(s) for s in data['shapeStats']]
+		

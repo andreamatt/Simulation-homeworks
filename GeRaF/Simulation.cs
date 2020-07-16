@@ -132,6 +132,7 @@ namespace GeRaF
 				GraphUtils.SetNeighbours(relays, distances);
 				connected = GraphUtils.Connected(relays);
 			}
+			GraphUtils.FloydWarshall(relays, distances);
 			//Console.WriteLine("Placed relays");
 
 			// init debug state

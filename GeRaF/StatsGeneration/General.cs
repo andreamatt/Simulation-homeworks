@@ -47,7 +47,8 @@ namespace GeRaF.StatsGeneration
 									lambda = l,
 									N = n,
 									duty = d,
-									protocolVersion = version
+									protocolVersion = version,
+									shape = emptyRegionType
 								};
 								for (int x = 0; x < new_sp.binsCount; x++) {
 									stat.traffic.Add(new List<double>(new double[new_sp.binsCount]));

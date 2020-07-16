@@ -26,8 +26,7 @@ namespace GeRaF
 		public SimulationParameters baseSP;
 		public List<BaseStat> dutyLambdas = new List<BaseStat>();
 		public List<BaseStat> lambdaNs = new List<BaseStat>();
-		public List<BaseStat> donuts = new List<BaseStat>();
-		public List<BaseStat> squares = new List<BaseStat>();
+		public List<BaseStat> shapeStats = new List<BaseStat>();
 	}
 
 	class BaseStat
@@ -36,6 +35,7 @@ namespace GeRaF
 		public double duty;
 		public double lambda;
 		public double N;
+		public EmptyRegionType shape;
 		public List<double> delay = new List<double>();
 		public List<double> success = new List<double>();
 		public List<double> energy = new List<double>();

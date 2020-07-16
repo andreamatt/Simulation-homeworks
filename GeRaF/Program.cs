@@ -34,15 +34,15 @@ namespace GeRaF
 				n_max_region_cycle = 1
 			};
 			var sp = new SimulationParameters() {
-				area_side = 50,
+				area_side = 100,
 				debug_interval = 1,
 				debugType = DebugType.Never,
 				debug_file = "../../graphic_debug/debug_data.js",
-				max_time = 2000,
-				n_nodes = 25,
-				packet_rate = 2,
-				range = 10,
-				min_distance = 4,
+				max_time = 50,
+				n_nodes = 100,
+				packet_rate = 5,
+				range = 20,
+				min_distance = 1,
 				emptyRegionType = EmptyRegionType.None,
 				skipCycleEvents = true
 			};
@@ -75,7 +75,7 @@ namespace GeRaF
 				//lambdas = new List<double> { 5, 20 },
 				versions = versions,
 				emptyRegionTypes = new List<EmptyRegionType> { EmptyRegionType.Square },
-				simulations = 2000
+				simulations = 50
 			});
 
 			var runResults = new RunResult {
@@ -83,8 +83,7 @@ namespace GeRaF
 				baseSP = sp,
 				//dutyLambdas = dutyLambdas,
 				//lambdaNs = lambdaNs,
-				donuts = donuts,
-				squares = squares
+				shapeStats = donuts.Union(squares).ToList()
 			};
 
 			Console.WriteLine("Finished simulating");

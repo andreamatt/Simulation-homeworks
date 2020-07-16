@@ -3,89 +3,82 @@ import seaborn as sns
 import numpy as np
 from classes import *
 
+
 def plot_heatmaps(runResults: RunResult):
-	n_protocol_versions = len(runResults.DonutStats)
-	fig, axs = plt.subplots(5, n_protocol_versions +1)
-	vmin = 0
-	vmax = 0
+    protocol_versions = list(
+        set([stat.version for stat in runResults.ShapeStats]))
+    shapes = list(set([stat.shape for stat in runResults.ShapeStats]))
+    fig, axs = plt.subplots(len(shapes)*2+1, len(protocol_versions) + 1)
+    vmin = 0
+    vmax = 0
 
-	props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-	
-	for i in range(5):
-		for k in range(n_protocol_versions):
-			stat = runResults.DonutStats[k] if i < 3 else runResults.SquareStats[k]
-			if i == 0:
-				textstr = f"version: {stat.version}"
-				axs[i][k+1].axis('off')
-				axs[i][k+1].text(0.05, 0.95, textstr, transform=axs[i][k+1].transAxes, fontsize=14,
-					verticalalignment='top', bbox=props)
-					  
-			if k == 0 and i != 0:
-				textstr = 'traffic' if i % 2 != 0 else 'failures'   
-				axs[i][k].axis('off')
-				axs[i][k].text(0.05, 0.95, textstr, transform=axs[i][k].transAxes, fontsize=14,
-						verticalalignment='top', bbox=props)
+    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 
-	textstr = '\n'.join((
-		"dati",
-		"generali"))
+    vmin = 0
+    vmax = 0
+    for stat in runResults.ShapeStats:
+        traffic = np.array(stat.traffic).T
+        failures = np.array(stat.failurePoints).T
+        vmax = max([vmax, np.ndarray.max(traffic), np.ndarray.max(failures)])
 
-	axs[0][0].axis('off')
-	axs[0][0].text(0.05, 0.95, textstr, transform=axs[0][0].transAxes, fontsize=14,
-		verticalalignment='top', bbox=props)
+    for i in range(len(shapes)):
+        shape = shapes[i]
+        stats = list(filter(lambda s: s.shape == shape, runResults.ShapeStats))
+        for k in range(len(protocol_versions)):
+            version = protocol_versions[k]
+            stat = stats[k]
+            traffic = np.array(stat.traffic).T
+            failures = np.array(stat.failurePoints).T
+            axs[1+i*2, k+1].imshow(traffic, vmin=vmin)
+            axs[2+i*2, k+1].imshow(failures, vmax=vmax)
 
-	for i in range(n_protocol_versions):
-		stat = runResults.DonutStats[i]
-		traffic = np.array(stat.traffic).T
-		failures = np.array(stat.failurePoints).T
-		vmax = max([vmax, np.ndarray.max(traffic), np.ndarray.max(failures)])
-		stat = runResults.SquareStats[i]
-		traffic = np.array(stat.traffic).T
-		failures = np.array(stat.failurePoints).T
-		vmax = max([vmax, np.ndarray.max(traffic), np.ndarray.max(failures)])
+    for i in range(len(shapes)):
+        axs[1+i*2][0].axis('off')
+        axs[1+i*2][0].text(0.05, 0.95, "traffic", transform=axs[1+i*2][0].transAxes, fontsize=14,
+                           verticalalignment='top')
 
-	for i in range(n_protocol_versions):
-		stat = runResults.DonutStats[i]
-		traffic = np.array(stat.traffic).T
-		failures = np.array(stat.failurePoints).T
-		axs[1,i+1].imshow(traffic, vmin=vmin)
-		axs[2,i+1].imshow(failures, vmax=vmax)
-		axs[2,i+1].set_title(f"Max: {np.max(failures)}")
+        axs[2+i*2][0].axis('off')
+        axs[2+i*2][0].text(0.05, 0.95, "failures", transform=axs[2+i*2][0].transAxes, fontsize=14,
+                           verticalalignment='top')
 
-		
-	for i in range(n_protocol_versions):
-		stat = runResults.SquareStats[i]
-		traffic = np.array(stat.traffic).T
-		failures = np.array(stat.failurePoints).T
-		axs[3,i+1].imshow(traffic, vmin=vmin)
-		axs[4,i+1].imshow(failures, vmax=vmax)
-		axs[4,i+1].set_title(f"Max: {np.max(failures)}")
-		
-	plt.tight_layout(h_pad=1)
-	plt.show()
+    for i in range(len(protocol_versions)):
+        axs[0][1+i].axis('off')
+        axs[0][1+i].text(0.05, 0.95, protocol_versions[i], transform=axs[0][1+i].transAxes, fontsize=14,
+                         verticalalignment='top')
+
+    textstr = '\n'.join((
+        "dati",
+        "generali"))
+
+    axs[0][0].axis('off')
+    axs[0][0].text(0.05, 0.95, textstr, transform=axs[0][0].transAxes, fontsize=14,
+                   verticalalignment='top')
+
+    plt.tight_layout(h_pad=1)
+    plt.show()
 
 
 def plot_heatmaps_hist(runResults):
-	n_protocol_versions = len(runResults.DonutStats)
-	fig, axs = plt.subplots(2, 2)
+    n_protocol_versions = len(runResults.DonutStats)
+    fig, axs = plt.subplots(2, 2)
 
-	for i in range(n_protocol_versions):
-		donut = runResults.DonutStats[i]
-		square = runResults.SquareStats[i]
-		version = runResults.DonutStats[i].version
+    for i in range(n_protocol_versions):
+        donut = runResults.DonutStats[i]
+        square = runResults.SquareStats[i]
+        version = runResults.DonutStats[i].version
 
-		d_traffic = np.array(donut.traffic).flatten()
-		d_failures = np.array(donut.failurePoints).flatten()
-		s_traffic = np.array(square.traffic).flatten()
-		s_failures = np.array(square.failurePoints).flatten()
-		
-		sns.kdeplot(d_traffic, ax=axs[0,0], label=version)
-		sns.kdeplot(d_failures, ax=axs[0,1], label=version)
-		sns.kdeplot(s_traffic, ax=axs[1,0], label=version)
-		sns.kdeplot(s_failures, ax=axs[1,1], label=version)
+        d_traffic = np.array(donut.traffic).flatten()
+        d_failures = np.array(donut.failurePoints).flatten()
+        s_traffic = np.array(square.traffic).flatten()
+        s_failures = np.array(square.failurePoints).flatten()
 
-		# print(ax.get_color())
+        sns.kdeplot(d_traffic, ax=axs[0, 0], label=version)
+        sns.kdeplot(d_failures, ax=axs[0, 1], label=version)
+        sns.kdeplot(s_traffic, ax=axs[1, 0], label=version)
+        sns.kdeplot(s_failures, ax=axs[1, 1], label=version)
 
-	axs[0,0].legend()
+        # print(ax.get_color())
 
-	plt.show()
+    axs[0, 0].legend()
+
+    plt.show()

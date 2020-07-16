@@ -6,8 +6,7 @@ const InfoModality = {
 	off: 0,
 	active_transmissions: 1,
 	finished_transmissions: 2,
-	packet_info: 3,
-	markov: 4
+	packet_info: 3
 }
 
 const RelayStatus = {
@@ -136,7 +135,6 @@ class Relay {
 
 		this.status = 0
 		this.ShouldBeAwake = 0
-		this.markovFromNeighbour = {}
 		this.transmissionType = 0
 		this.transmissionDestinationId = -1
 		this.REGION_index = 0
@@ -154,24 +152,20 @@ class Relay {
 	update(fields, packets) {
 		this.status = parseInt(fields[1])
 		this.ShouldBeAwake = parseInt(fields[2])
-		let markovs = fields[3].split("_")
-		for (let markov of markovs) {
-			let [k, v] = markov.split(":")
-			this.markovFromNeighbour[parseInt(k)] = Number(v)
-		}
-		if (fields.length > 4) {
-			this.transmissionType = parseInt(fields[4])
-			this.transmissionDestinationId = parseInt(fields[5])
-			if (fields.length > 6) {
-				this.REGION_index = parseInt(fields[6])
-				this.COL_count = parseInt(fields[7])
-				this.SENSE_count = parseInt(fields[8])
-				this.SINK_RTS_count = parseInt(fields[9])
-				this.PKT_count = parseInt(fields[10])
-				this.REGION_cycle = parseInt(fields[11])
-				this.BusyWithId = parseInt(fields[12])
-				this.packetContentId = fields[13] == "" ? -1 : parseInt(fields[13])
-				this.packetCopyId = fields[14] == "" ? -1 : parseInt(fields[14])
+
+		if (fields.length > 3) {
+			this.transmissionType = parseInt(fields[3])
+			this.transmissionDestinationId = parseInt(fields[4])
+			if (fields.length > 5) {
+				this.REGION_index = parseInt(fields[5])
+				this.COL_count = parseInt(fields[6])
+				this.SENSE_count = parseInt(fields[7])
+				this.SINK_RTS_count = parseInt(fields[8])
+				this.PKT_count = parseInt(fields[9])
+				this.REGION_cycle = parseInt(fields[10])
+				this.BusyWithId = parseInt(fields[11])
+				this.packetContentId = fields[12] == "" ? -1 : parseInt(fields[12])
+				this.packetCopyId = fields[13] == "" ? -1 : parseInt(fields[13])
 			}
 		}
 		if (this.packetContentId != -1) {
@@ -200,6 +194,5 @@ class Relay {
 		if (this.info_modality == InfoModality.active_transmissions) return `ACTIVE`
 		if (this.info_modality == InfoModality.finished_transmissions) return `FINISHED`
 		if (this.info_modality == InfoModality.packet_info) return `PACKET: ${this.packetToSend}`
-		if (this.info_modality == InfoModality.markov) return `${JSON.stringify(this.markovFromNeighbour)}`
 	}
 }
