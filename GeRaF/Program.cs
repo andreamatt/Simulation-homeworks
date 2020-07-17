@@ -34,12 +34,12 @@ namespace GeRaF
 				n_max_region_cycle = 1
 			};
 			var sp = new SimulationParameters() {
-				area_side = 100,
+				area_side = 200,
 				debug_interval = 1,
 				debugType = DebugType.Never,
 				debug_file = "../../graphic_debug/debug_data.js",
 				max_time = 50,
-				n_nodes = 100,
+				n_nodes = 300,
 				packet_rate = 5,
 				range = 20,
 				min_distance = 1,
@@ -50,41 +50,33 @@ namespace GeRaF
 			var versions = Enum.GetValues(typeof(ProtocolVersion)).Cast<ProtocolVersion>().ToList();
 			var shapes = Enum.GetValues(typeof(EmptyRegionType)).Cast<EmptyRegionType>().ToList();
 
-			//var dutyLambdas = General.Generate("DL", sp, pp, new GeneralParameters() {
-			//	lambdas = new List<double> { 0.1, 1, 5, 10 },
-			//	dutyCycles = new List<double>() { 0.1, 0.5, 0.9 },
-			//	versions = versions,
-			//	simulations = 20
-			//});
-
-			//var lambdaNs = General.Generate("LN", sp, pp, new GeneralParameters() {
-			//	lambdas = new List<double> { 1, 5, 10, 20, 100, 500 },
-			//	Ns = new List<int> { 50, 100, 200, 500 },
-			//	versions = versions,
-			//	simulations = 20
-			//});
-
-			var donuts = General.Generate("donuts", sp, pp, new GeneralParameters() {
-				//lambdas = new List<double> { 5, 20 },
-				versions = versions,
-				emptyRegionTypes = new List<EmptyRegionType> { EmptyRegionType.Circle },
-				simulations = 10
-			});
-
-			var squares = General.Generate("squares", sp, pp, new GeneralParameters() {
-				//lambdas = new List<double> { 5, 20 },
-				versions = versions,
-				emptyRegionTypes = new List<EmptyRegionType> { EmptyRegionType.Square },
-				simulations = 50
-			});
-
 			var runResults = new RunResult {
 				basePP = pp,
-				baseSP = sp,
-				//dutyLambdas = dutyLambdas,
-				//lambdaNs = lambdaNs,
-				shapeStats = donuts.Union(squares).ToList()
+				baseSP = sp
 			};
+
+			var DLparameters = new GeneralParameters() {
+				lambdas = new List<double> { 0.1, 1, 5, 10 },
+				dutyCycles = new List<double>() { 0.1, 0.5, 0.9 },
+				versions = new List<ProtocolVersion> { ProtocolVersion.Plus },
+				simulations = 1
+			};
+			var LNparameters = new GeneralParameters() {
+				lambdas = new List<double> { 1, 5, 10, 20, 100, 500 },
+				Ns = new List<int> { 50, 100, 200, 500 },
+				versions = new List<ProtocolVersion> { ProtocolVersion.Base },
+				simulations = 20
+			};
+			var shapeParameters = new GeneralParameters() {
+				//lambdas = new List<double> { 5, 20 },
+				versions = versions,
+				emptyRegionTypes = shapes,
+				simulations = 1000
+			};
+
+			runResults.dutyLambdas = General.Generate("DL", sp, pp, DLparameters);
+			//runResults.lambdaNs = General.Generate("LN", sp, pp, LNparameters);
+			//runResults.shapeStats = General.Generate("donuts", sp, pp, shapeParameters);
 
 			Console.WriteLine("Finished simulating");
 

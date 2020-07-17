@@ -35,7 +35,7 @@ namespace GeRaF.StatsGeneration
 							new_pp.protocolVersion = version;
 							foreach (var emptyRegionType in parameters.emptyRegionTypes) {
 								new_sp.emptyRegionType = emptyRegionType;
-								switch(emptyRegionType){
+								switch (emptyRegionType) {
 									case EmptyRegionType.Circle:
 										new_sp.emptyRegionSize = new_sp.area_side / 6; // radius
 										break;
@@ -85,15 +85,15 @@ namespace GeRaF.StatsGeneration
 									foreach (var p in packetsForTraffic) {
 										foreach (var relayId in p.hopsIds) {
 											var relay = sim.relayById[relayId];
-											var xBin = sim.xToSlot(relay.X);
-											var yBin = sim.xToSlot(relay.Y);
+											var xBin = sim.xToSlot(relay.position.X);
+											var yBin = sim.xToSlot(relay.position.Y);
 											traffic[xBin][yBin]++;
 										}
 									}
 									foreach (var p in packetsForFailures) {
 										var relay = sim.relayById[p.hopsIds.Last()];
-										var xBin = sim.xToSlot(relay.X);
-										var yBin = sim.xToSlot(relay.Y);
+										var xBin = sim.xToSlot(relay.position.X);
+										var yBin = sim.xToSlot(relay.position.Y);
 										failures[xBin][yBin]++;
 									}
 

@@ -98,12 +98,12 @@ namespace GeRaF
 						Y_slot = RNG.rand_int(0, n_slots);
 
 						// assign actual position
-						relay.X = slotToX(X_slot);
-						relay.Y = slotToX(Y_slot);
+						relay.position.X = slotToX(X_slot);
+						relay.position.Y = slotToX(Y_slot);
 
 						// calculate if in region
-						var dx = relay.X - simulationParameters.area_side / 2;
-						var dy = relay.Y - simulationParameters.area_side / 2;
+						var dx = relay.position.X - simulationParameters.area_side / 2;
+						var dy = relay.position.Y - simulationParameters.area_side / 2;
 						switch (simulationParameters.emptyRegionType) {
 							case EmptyRegionType.None:
 								validRegion = true;
@@ -132,7 +132,9 @@ namespace GeRaF
 				GraphUtils.SetNeighbours(relays, distances);
 				connected = GraphUtils.Connected(relays);
 			}
-			GraphUtils.FloydWarshall(relays, distances);
+			if (protocolParameters.protocolVersion == ProtocolVersion.Plus) {
+				GraphUtils.FloydWarshall(relays, distances);
+			}
 			//Console.WriteLine("Placed relays");
 
 			// init debug state
@@ -144,7 +146,7 @@ namespace GeRaF
 				debugWriter.WriteLine($"{JsonConvert.SerializeObject(protocolParameters)}");
 				debugWriter.WriteLine("#");
 				foreach (var r in relays) {
-					debugWriter.WriteLine($"{r.id};{r.X};{r.Y};{r.range}");
+					debugWriter.WriteLine($"{r.id};{r.position.X};{r.position.Y};{r.range}");
 				}
 				debugWriter.WriteLine("#");
 				debugWriter.WriteLine($"{JsonConvert.SerializeObject(distances)}");

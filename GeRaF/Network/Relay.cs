@@ -30,14 +30,13 @@ namespace GeRaF.Network
 		public Simulation sim;
 
 		public int id = -1;
-		public double X;
-		public double Y;
+		public Position position;
 		public double range = -1;
 
 		[JsonIgnore]
 		public HashSet<Relay> neighbours = new HashSet<Relay>();
 		public List<int> neighboursIds => neighbours.Select(n => n.id).ToList();
-		public Dictionary<Relay, (double, double)> directionForSink = new Dictionary<Relay, (double, double)>();
+		public Dictionary<Relay, Position> directionForSink = new Dictionary<Relay, Position>();
 
 		public void OnPacketFinished() {
 		}

@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 
 namespace GeRaF.Utils
 {
+	struct Position
+	{
+		public double X;
+		public double Y;
+	}
+
 	class GraphUtils
 	{
 		static public List<Relay> Movable(List<Relay> relays, Dictionary<int, Dictionary<int, double>> distances, double min_distance) {
@@ -62,7 +68,7 @@ namespace GeRaF.Utils
 				distances[r1.id] = new Dictionary<int, double>();
 				foreach (var r2 in relays) {
 					if (r1 != r2) {
-						var dist = Math.Sqrt(Math.Pow(r1.X - r2.X, 2) + Math.Pow(r1.Y - r2.Y, 2));
+						var dist = Math.Sqrt(Math.Pow(r1.position.X - r2.position.X, 2) + Math.Pow(r1.position.Y - r2.position.Y, 2));
 						distances[r1.id][r2.id] = dist;
 					}
 				}
@@ -84,52 +90,55 @@ namespace GeRaF.Utils
 		}
 
 		static public void FloydWarshall(List<Relay> relays, Dictionary<int, Dictionary<int, double>> distances) {
-			var pathLength = new Dictionary<Relay, Dictionary<Relay, double>>();
+			var pathLength = new Dictionary<int, Dictionary<int, double>>();
 			var maxLength = relays.Count;
-			var nextHop = new Dictionary<Relay, Dictionary<Relay, Relay>>();
+			var nextHop = new Dictionary<int, Dictionary<int, Relay>>();
 			foreach (var r1 in relays) {
-				pathLength[r1] = new Dictionary<Relay, double>();
-				nextHop[r1] = new Dictionary<Relay, Relay>();
+				pathLength[r1.id] = new Dictionary<int, double>();
+				nextHop[r1.id] = new Dictionary<int, Relay>();
 				foreach (var r2 in relays) {
 					if (r1 == r2) {
-						pathLength[r1][r1] = 0;
-						nextHop[r1][r1] = r1;
+						pathLength[r1.id][r1.id] = 0;
+						nextHop[r1.id][r1.id] = r1;
 					}
 					else {
-						pathLength[r1][r2] = maxLength;
+						pathLength[r1.id][r2.id] = maxLength;
 						if (r1.neighbours.Contains(r2)) {
-							pathLength[r1][r2] = 1;
-							nextHop[r1][r2] = r2;
+							pathLength[r1.id][r2.id] = 1;
+							nextHop[r1.id][r2.id] = r2;
 						}
 					}
 				}
 			}
 
-			foreach(var k in relays){
-				foreach(var i in relays){
-					foreach(var j in relays){
-						if(pathLength[i][j] > pathLength[i][k] + pathLength[k][j]){
-							pathLength[i][j] = pathLength[i][k] + pathLength[k][j];
-							nextHop[i][j] = nextHop[i][k];
+			foreach (var k in relays) {
+				foreach (var i in relays) {
+					foreach (var j in relays) {
+						if (pathLength[i.id][j.id] > pathLength[i.id][k.id] + pathLength[k.id][j.id]) {
+							pathLength[i.id][j.id] = pathLength[i.id][k.id] + pathLength[k.id][j.id];
+							nextHop[i.id][j.id] = nextHop[i.id][k.id];
 						}
 					}
 				}
 			}
 
-			foreach(var r1 in relays){
-				foreach(var r2 in relays){
-					if(r1!=r2 && !r1.neighbours.Contains(r2)){
+			foreach (var r1 in relays) {
+				foreach (var r2 in relays) {
+					if (r1 != r2 && !r1.neighbours.Contains(r2)) {
 						var distToSink = distances[r1.id][r2.id];
-						var hop = nextHop[r1][r2];
+						var hop = nextHop[r1.id][r2.id];
 						var distToHop = distances[r1.id][hop.id];
 
-						var dx = r2.X - r1.X;
-						var dy = r2.Y - r1.Y;
+						var dx = r2.position.X - r1.position.X;
+						var dy = r2.position.Y - r1.position.Y;
 
 						// aim in the same direction as nextHop, but at sink distance (different region radius/shape)
-						var aimX = r1.X + dx * distToSink / distToHop;
-						var aimY = r1.Y + dy * distToSink / distToHop;
-						r1.directionForSink[r2] = (aimX, aimY);
+						var aimX = r1.position.X + dx * distToSink / distToHop;
+						var aimY = r1.position.Y + dy * distToSink / distToHop;
+						r1.directionForSink[r2] = new Position() {
+							X = aimX,
+							Y = aimY
+						};
 					}
 				}
 			}
