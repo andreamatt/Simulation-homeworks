@@ -133,7 +133,7 @@ namespace GeRaF
 				connected = GraphUtils.Connected(relays);
 			}
 			if (protocolParameters.protocolVersion == ProtocolVersion.Plus) {
-				GraphUtils.FloydWarshall(relays, distances);
+				GraphUtils.RepeatedBFS(relays, distances);
 			}
 			//Console.WriteLine("Placed relays");
 

@@ -22,6 +22,8 @@ namespace GeRaF
 
 	class RunResult
 	{
+		public DateTime startTime;
+		public DateTime endTime;
 		public ProtocolParameters basePP;
 		public SimulationParameters baseSP;
 		public List<BaseStat> dutyLambdas = new List<BaseStat>();

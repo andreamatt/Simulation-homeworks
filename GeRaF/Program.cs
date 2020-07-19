@@ -34,12 +34,12 @@ namespace GeRaF
 				n_max_region_cycle = 1
 			};
 			var sp = new SimulationParameters() {
-				area_side = 200,
+				area_side = 100,
 				debug_interval = 1,
 				debugType = DebugType.Never,
 				debug_file = "../../graphic_debug/debug_data.js",
-				max_time = 50,
-				n_nodes = 300,
+				max_time = 20,
+				n_nodes = 100,
 				packet_rate = 5,
 				range = 20,
 				min_distance = 1,
@@ -51,6 +51,7 @@ namespace GeRaF
 			var shapes = Enum.GetValues(typeof(EmptyRegionType)).Cast<EmptyRegionType>().ToList();
 
 			var runResults = new RunResult {
+				startTime = DateTime.Now,
 				basePP = pp,
 				baseSP = sp
 			};
@@ -58,14 +59,14 @@ namespace GeRaF
 			var DLparameters = new GeneralParameters() {
 				lambdas = new List<double> { 0.1, 1, 5, 10 },
 				dutyCycles = new List<double>() { 0.1, 0.5, 0.9 },
-				versions = new List<ProtocolVersion> { ProtocolVersion.Plus },
-				simulations = 1
+				versions = new List<ProtocolVersion> { ProtocolVersion.Base },
+				simulations = 100
 			};
 			var LNparameters = new GeneralParameters() {
 				lambdas = new List<double> { 1, 5, 10, 20, 100, 500 },
-				Ns = new List<int> { 50, 100, 200, 500 },
+				Ns = new List<int> { 100, 200, 500 }, // CHANGE TO PROPORTIONAL TO AREA
 				versions = new List<ProtocolVersion> { ProtocolVersion.Base },
-				simulations = 20
+				simulations = 100
 			};
 			var shapeParameters = new GeneralParameters() {
 				//lambdas = new List<double> { 5, 20 },
@@ -73,10 +74,21 @@ namespace GeRaF
 				emptyRegionTypes = shapes,
 				simulations = 1000
 			};
+			var debugParameters = new GeneralParameters() {
+				versions = new List<ProtocolVersion> { ProtocolVersion.Plus },
+				emptyRegionTypes = new List<EmptyRegionType> { EmptyRegionType.Square },
+				simulations = 1
+			};
 
-			runResults.dutyLambdas = General.Generate("DL", sp, pp, DLparameters);
+			//runResults.dutyLambdas = General.Generate("DL", sp, pp, DLparameters);
 			//runResults.lambdaNs = General.Generate("LN", sp, pp, LNparameters);
-			//runResults.shapeStats = General.Generate("donuts", sp, pp, shapeParameters);
+			runResults.shapeStats = General.Generate("donuts", sp, pp, shapeParameters);
+
+			// debug
+			//sp.debugType = DebugType.Always;
+			//General.Generate("Debug", sp, pp, debugParameters);
+
+			runResults.endTime = DateTime.Now;
 
 			Console.WriteLine("Finished simulating");
 

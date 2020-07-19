@@ -39,8 +39,10 @@ class Plot {
 			this.relays_dict[r.id] = r
 		}
 		this.relays = Object.values(this.relays_dict)
-
 		this.distances = JSON.parse(data_sections[3])
+		GraphUtils.SetNeighbours(this.relays, this.distances)
+		GraphUtils.RepeatedBFS(this.relays, this.distances)
+
 		let other_lines = data_sections[4].split(/\r?\n/).map(d => d.trim())
 		this.frame_lines = other_lines.filter(l => l[0] == 'F').map(l => l.substring(2))
 
@@ -221,7 +223,7 @@ class Plot {
 			.attr('opacity', r => r.actualStatus > 0 ? "ff" : "40")
 			.attr('stroke-width', 0.2 * this.scale)
 			.on('click', r => {
-				r.info_modality = (r.info_modality + 1) % 5
+				r.info_modality = (r.info_modality + 1) % 4
 				this.plot()
 			})
 
@@ -284,16 +286,16 @@ class Plot {
 
 		// mask with sink range
 		masks.append('circle')
-			.attr('cx', t => this.relays_dict[t.rel.packetToSend.sinkId].X * this.scale)
-			.attr('cy', t => this.relays_dict[t.rel.packetToSend.sinkId].Y * this.scale)
+			.attr('cx', t => t.rel.directionForSink[t.rel.packetToSend.sinkId][0] * this.scale)
+			.attr('cy', t => t.rel.directionForSink[t.rel.packetToSend.sinkId][1] * this.scale)
 			.attr('r', t => (this.distances[t.rel.id][t.rel.packetToSend.sinkId] - t.rel.range + t.reg * t.rel.range / this.protocol_params.n_regions) * this.scale)
 			.style('stroke', 'none')
 			.style('fill', '#000000')
 
 		// circle that fills
 		region_groups.append('circle')
-			.attr('cx', t => this.relays_dict[t.rel.packetToSend.sinkId].X * this.scale)
-			.attr('cy', t => this.relays_dict[t.rel.packetToSend.sinkId].Y * this.scale)
+			.attr('cx', t => t.rel.directionForSink[t.rel.packetToSend.sinkId][0] * this.scale)
+			.attr('cy', t => t.rel.directionForSink[t.rel.packetToSend.sinkId][1] * this.scale)
 			.attr('r', t => (this.distances[t.rel.id][t.rel.packetToSend.sinkId] - t.rel.range + (t.reg + 1) * t.rel.range / this.protocol_params.n_regions) * this.scale)
 			.attr('mask', t => `url(#mask_${t.rel.id}_${t.reg})`)
 			.style('fill', t => t.rel.REGION_index == t.reg ? '#00e00080' : '#0000e080')

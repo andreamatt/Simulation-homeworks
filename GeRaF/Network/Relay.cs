@@ -33,6 +33,14 @@ namespace GeRaF.Network
 		public Position position;
 		public double range = -1;
 
+		//public override bool Equals(object obj) {
+		//	return id == (obj as Relay).id;
+		//}
+
+		//public override int GetHashCode() {
+		//	return id;
+		//}
+
 		[JsonIgnore]
 		public HashSet<Relay> neighbours = new HashSet<Relay>();
 		public List<int> neighboursIds => neighbours.Select(n => n.id).ToList();

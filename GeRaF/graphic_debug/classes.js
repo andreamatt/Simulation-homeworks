@@ -147,6 +147,8 @@ class Relay {
 		this.packetContentId = -1
 		this.packetCopyId = -1
 		this.info_modality = InfoModality.off
+		this.directionForSink = {}
+		this.neighbours = new Set()
 	}
 
 	update(fields, packets) {

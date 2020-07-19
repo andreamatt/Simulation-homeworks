@@ -90,12 +90,12 @@ namespace GeRaF.Utils
 		}
 
 		static public void FloydWarshall(List<Relay> relays, Dictionary<int, Dictionary<int, double>> distances) {
-			var pathLength = new Dictionary<int, Dictionary<int, double>>();
+			var pathLength = new Dictionary<int, Dictionary<int, double>>(relays.Count);
 			var maxLength = relays.Count;
-			var nextHop = new Dictionary<int, Dictionary<int, Relay>>();
+			var nextHop = new Dictionary<int, Dictionary<int, Relay>>(relays.Count);
 			foreach (var r1 in relays) {
-				pathLength[r1.id] = new Dictionary<int, double>();
-				nextHop[r1.id] = new Dictionary<int, Relay>();
+				pathLength[r1.id] = new Dictionary<int, double>(relays.Count);
+				nextHop[r1.id] = new Dictionary<int, Relay>(relays.Count);
 				foreach (var r2 in relays) {
 					if (r1 == r2) {
 						pathLength[r1.id][r1.id] = 0;
@@ -131,6 +131,56 @@ namespace GeRaF.Utils
 
 						var dx = r2.position.X - r1.position.X;
 						var dy = r2.position.Y - r1.position.Y;
+
+						// aim in the same direction as nextHop, but at sink distance (different region radius/shape)
+						var aimX = r1.position.X + dx * distToSink / distToHop;
+						var aimY = r1.position.Y + dy * distToSink / distToHop;
+						r1.directionForSink[r2] = new Position() {
+							X = aimX,
+							Y = aimY
+						};
+					}
+				}
+			}
+		}
+
+		static public void RepeatedBFS(List<Relay> relays, Dictionary<int, Dictionary<int, double>> distances) {
+			var nextHop = new Dictionary<int, Dictionary<int, Relay>>();
+
+			foreach (var start in relays) {
+				nextHop[start.id] = new Dictionary<int, Relay>();
+
+				var queue = new Queue<(Relay, Relay)>();
+				var visited = new HashSet<int>();
+				visited.Add(start.id);
+				foreach (var n in start.neighbours) {
+					visited.Add(n.id);
+					queue.Enqueue((n, n));
+				}
+
+				while (queue.Count != 0) {
+					var v = queue.Dequeue();
+					var relay = v.Item1;
+					var origin = v.Item2;
+					foreach (var neigh in relay.neighbours) {
+						if (!visited.Contains(neigh.id)) {
+							visited.Add(neigh.id);
+							nextHop[start.id][neigh.id] = origin;
+							queue.Enqueue((neigh, origin));
+						}
+					}
+				}
+			}
+
+			foreach (var r1 in relays) {
+				foreach (var r2 in relays) {
+					if (r1 != r2 && !r1.neighbours.Contains(r2)) {
+						var distToSink = distances[r1.id][r2.id];
+						var hop = nextHop[r1.id][r2.id];
+						var distToHop = distances[r1.id][hop.id];
+
+						var dx = hop.position.X - r1.position.X;
+						var dy = hop.position.Y - r1.position.Y;
 
 						// aim in the same direction as nextHop, but at sink distance (different region radius/shape)
 						var aimX = r1.position.X + dx * distToSink / distToHop;

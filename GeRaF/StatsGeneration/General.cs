@@ -19,7 +19,7 @@ namespace GeRaF.StatsGeneration
 			if (parameters.versions.Count == 0) parameters.versions.Add(pp.protocolVersion);
 			if (parameters.emptyRegionTypes.Count == 0) parameters.emptyRegionTypes.Add(sp.emptyRegionType);
 
-			var totalSimulations = parameters.simulations * parameters.lambdas.Count * parameters.Ns.Count * parameters.dutyCycles.Count * parameters.versions.Count;
+			var totalSimulations = parameters.simulations * parameters.lambdas.Count * parameters.Ns.Count * parameters.dutyCycles.Count * parameters.versions.Count * parameters.emptyRegionTypes.Count;
 
 			var stats = new List<BaseStat>();
 			var new_pp = (ProtocolParameters)pp.Clone();
@@ -50,9 +50,19 @@ namespace GeRaF.StatsGeneration
 									protocolVersion = version,
 									shape = emptyRegionType
 								};
+								//for (int x = 0; x < new_sp.binsCount; x++) {
+								//	stat.traffic.Add(new List<double>(new double[new_sp.binsCount]));
+								//	stat.failurePoints.Add(new List<double>(new double[new_sp.binsCount]));
+								//}
+								var trafficList = new List<List<List<int>>>();
+								var failureList = new List<List<List<int>>>();
 								for (int x = 0; x < new_sp.binsCount; x++) {
-									stat.traffic.Add(new List<double>(new double[new_sp.binsCount]));
-									stat.failurePoints.Add(new List<double>(new double[new_sp.binsCount]));
+									trafficList.Add(new List<List<int>>());
+									failureList.Add(new List<List<int>>());
+									for (int y = 0; y < new_sp.binsCount; y++) {
+										trafficList[x].Add(new List<int>());
+										failureList[x].Add(new List<int>());
+									}
 								}
 
 								// simulate
@@ -60,7 +70,7 @@ namespace GeRaF.StatsGeneration
 									var sim = new Simulation(new_sp, new_pp);
 									sim.Run();
 
-									var packetsSuccess = sim.packetsFinished.Where(p => p.result == Network.Result.Success).ToList();
+									var packetsSuccess = sim.packetsFinished.Where(p => p.result == Result.Success).ToList();
 									var success = packetsSuccess.Count / (float)sim.packetsFinished.Count;
 									double delay = 0;
 									if (packetsSuccess.Count > 0) {
@@ -101,15 +111,29 @@ namespace GeRaF.StatsGeneration
 										stat.success.Add(success);
 										stat.delay.Add(delay);
 										stat.energy.Add(energy);
-										for (int x = 0; x < new_sp.binsCount; x++) {
-											for (int y = 0; y < new_sp.binsCount; y++) {
-												stat.traffic[x][y] += traffic[x][y];// / (double)packetsForTraffic.Count;
-												stat.failurePoints[x][y] += failures[x][y];// / (double)packetsForFailures.Count;
-											}
-										}
 										Console.WriteLine($"Simulating general {name} ... {(stats.Count * parameters.simulations + stat.success.Count) * 100f / totalSimulations:##.00}%, l={l} n={n} d={d} v={version} shape={emptyRegionType}");
 									}
+
+									lock (trafficList) {
+										lock (failureList) {
+											for (int x = 0; x < new_sp.binsCount; x++) {
+												for (int y = 0; y < new_sp.binsCount; y++) {
+													trafficList[x][y].Add(traffic[x][y]);// / (double)packetsForTraffic.Count;
+													failureList[x][y].Add(failures[x][y]);// / (double)packetsForFailures.Count;
+												}
+											}
+										}
+									}
 								});
+
+								for (int x = 0; x < new_sp.binsCount; x++) {
+									stat.traffic.Add(new List<double>(new double[new_sp.binsCount]));
+									stat.failurePoints.Add(new List<double>(new double[new_sp.binsCount]));
+									for (int y = 0; y < new_sp.binsCount; y++) {
+										stat.traffic[x][y] = trafficList[x][y].Average();
+										stat.failurePoints[x][y] = failureList[x][y].Average();
+									}
+								}
 
 								stats.Add(stat);
 							}

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using GeRaF.Utils;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +16,7 @@ namespace GeRaF
 		Always
 	}
 
+	[JsonConverter(typeof(EnumJsonConverter))]
 	public enum EmptyRegionType
 	{
 		None,
