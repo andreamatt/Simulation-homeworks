@@ -3,14 +3,13 @@ from enum import Enum
 
 class SimulationParameters:
 	def __init__(self, data):
-		data = list(data.values())
-		self.max_time = float(data[0])
-		self.area_side = float(data[1])
-		self.range = float(data[2])
-		self.min_distance =  float(data[3])
-		self.n_nodes = int(data[4])
-		self.packet_rate = float(data[5])
-		self.skipCycleEvents = True if data[6]=='true' else False
+		self.max_time = float(data['max_time'])
+		self.area_side = float(data['area_side'])
+		self.range = float(data['range'])
+		self.min_distance =  float(data['min_distance'])
+		self.n_nodes = int(data['n_nodes'])
+		self.packet_rate = float(data['packet_rate'])
+		self.skipCycleEvents = True if data['skipCycleEvents']=='true' else False
 		# useless
 		# self.debug_interval = data[7]
 		# self.debugType = data[8]
@@ -19,24 +18,23 @@ class SimulationParameters:
 
 class ProtocolParamaters:
 	def __init__(self, data):
-		data = list(data.values())
-		self.duty_cycle = float(data[0])
-		self.t_sense = float(data[1])
-		self.t_backoff = float(data[2])
-		self.t_listen = float(data[3])
-		self.t_data = float(data[4])
-		self.t_signal = int(data[5])
-		self.n_regions = int(data[6])
-		self.n_max_coll = int(data[7])
-		self.n_max_sensing = int(data[8])
-		self.n_max_sink_rts = int(data[9])
-		self.n_max_pkt = int(data[10])
-		self.n_max_region_cycle = int(data[11])
-		self.t_delta = float(data[12])
-		self.protocolVersion = data[13]
-		self.t_sleep = float(data[14])
-		self.t_cycle = float(data[15])
-		self.t_busy = float(data[16])
+		self.duty_cycle = float(data["duty_cycle"])
+		self.t_sense = float(data["t_sense"])
+		self.t_backoff = float(data["t_backoff"])
+		self.t_listen = float(data["t_listen"])
+		self.t_data = float(data["t_data"])
+		self.t_signal = int(data["t_signal"])
+		self.n_regions = int(data["n_regions"])
+		self.n_max_coll = int(data["n_max_coll"])
+		self.n_max_sensing = int(data["n_max_sensing"])
+		self.n_max_sink_rts = int(data['n_max_sink_rts'])
+		self.n_max_pkt = int(data['n_max_pkt'])
+		self.n_max_region_cycle = int(data['n_max_region_cycle'])
+		self.t_delta = float(data['t_delta'])
+		self.protocolVersion = data['protocolVersion']
+		self.t_sleep = float(data['t_sleep'])
+		self.t_cycle = float(data['t_cycle'])
+		self.t_busy = float(data['t_busy'])
 
 
 class BaseStat:

@@ -1,12 +1,13 @@
 from matplotlib import pyplot as plt, patches
+from collections import OrderedDict
 import seaborn as sns
 import numpy as np
 from classes import *
 
 
 def plot_heatmaps(runResults: RunResult):
-	protocol_versions = np.unique(np.array([stat.version for stat in runResults.ShapeStats]))
-	shapes = np.unique(np.array([stat.shape for stat in runResults.ShapeStats]))
+	protocol_versions = list(OrderedDict.fromkeys([stat.version for stat in runResults.ShapeStats]))
+	shapes = list(OrderedDict.fromkeys([stat.shape for stat in runResults.ShapeStats]))
 	
 	fig, axs = plt.subplots(len(protocol_versions), len(shapes)*2)
 
@@ -43,13 +44,13 @@ def plot_heatmaps(runResults: RunResult):
 		axs[k][0].set_yticks([])
 		axs[k][0].set_xticks([])
 
-	plt.tight_layout(h_pad=0.08, w_pad=0.08, rect=(0.3, 0.3, 0.97, 0.97))
+	# plt.tight_layout(h_pad=0.08, w_pad=0.08, rect=(0.3, 0.3, 0.97, 0.97))
 	plt.show()
 
 
 def plot_heatmaps_hist(runResults):
-	protocol_versions = np.unique(np.array([stat.version for stat in runResults.ShapeStats]))
-	shapes = np.unique(np.array([stat.shape for stat in runResults.ShapeStats]))
+	protocol_versions = list(OrderedDict.fromkeys([stat.version for stat in runResults.ShapeStats]))
+	shapes = list(OrderedDict.fromkeys([stat.shape for stat in runResults.ShapeStats]))
 
 	fig, axs = plt.subplots(2, len(shapes))
 

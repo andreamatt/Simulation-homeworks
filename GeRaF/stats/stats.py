@@ -27,4 +27,4 @@ runResult = RunResult(data)
 # plot_energy_over_lambda_and_duty(runResult)
 
 plot_heatmaps(runResult)
-# plot_heatmaps_hist(runResult)
+plot_heatmaps_hist(runResult)

@@ -16,12 +16,12 @@ namespace GeRaF
 			customCulture.NumberFormat.NumberDecimalSeparator = ".";
 			System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
 			maxParallel = Environment.ProcessorCount - 1;
-			maxParallel = 20;
+			maxParallel = 3;
 			Console.WriteLine("Max parallel sims: " + maxParallel);
 
 
 			var pp = new ProtocolParameters() {
-				duty_cycle = 0.5, // NOT IN SECONDS: active time percentage (t_l / (t_l + t_s))
+				duty_cycle = 0.9, // NOT IN SECONDS: active time percentage (t_l / (t_l + t_s))
 				t_sense = 0.0521, // carrier sense duration (needs to be more than any signal duration)
 				t_backoff = 0.0219, // backoff interval length (constant?)
 				t_listen = 0.016, // listening time, must be quite higher than t_signal
@@ -38,7 +38,7 @@ namespace GeRaF
 				debug_interval = 1,
 				debugType = DebugType.Never,
 				debug_file = "../../graphic_debug/debug_data.js",
-				max_time = 20,
+				max_time = 50,
 				n_nodes = 100,
 				packet_rate = 5,
 				range = 20,
@@ -72,7 +72,7 @@ namespace GeRaF
 				//lambdas = new List<double> { 5, 20 },
 				versions = versions,
 				emptyRegionTypes = shapes,
-				simulations = 1000
+				simulations = 2000
 			};
 			var debugParameters = new GeneralParameters() {
 				versions = new List<ProtocolVersion> { ProtocolVersion.Plus },

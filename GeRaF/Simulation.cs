@@ -102,8 +102,11 @@ namespace GeRaF
 						relay.position.Y = slotToX(Y_slot);
 
 						// calculate if in region
-						var dx = relay.position.X - simulationParameters.area_side / 2;
-						var dy = relay.position.Y - simulationParameters.area_side / 2;
+						var X = relay.position.X;
+						var Y = relay.position.Y;
+						var c = simulationParameters.area_side / 2;
+						var dx = X - c;
+						var dy = Y - c;
 						switch (simulationParameters.emptyRegionType) {
 							case EmptyRegionType.None:
 								validRegion = true;
@@ -116,6 +119,21 @@ namespace GeRaF
 							case EmptyRegionType.Square:
 								var side = simulationParameters.emptyRegionSize;
 								validRegion = (Math.Abs(dx) >= side / 2) || (Math.Abs(dy) >= side / 2);
+								break;
+							case EmptyRegionType.Lines:
+								var side_w = simulationParameters.emptyRegionSize;
+								var side_h = Math.Max(relay.range + 2, side_w / 8);
+								var validFirstLine = (X <= c - side_w / 2) || (X >= c + side_w / 2) || (Y <= c * 3 / 2 - side_h / 2) || (Y >= c * 3 / 2 + side_h / 2);
+								var validSecondLine = (X <= c - side_w / 2) || (X >= c + side_w / 2) || (Y <= c * 1 / 2 - side_h / 2) || (Y >= c * 1 / 2 + side_h / 2);
+								validRegion = validFirstLine && validSecondLine;
+								break;
+							case EmptyRegionType.Holes:
+								radius = simulationParameters.emptyRegionSize;
+								var d1 = Math.Sqrt(Math.Pow(X - c / 2, 2) + Math.Pow(Y - c / 2, 2));
+								var d2 = Math.Sqrt(Math.Pow(X - c / 2, 2) + Math.Pow(Y - 3 * c / 2, 2));
+								var d3 = Math.Sqrt(Math.Pow(X - 3 * c / 2, 2) + Math.Pow(Y - c / 2, 2));
+								var d4 = Math.Sqrt(Math.Pow(X - 3 * c / 2, 2) + Math.Pow(Y - 3 * c / 2, 2));
+								validRegion = d1 >= radius && d2 >= radius && d3 >= radius && d4 >= radius;
 								break;
 						}
 					}

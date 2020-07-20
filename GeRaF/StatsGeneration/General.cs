@@ -28,21 +28,34 @@ namespace GeRaF.StatsGeneration
 			foreach (var l in parameters.lambdas) {
 				new_sp.packet_rate = l;
 				foreach (var n in parameters.Ns) {
-					new_sp.n_nodes = n;
 					foreach (var d in parameters.dutyCycles) {
 						new_pp.duty_cycle = d;
 						foreach (var version in parameters.versions) {
 							new_pp.protocolVersion = version;
 							foreach (var emptyRegionType in parameters.emptyRegionTypes) {
 								new_sp.emptyRegionType = emptyRegionType;
+								var area = Math.Pow(new_sp.area_side, 2);
 								switch (emptyRegionType) {
 									case EmptyRegionType.Circle:
 										new_sp.emptyRegionSize = new_sp.area_side / 6; // radius
+										area = area - Math.PI * Math.Pow(new_sp.emptyRegionSize, 2);
 										break;
 									case EmptyRegionType.Square:
 										new_sp.emptyRegionSize = new_sp.area_side / 3; // side
+										area = area - Math.Pow(new_sp.emptyRegionSize, 2);
+										break;
+									case EmptyRegionType.Lines:
+										new_sp.emptyRegionSize = new_sp.area_side / 10 * 8; // long side = 80% area side
+										area = area - new_sp.emptyRegionSize * Math.Max(new_sp.emptyRegionSize / 8, new_sp.range + 2) * 2;
+										break;
+									case EmptyRegionType.Holes:
+										new_sp.emptyRegionSize = new_sp.area_side / 6; // half radius of circle
+										area = area - Math.PI * Math.Pow(new_sp.emptyRegionSize, 2) * 4;
 										break;
 								}
+								new_sp.n_nodes = n;
+								new_sp.n_nodes = (int)Math.Floor(new_sp.n_nodes * area / Math.Pow(new_sp.area_side, 2));
+
 								var stat = new BaseStat() {
 									lambda = l,
 									N = n,
@@ -111,7 +124,7 @@ namespace GeRaF.StatsGeneration
 										stat.success.Add(success);
 										stat.delay.Add(delay);
 										stat.energy.Add(energy);
-										Console.WriteLine($"Simulating general {name} ... {(stats.Count * parameters.simulations + stat.success.Count) * 100f / totalSimulations:##.00}%, l={l} n={n} d={d} v={version} shape={emptyRegionType}");
+										Console.WriteLine($"Simulating general {name} ... {(stats.Count * parameters.simulations + stat.success.Count) * 100f / totalSimulations:##.00}%, l={l} n={new_sp.n_nodes} d={d} v={version} shape={emptyRegionType}");
 									}
 
 									lock (trafficList) {

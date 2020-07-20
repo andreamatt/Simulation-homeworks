@@ -21,7 +21,9 @@ namespace GeRaF
 	{
 		None,
 		Circle,
-		Square
+		Square,
+		Lines,
+		Holes
 	}
 
 	class SimulationParameters : ICloneable
