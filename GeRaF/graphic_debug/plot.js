@@ -117,8 +117,19 @@ class Plot {
 		} else {
 			console.log('INVALID ARGUMENT: index out of boundaries')
 		}
-		console.log('index: ' + this.frame_index)
 		this.plot()
+	}
+
+	updateTime(time){
+		let index = 0
+		let time_str = Number.MAX_VALUE
+		do{
+			let frame = this.frame_lines[index]
+			time_str = frame.match(/"time":((\d|\.)*),/)[1]
+			index++
+		}
+		while(index < this.frame_lines.length-1 && Number(time_str) < time)
+		this.updateIndex(index)
 	}
 
 	plot() {
@@ -128,6 +139,7 @@ class Plot {
 		let frame = this.frame_lines[this.frame_index]
 		let frame_sections = frame.split(';')
 		this.time = Number(frame_sections[0].replace(",", "."))
+		console.log('index: ' + this.frame_index + ', time: ' + this.time)
 
 		this.frame_event = JSON.parse(frame_sections[1])
 		for (let s of frame_sections.slice(2)) {
