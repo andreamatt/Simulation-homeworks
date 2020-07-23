@@ -24,6 +24,7 @@ namespace GeRaF
 		public Dictionary<int, Relay> relayById;
 		public Dictionary<int, Dictionary<int, double>> distances;
 		public List<Packet> packetsFinished = new List<Packet>();
+		public List<Packet> packetsPassed = new List<Packet>();
 		public PacketGenerator packetGenerator = new PacketGenerator();
 
 		// simulation state

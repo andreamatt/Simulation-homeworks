@@ -20,7 +20,10 @@ namespace GeRaF.Network
 		private SleepEvent sleepEvent = null;
 		private double awakeSince = 0;
 		private double lastSleep = 0;
+		public double startTransmissionTime = 0;
 		public double totalAwake = 0;
+		public double totalTransmitting = 0;
+		public double totalSleep => sim.clock - totalAwake;
 
 		public bool ShouldBeAwake {
 			get {

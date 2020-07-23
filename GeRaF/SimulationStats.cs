@@ -29,6 +29,7 @@ namespace GeRaF
 		public List<BaseStat> dutyLambdas = new List<BaseStat>();
 		public List<BaseStat> lambdaNs = new List<BaseStat>();
 		public List<BaseStat> shapeStats = new List<BaseStat>();
+		public List<BaseStat> outcomeStats = new List<BaseStat>();
 	}
 
 	class BaseStat
@@ -43,5 +44,6 @@ namespace GeRaF
 		public List<double> energy = new List<double>();
 		public List<List<double>> traffic = new List<List<double>>();
 		public List<List<double>> failurePoints = new List<List<double>>();
+		public List<double> averageOutcomes = new List<double>();
 	}
 }

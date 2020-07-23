@@ -20,6 +20,7 @@ namespace GeRaF.Events.Transmissions
 		public int actualDestinationId => actualDestination == null ? -1 : actualDestination.id;
 
 		protected void StartTransmission() {
+			relay.startTransmissionTime = sim.clock;
 			relay.transmissionDestinationId = actualDestinationId;
 			foreach (var neigh in relay.neighbours) {
 				neigh.StartReceiving(relay);
@@ -27,6 +28,7 @@ namespace GeRaF.Events.Transmissions
 		}
 
 		protected void EndTransmission() {
+			relay.totalTransmitting += sim.clock - relay.startTransmissionTime;
 			foreach (var neigh in relay.neighbours) {
 				neigh.EndReceiving(this, relay.transmissionType, relay, actualDestination);
 			}

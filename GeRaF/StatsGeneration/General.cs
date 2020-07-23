@@ -46,7 +46,7 @@ namespace GeRaF.StatsGeneration
 										break;
 									case EmptyRegionType.Lines:
 										new_sp.emptyRegionSize = new_sp.area_side / 10 * 8; // long side = 80% area side
-										area = area - new_sp.emptyRegionSize * Math.Max(new_sp.emptyRegionSize / 8, new_sp.range + 2) * 2;
+										area = area - new_sp.emptyRegionSize * Math.Max(new_sp.emptyRegionSize / 8, new_sp.range + 2)* 2;
 										break;
 									case EmptyRegionType.Holes:
 										new_sp.emptyRegionSize = new_sp.area_side / 6; // half radius of circle
@@ -56,12 +56,14 @@ namespace GeRaF.StatsGeneration
 								new_sp.n_nodes = n;
 								new_sp.n_nodes = (int)Math.Floor(new_sp.n_nodes * area / Math.Pow(new_sp.area_side, 2));
 
+								var outcomesNumber = Enum.GetValues(typeof(Result)).Length;
 								var stat = new BaseStat() {
 									lambda = l,
 									N = n,
 									duty = d,
 									protocolVersion = version,
-									shape = emptyRegionType
+									shape = emptyRegionType,
+									averageOutcomes = new List<double>(new double[outcomesNumber])
 								};
 								//for (int x = 0; x < new_sp.binsCount; x++) {
 								//	stat.traffic.Add(new List<double>(new double[new_sp.binsCount]));
@@ -79,10 +81,14 @@ namespace GeRaF.StatsGeneration
 								}
 
 								// simulate
-								Parallel.For(0, parameters.simulations, options, i => {
+								Parallel.For(0, parameters.simulations, options, parallel_iteration_index => {
 									var sim = new Simulation(new_sp, new_pp);
 									sim.Run();
 
+									var outcomes = new List<double>(new double[outcomesNumber]);
+									foreach (var p in sim.packetsFinished){
+										outcomes[(int)p.result]++;
+									}
 									var packetsSuccess = sim.packetsFinished.Where(p => p.result == Result.Success).ToList();
 									var success = packetsSuccess.Count / (float)sim.packetsFinished.Count;
 									double delay = 0;
@@ -94,7 +100,10 @@ namespace GeRaF.StatsGeneration
 											return (endTime - startTime) / dist;
 										});
 									}
-									var energy = sim.relays.Average(r => r.totalAwake);
+									var energy = sim.relays.Average(r => {
+										var awakeIdle = r.totalAwake - r.totalTransmitting;
+										return sp.asleepEnergy * r.totalSleep + sp.idleEnergy * awakeIdle + sp.transmissionEnergy * r.totalTransmitting;
+									});
 
 									var traffic = new List<List<int>>();
 									var failures = new List<List<int>>();
@@ -124,6 +133,9 @@ namespace GeRaF.StatsGeneration
 										stat.success.Add(success);
 										stat.delay.Add(delay);
 										stat.energy.Add(energy);
+										for(int i=0; i<outcomes.Count; i++){
+											stat.averageOutcomes[i] += outcomes[i];
+										}
 										Console.WriteLine($"Simulating general {name} ... {(stats.Count * parameters.simulations + stat.success.Count) * 100f / totalSimulations:##.00}%, l={l} n={new_sp.n_nodes} d={d} v={version} shape={emptyRegionType}");
 									}
 
@@ -146,6 +158,11 @@ namespace GeRaF.StatsGeneration
 										stat.traffic[x][y] = trafficList[x][y].Average();
 										stat.failurePoints[x][y] = failureList[x][y].Average();
 									}
+								}
+
+								var tot = stat.averageOutcomes.Sum();
+								for (int i = 0; i < stat.averageOutcomes.Count; i++) {
+									stat.averageOutcomes[i] = stat.averageOutcomes[i] / tot;
 								}
 
 								stats.Add(stat);

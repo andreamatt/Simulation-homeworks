@@ -36,6 +36,9 @@ namespace GeRaF
 		public double emptyRegionSize;
 		public int n_nodes;
 		public double packet_rate;
+		public double asleepEnergy;
+		public double idleEnergy;
+		public double transmissionEnergy;
 		public bool skipCycleEvents;
 		public double debug_interval;
 		public DebugType debugType;

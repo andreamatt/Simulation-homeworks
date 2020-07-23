@@ -114,9 +114,11 @@ namespace GeRaF.Events
 					startRelay = chosen,
 					sink = sink
 				};
+
 				if (sim.simulationParameters.debugType != DebugType.Never) {
-					sim.debugWriter.WriteLine($"P;{packet}");
+					//sim.debugWriter.WriteLine($"P;{packet}");
 				}
+
 				chosen.packetToSend = packet;
 				packet.hopsIds.Add(chosen.id);
 				packet.receivedTimes.Add(sim.clock);

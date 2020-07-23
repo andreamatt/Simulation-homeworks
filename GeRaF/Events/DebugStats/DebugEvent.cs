@@ -30,6 +30,12 @@ namespace GeRaF.Events.DebugStats
 
 			if (ending) {
 				stats.finishedPackets = sim.packetsFinished;
+				foreach (var packet in sim.packetsFinished) {
+					sim.debugWriter.WriteLine($"P;{packet}");
+				}
+				foreach (var packet in sim.packetsPassed) {
+					sim.debugWriter.WriteLine($"P;{packet}");
+				}
 			}
 
 			var stats_to_string = stats.ConvertToFrameLine();

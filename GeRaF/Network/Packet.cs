@@ -67,7 +67,12 @@ namespace GeRaF.Network
 
 		public void Finish(Result result, Simulation sim) {
 			this.result = result;
-			sim.packetsFinished.Add(this);
+			if (result == Result.Passed) {
+				sim.packetsPassed.Add(this);
+			}
+			else {
+				sim.packetsFinished.Add(this);
+			}
 		}
 
 		public override string ToString() {
