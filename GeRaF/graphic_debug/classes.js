@@ -108,17 +108,20 @@ class Packet {
 		this.receivedTimes = []
 		this.result = parseInt(fields[7])
 
+		if (this.result == 4) {
+			console.log(`Packet: ${this.content_id} - ${this.copy_id} at ${this.generationTime}`)
+		}
 
 		let hops_list = fields[5].split(",")
-		for (const h in hops_list) {
+		for (let h of hops_list) {
 			let element = parseInt(h);
 			this.hops.push(element)
 		}
 
 		let received_list = fields[6].split(",")
-		for (const r in received_list) {
+		for (let r of received_list) {
 			let element = parseFloat(r);
-			this.hops.push(element)
+			this.receivedTimes.push(element)
 		}
 	}
 
