@@ -44,6 +44,19 @@ class GraphUtils{
 		}
 	}
 
+	static BaseVersionBFS(relays, distances){
+		for(let r1 of relays){
+			for(let r2 of relays){
+				if (r1 != r2 && !r1.neighbours.has(r2)) {
+					// aim at sink
+					let aimX = r2.X
+					let aimY = r2.Y
+					r1.directionForSink[r2.id] = [aimX, aimY]
+				}
+			}
+		}
+	}
+
 	static SetNeighbours(relays, distances){
 		for(let r1 of relays){
 			for(let r2 of relays){

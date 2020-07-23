@@ -25,7 +25,7 @@ namespace GeRaF.Utils
 		}
 
 		public void Remove(Event e) {
-			if (queue.Count(ev => ev == e) != 1) throw new Exception("Double event?");
+			//if (queue.Count(ev => ev == e) != 1) throw new Exception("Double event?");
 			queue.Remove(e);
 		}
 

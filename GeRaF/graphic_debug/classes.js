@@ -198,6 +198,6 @@ class Relay {
 	details() {
 		if (this.info_modality == InfoModality.active_transmissions) return `ACTIVE`
 		if (this.info_modality == InfoModality.finished_transmissions) return `FINISHED`
-		if (this.info_modality == InfoModality.packet_info) return `PACKET: ${this.packetToSend}`
+		if (this.info_modality == InfoModality.packet_info) return `PACKET: ${JSON.stringify(this.packetToSend)}`
 	}
 }

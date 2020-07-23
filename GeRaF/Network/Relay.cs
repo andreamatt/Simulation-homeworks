@@ -64,7 +64,7 @@ namespace GeRaF.Network
 
 		public Packet packetToSend = null;
 
-		public RelayStatus status = RelayStatus.Free;
+		public RelayStatus status;
 
 		// iteration status
 		public int REGION_index = 0;

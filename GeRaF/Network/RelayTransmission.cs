@@ -11,10 +11,10 @@ namespace GeRaF.Network
 {
 	partial class Relay
 	{
-		public void StartReceiving(Relay sender) {
+		public void StartReceiving(Event cause, Relay sender) {
 			// if skipping events, wake up as it receives any transmission (can be optimized to wake up only when actually necessary)
 			if (sim.simulationParameters.skipCycleEvents && this.status == RelayStatus.Asleep && this.ShouldBeAwake) {
-				this.AwakeMidtime(null);
+				this.AwakeMidtime(cause);
 			}
 
 			bool interested = false;
@@ -23,6 +23,7 @@ namespace GeRaF.Network
 					this.hasSensed = true;
 					break;
 				case RelayStatus.Free:
+					this.PostponeSleep(cause);
 					interested = true;
 					break;
 				case RelayStatus.Awaiting_Signal:
@@ -184,12 +185,31 @@ namespace GeRaF.Network
 
 		private void HandleCOL(Event cause, Relay sender) {
 			bool failed = this.receivingTransmissions[sender];
-			var sink = sender.packetToSend.sink;
-			var sourceToSink = sim.distances[sender.id][sink.id];
-			var limitToSink = sourceToSink - sender.range;
-			var regionWidth = sender.range / sim.protocolParameters.n_regions;
-			var dist = sim.distances[this.id][sink.id];
-			var myIndex = (int)Math.Floor((dist - limitToSink) / regionWidth);
+			int myIndex = -1;
+			switch (sim.protocolParameters.protocolVersion) {
+				case ProtocolVersion.Plus: {
+						// Calculate regions based on next hop direction instead of sink direction
+						var sink = sender.packetToSend.sink;
+						var direction = sender.directionForSink[sink];
+						var aimX = direction.X;
+						var aimY = direction.Y;
+						var sourceToSink = sim.distances[sender.id][sink.id]; // same distance as sink, by design
+						var limitToSink = sourceToSink - sender.range;
+						var regionWidth = sender.range / sim.protocolParameters.n_regions;
+						var dist = Math.Sqrt(Math.Pow(position.X - aimX, 2) + Math.Pow(position.Y - aimY, 2));
+						myIndex = (int)Math.Floor((dist - limitToSink) / regionWidth);
+						break;
+					}
+				default: {
+						var sink = sender.packetToSend.sink;
+						var sourceToSink = sim.distances[sender.id][sink.id];
+						var limitToSink = sourceToSink - sender.range;
+						var regionWidth = sender.range / sim.protocolParameters.n_regions;
+						var dist = sim.distances[this.id][sink.id];
+						myIndex = (int)Math.Floor((dist - limitToSink) / regionWidth);
+						break;
+					}
+			}
 
 			// if i'm busy with sender it means I did send CTS
 			// check region to be sure I'm still valid (could have missed my CTS, next RTS, other CTSs and this is their COL)

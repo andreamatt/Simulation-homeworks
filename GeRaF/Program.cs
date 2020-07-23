@@ -31,16 +31,16 @@ namespace GeRaF
 				n_max_coll = 6, // number of attempts for solving a collision
 				n_max_sensing = 10,
 				n_max_pkt = 3,
-				n_max_region_cycle = 1
+				n_max_region_cycle = 5
 			};
 			var sp = new SimulationParameters() {
 				area_side = 100,
 				debug_interval = 1,
 				debugType = DebugType.Never,
 				debug_file = "../../graphic_debug/debug_data.js",
-				max_time = 500,
+				max_time = 50,
 				n_nodes = 200,
-				packet_rate = 0.1,
+				packet_rate = 5,
 				range = 20,
 				min_distance = 1,
 				asleepEnergy = 2,
@@ -75,26 +75,27 @@ namespace GeRaF
 				//lambdas = new List<double> { 5, 20 },
 				versions = versions,
 				emptyRegionTypes = shapes,
-				simulations = 100
+				simulations = 1000
 			};
 			var outcomesParameters = new GeneralParameters() {
 				versions = versions,
+				emptyRegionTypes = shapes,//new List<EmptyRegionType> { EmptyRegionType.None },
 				simulations = 100
 			};
 			var debugParameters = new GeneralParameters() {
-				versions = new List<ProtocolVersion> { ProtocolVersion.Plus },
+				versions = new List<ProtocolVersion> { ProtocolVersion.Base },
 				emptyRegionTypes = new List<EmptyRegionType> { EmptyRegionType.Lines },
 				simulations = 1
 			};
 
 			//runResults.dutyLambdas = General.Generate("DL", sp, pp, DLparameters);
 			//runResults.lambdaNs = General.Generate("LN", sp, pp, LNparameters);
-			//runResults.shapeStats = General.Generate("donuts", sp, pp, shapeParameters);
+			runResults.shapeStats = General.Generate("Shapes", sp, pp, shapeParameters);
 			//runResults.outcomeStats = General.Generate("Outcomes", sp, pp, outcomesParameters);
 
 			// debug
-			sp.debugType = DebugType.Always;
-			General.Generate("Debug", sp, pp, debugParameters);
+			//sp.debugType = DebugType.Always;
+			//General.Generate("Debug", sp, pp, debugParameters);
 
 			runResults.endTime = DateTime.Now;
 

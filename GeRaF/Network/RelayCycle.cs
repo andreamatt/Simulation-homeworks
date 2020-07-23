@@ -194,5 +194,12 @@ namespace GeRaF.Network
 			// update awake time stat
 			totalAwake += sim.clock - awakeSince;
 		}
+
+		public void PostponeSleep(Event cause) {
+			if (sleepEvent != null && busyWith == null) {
+				sleepEvent.time = sim.clock + sim.protocolParameters.t_signal + sim.protocolParameters.t_delta;
+				sim.eventQueue.Reschedule(sleepEvent);
+			}
+		}
 	}
 }

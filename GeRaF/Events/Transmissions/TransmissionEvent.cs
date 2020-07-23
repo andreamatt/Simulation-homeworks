@@ -23,7 +23,7 @@ namespace GeRaF.Events.Transmissions
 			relay.startTransmissionTime = sim.clock;
 			relay.transmissionDestinationId = actualDestinationId;
 			foreach (var neigh in relay.neighbours) {
-				neigh.StartReceiving(relay);
+				neigh.StartReceiving(this, relay);
 			}
 		}
 

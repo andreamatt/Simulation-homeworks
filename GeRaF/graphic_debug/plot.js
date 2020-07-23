@@ -41,7 +41,12 @@ class Plot {
 		this.relays = Object.values(this.relays_dict)
 		this.distances = JSON.parse(data_sections[3])
 		GraphUtils.SetNeighbours(this.relays, this.distances)
-		GraphUtils.RepeatedBFS(this.relays, this.distances)
+		if(this.protocol_params.protocolVersion=="Base"){
+			GraphUtils.BaseVersionBFS(this.relays, this.distances)
+		}
+		else {
+			GraphUtils.RepeatedBFS(this.relays, this.distances)
+		}
 
 		let other_lines = data_sections[4].split(/\r?\n/).map(d => d.trim())
 		this.frame_lines = other_lines.filter(l => l[0] == 'F').map(l => l.substring(2))
@@ -125,7 +130,7 @@ class Plot {
 		let time_str = Number.MAX_VALUE
 		do{
 			let frame = this.frame_lines[index]
-			time_str = frame.match(/"time":((\d|\.)*),/)[1]
+			time_str = frame.match(/"time":((?:\d|\.|E|\+|\-)*),/)[1]
 			index++
 		}
 		while(index < this.frame_lines.length-1 && Number(time_str) < time)
