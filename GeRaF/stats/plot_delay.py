@@ -1,47 +1,72 @@
 from matplotlib import pyplot as plt, patches
 import numpy as np
 from classes import *
+from collections import OrderedDict
 
-def plot_delay_over_lambda_and_duty(runResult):
-	duty_cycles = set([stat.duty for stat in runResult.DLstats])
-
+def plot_delay_over_lambda_and_duty(runResults):
+	duty_cycles = list(OrderedDict.fromkeys([stat.duty for stat in runResults.DLstats]))
+	protocol_versions = list(OrderedDict.fromkeys([stat.version for stat in runResults.DLstats]))
+	
 	legend_patches = []
-	for duty in duty_cycles:
-		avg_delays = []
-		lambdas = []
-		stats = list(filter(lambda s : s.duty == duty, runResult.DLstats))
-		for stat in stats:
-			avg_delays.append(np.mean(stat.delay))
-			lambdas.append(stat.lam)
+	colors = ["red", "blue", "green", "grey", "black"] # for duties
+	line_markers = ["-", ":", "-."]	# for protocol versions
+	
+	for i in range(len(protocol_versions)):
+		version = protocol_versions[i]
+		marker = line_markers[i]
+		for j in range(len(duty_cycles)):
+			duty = duty_cycles[j]
+			color = colors[j]
+			avg_delay = []
+			lambdas = []
 
-		line = plt.plot(lambdas, avg_delays, '-', marker=".", lw=1) 
-		color = line[0].get_color()
-		legend_patches.append(patches.Patch(color=color, label=f'D = {duty}'))
+			stats = list(filter(lambda s : s.duty == duty and s.version == version, runResults.DLstats))
 
-	plt.legend(handles=legend_patches)
-	plt.title('Average end-to-end delay normalized over distance, N=?')
-	plt.xlabel('$\lambda$')
-	plt.ylabel('avg delay (s)')
-	plt.show()
+			for stat in stats:
+				avg_delay.append(np.mean(stat.delay))
+				lambdas.append(stat.lam)
 
-def plot_delay_over_lambda_and_n(runResult):
-	Ns = sorted(set([stat.N for stat in runResult.LNstats]))
-
-	legend_patches = []
-	for n in Ns:
-		avg_delays = []
-		lambdas = []
-		stats = list(filter(lambda s : s.N == n, runResult.LNstats))
-		for stat in stats:
-			avg_delays.append(np.mean(stat.delay))
-			lambdas.append(stat.lam)
-
-		line = plt.plot(lambdas, avg_delays, '-', marker=".", lw=1) 
-		color = line[0].get_color()
-		legend_patches.append(patches.Patch(color=color, label=f'N = {n}'))
+			line = plt.plot(lambdas, avg_delay, marker, marker=".", lw=1, color=color)
+			
+			if i==0:
+				legend_patches.append(patches.Patch(color=color, label=f'd = {duty}'))
 	
 	plt.legend(handles=legend_patches)
-	plt.title('Average end-to-end delay normalized over distance, D=?')
+	plt.title('avg_delay, N=?')
 	plt.xlabel('$\lambda$')
-	plt.ylabel('avg delay (s)')
+	plt.ylabel('delay')
+	plt.show()
+
+def plot_delay_over_lambda_and_n(runResults):
+	Ns = list(OrderedDict.fromkeys([stat.N for stat in runResults.LNstats]))
+	protocol_versions = list(OrderedDict.fromkeys([stat.version for stat in runResults.LNstats]))
+	
+	legend_patches = []
+	colors = ["red", "blue", "green", "grey", "black"] # for duties
+	line_markers = ["-", ":", "-."]	# for protocol versions
+	
+	for i in range(len(protocol_versions)):
+		version = protocol_versions[i]
+		marker = line_markers[i]
+		for j in range(len(Ns)):
+			N = Ns[j]
+			color = colors[j]
+			avg_delay = []
+			lambdas = []
+
+			stats = list(filter(lambda s : s.N == N and s.version == version, runResults.LNstats))
+
+			for stat in stats:
+				avg_delay.append(np.mean(stat.delay))
+				lambdas.append(stat.lam)
+
+			line = plt.plot(lambdas, avg_delay, marker, marker=".", lw=1, color=color)
+			
+			if i==0:
+				legend_patches.append(patches.Patch(color=color, label=f'N = {N}'))
+	
+	plt.legend(handles=legend_patches)
+	plt.title('avg_delay, d=?')
+	plt.xlabel('$\lambda$')
+	plt.ylabel('delay')
 	plt.show()

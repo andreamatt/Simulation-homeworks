@@ -14,12 +14,12 @@ namespace GeRaF.StatsGeneration
 
 			// set default values
 			if (parameters.lambdas.Count == 0) parameters.lambdas.Add(sp.packet_rate);
-			if (parameters.Ns.Count == 0) parameters.Ns.Add(sp.n_nodes);
+			if (parameters.relay_densities.Count == 0) parameters.relay_densities.Add(sp.n_nodes);
 			if (parameters.dutyCycles.Count == 0) parameters.dutyCycles.Add(pp.duty_cycle);
 			if (parameters.versions.Count == 0) parameters.versions.Add(pp.protocolVersion);
 			if (parameters.emptyRegionTypes.Count == 0) parameters.emptyRegionTypes.Add(sp.emptyRegionType);
 
-			var totalSimulations = parameters.simulations * parameters.lambdas.Count * parameters.Ns.Count * parameters.dutyCycles.Count * parameters.versions.Count * parameters.emptyRegionTypes.Count;
+			var totalSimulations = parameters.simulations * parameters.lambdas.Count * parameters.relay_densities.Count * parameters.dutyCycles.Count * parameters.versions.Count * parameters.emptyRegionTypes.Count;
 
 			var stats = new List<BaseStat>();
 			var new_pp = (ProtocolParameters)pp.Clone();
@@ -27,7 +27,7 @@ namespace GeRaF.StatsGeneration
 
 			foreach (var l in parameters.lambdas) {
 				new_sp.packet_rate = l;
-				foreach (var n in parameters.Ns) {
+				foreach (var density in parameters.relay_densities) {
 					foreach (var d in parameters.dutyCycles) {
 						new_pp.duty_cycle = d;
 						foreach (var version in parameters.versions) {
@@ -46,20 +46,20 @@ namespace GeRaF.StatsGeneration
 										break;
 									case EmptyRegionType.Lines:
 										new_sp.emptyRegionSize = new_sp.area_side / 10 * 8; // long side = 80% area side
-										area = area - new_sp.emptyRegionSize * Math.Max(new_sp.emptyRegionSize / 8, new_sp.range + 2)* 2;
+										area = area - new_sp.emptyRegionSize * Math.Max(new_sp.emptyRegionSize / 8, new_sp.range + 2) * 2;
 										break;
 									case EmptyRegionType.Holes:
 										new_sp.emptyRegionSize = new_sp.area_side / 6; // half radius of circle
 										area = area - Math.PI * Math.Pow(new_sp.emptyRegionSize, 2) * 4;
 										break;
 								}
-								new_sp.n_nodes = n;
-								new_sp.n_nodes = (int)Math.Floor(new_sp.n_nodes * area / Math.Pow(new_sp.area_side, 2));
+								new_sp.n_nodes = (int)Math.Floor(area * density);
+								//new_sp.n_nodes = (int)Math.Floor(new_sp.n_nodes * area / Math.Pow(new_sp.area_side, 2));
 
 								var outcomesNumber = Enum.GetValues(typeof(Result)).Length;
 								var stat = new BaseStat() {
 									lambda = l,
-									N = n,
+									N = density,
 									duty = d,
 									protocolVersion = version,
 									shape = emptyRegionType,
@@ -86,7 +86,7 @@ namespace GeRaF.StatsGeneration
 									sim.Run();
 
 									var outcomes = new List<double>(new double[outcomesNumber]);
-									foreach (var p in sim.packetsFinished){
+									foreach (var p in sim.packetsFinished) {
 										outcomes[(int)p.result]++;
 									}
 									var packetsSuccess = sim.packetsFinished.Where(p => p.result == Result.Success).ToList();
@@ -133,7 +133,7 @@ namespace GeRaF.StatsGeneration
 										stat.success.Add(success);
 										stat.delay.Add(delay);
 										stat.energy.Add(energy);
-										for(int i=0; i<outcomes.Count; i++){
+										for (int i = 0; i < outcomes.Count; i++) {
 											stat.averageOutcomes[i] += outcomes[i];
 										}
 										Console.WriteLine($"Simulating general {name} ... {(stats.Count * parameters.simulations + stat.success.Count) * 100f / totalSimulations:##.00}%, l={l} n={new_sp.n_nodes} d={d} v={version} shape={emptyRegionType}");

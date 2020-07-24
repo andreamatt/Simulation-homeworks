@@ -16,7 +16,7 @@ namespace GeRaF
 			customCulture.NumberFormat.NumberDecimalSeparator = ".";
 			System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
 			maxParallel = Environment.ProcessorCount - 1;
-			maxParallel = 3;
+			//maxParallel = 3;
 			Console.WriteLine("Max parallel sims: " + maxParallel);
 
 
@@ -61,13 +61,13 @@ namespace GeRaF
 
 			var DLparameters = new GeneralParameters() {
 				lambdas = new List<double> { 0.1, 1, 5, 10 },
-				dutyCycles = new List<double>() { 0.1, 0.5, 0.9 },
+				dutyCycles = new List<double>() { 0.1, 0.3, 0.5, 0.9 },
 				versions = versions,
-				simulations = 200
+				simulations = 20
 			};
 			var LNparameters = new GeneralParameters() {
-				lambdas = new List<double> { 1, 5, 10, 20, 100, 500 },
-				Ns = new List<int> { 100, 200, 500 }, // CHANGE TO PROPORTIONAL TO AREA
+				lambdas = new List<double> { 1, 5, 10, 20, 100 },
+				relay_densities = new List<int> { 50, 100, 150, 200 }, // CHANGE PROPORTIONAL TO AREA
 				versions = versions,
 				simulations = 20
 			};
@@ -75,7 +75,7 @@ namespace GeRaF
 				//lambdas = new List<double> { 5, 20 },
 				versions = versions,
 				emptyRegionTypes = shapes,
-				simulations = 1000
+				simulations = 100
 			};
 			var outcomesParameters = new GeneralParameters() {
 				versions = versions,
@@ -88,10 +88,10 @@ namespace GeRaF
 				simulations = 1
 			};
 
-			//runResults.dutyLambdas = General.Generate("DL", sp, pp, DLparameters);
-			//runResults.lambdaNs = General.Generate("LN", sp, pp, LNparameters);
+			runResults.dutyLambdas = General.Generate("DL", sp, pp, DLparameters);
+			runResults.lambdaNs = General.Generate("LN", sp, pp, LNparameters);
 			runResults.shapeStats = General.Generate("Shapes", sp, pp, shapeParameters);
-			//runResults.outcomeStats = General.Generate("Outcomes", sp, pp, outcomesParameters);
+			runResults.outcomeStats = General.Generate("Outcomes", sp, pp, outcomesParameters);
 
 			// debug
 			//sp.debugType = DebugType.Always;
