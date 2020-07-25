@@ -41,14 +41,15 @@ class BaseStat:
 	def __init__(self, data):
 		self.shape = data['shape']
 		self.version = data["protocolVersion"]
-		self.duty = data["duty"]
+		self.duty = float(data["duty"])
 		self.lam = float(data['lambda'])
-		self.N = float(data['N'])
+		self.N = int(data['N'])
 		self.delay = [float(s) for s in data['delay']]
 		self.success = [float(s) for s in data['success']]
 		self.energy = [float(s) for s in data['energy']]
 		self.traffic = data['traffic']
 		self.failurePoints = data['failurePoints']
+		self.averageOutcomes = data['averageOutcomes']
 	
 
 
@@ -58,5 +59,6 @@ class RunResult:
 		self.baseSP = SimulationParameters(data['baseSP'])
 		self.DLstats = [BaseStat(s) for s in data['dutyLambdas']]
 		self.LNstats = [BaseStat(s) for s in data['lambdaNs']]
+		self.outcomeStats = [BaseStat(s) for s in data['outcomeStats']]
 		self.ShapeStats = [BaseStat(s) for s in data['shapeStats']]
 		

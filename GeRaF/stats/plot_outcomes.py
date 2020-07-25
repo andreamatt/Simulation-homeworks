@@ -1,0 +1,62 @@
+from matplotlib import pyplot as plt, patches
+import numpy as np
+from classes import *
+from collections import OrderedDict
+import seaborn as sns
+import pandas as pd
+
+
+def plot_outcomes(runResults):
+	shapes = list(OrderedDict.fromkeys([stat.shape for stat in runResults.outcomeStats]))
+	protocol_versions = list(OrderedDict.fromkeys([stat.version for stat in runResults.outcomeStats]))
+
+	fig, axs = plt.subplots(1, len(shapes))
+	interesting_outcomes = [1, 3, 4, 5, 6, 7]
+	outcomes_names = ["Success","No_start_relays","Abort_max_region_cycle","Abort_max_sensing","Abort_max_sink_rts","Abort_no_ack"]
+
+	for i in range(len(shapes)):
+		shape = shapes[i]
+		data = []
+		for j in range(len(protocol_versions)):
+			version = protocol_versions[j]
+
+			stat = list(filter(lambda s : s.shape==shape and s.version == version, runResults.outcomeStats))[0] # only 1 per version/shape
+
+			outcomes = np.array(stat.averageOutcomes)[interesting_outcomes]
+			for o in range(len(outcomes)):
+				data.append([outcomes_names[o], outcomes[o], version])
+
+		data = pd.DataFrame(data).rename(columns={2:"Version"})
+		sns.barplot(x=0, y=1, hue="Version", data=data, ax=axs[i])
+		axs[i].set_xticklabels(labels=outcomes_names, rotation=30, horizontalalignment='right')
+		axs[i].set_xlabel("")
+		axs[i].set_title(shape)
+	
+	plt.show()
+
+
+	# for i in range(len(protocol_versions)):
+	# 	version = protocol_versions[i]
+	# 	marker = line_markers[i]
+	# 	for j in range(len(duty_cycles)):
+	# 		duty = duty_cycles[j]
+	# 		color = colors[j]
+	# 		avg_succ = []
+	# 		lambdas = []
+
+	# 		stats = list(filter(lambda s : s.duty == duty and s.version == version, runResults.outcomeStats))
+
+	# 		for stat in stats:
+	# 			avg_succ.append(np.mean(stat.success))
+	# 			lambdas.append(stat.lam)
+
+	# 		line = plt.plot(lambdas, avg_succ, marker, marker=".", lw=1, color=color)
+			
+	# 		if i==0:
+	# 			legend_patches.append(patches.Patch(color=color, label=f'd = {duty}'))
+	
+	# plt.legend(handles=legend_patches)
+	# plt.title('Percentage of packets successfully delivered to the sink, N=?')
+	# plt.xlabel('$\lambda$')
+	# plt.ylabel('% success delivery')
+	# plt.show()

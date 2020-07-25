@@ -39,7 +39,7 @@ namespace GeRaF
 				debugType = DebugType.Never,
 				debug_file = "../../graphic_debug/debug_data.js",
 				max_time = 50,
-				n_nodes = 200,
+				n_nodes = 100,
 				packet_rate = 5,
 				range = 20,
 				min_distance = 1,
@@ -80,7 +80,7 @@ namespace GeRaF
 			var outcomesParameters = new GeneralParameters() {
 				versions = versions,
 				emptyRegionTypes = shapes,//new List<EmptyRegionType> { EmptyRegionType.None },
-				simulations = 100
+				simulations = 300
 			};
 			var debugParameters = new GeneralParameters() {
 				versions = new List<ProtocolVersion> { ProtocolVersion.Base },

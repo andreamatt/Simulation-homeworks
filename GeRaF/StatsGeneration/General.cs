@@ -53,7 +53,7 @@ namespace GeRaF.StatsGeneration
 										area = area - Math.PI * Math.Pow(new_sp.emptyRegionSize, 2) * 4;
 										break;
 								}
-								new_sp.n_nodes = (int)Math.Floor(area * density);
+								new_sp.n_nodes = (int)Math.Floor(area * density / 10000);
 								//new_sp.n_nodes = (int)Math.Floor(new_sp.n_nodes * area / Math.Pow(new_sp.area_side, 2));
 
 								var outcomesNumber = Enum.GetValues(typeof(Result)).Length;
