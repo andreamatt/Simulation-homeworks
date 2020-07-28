@@ -38,6 +38,8 @@ namespace GeRaF
 
 		public ProtocolVersion protocolVersion = ProtocolVersion.Base;
 
+		public int passed_packets_memory = 10;
+
 		public object Clone() {
 			return MemberwiseClone();
 		}

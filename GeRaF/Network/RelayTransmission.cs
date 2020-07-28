@@ -92,6 +92,11 @@ namespace GeRaF.Network
 		}
 
 		private void HandleRTS(Event cause, Relay sender) {
+			var packetContentID = sender.packetToSend.content_id;
+			if (sim.protocolParameters.protocolVersion == ProtocolVersion.Plus && passedPacketsSet.Contains(packetContentID)) {
+				// do not reply
+				return;
+			}
 			bool failed = this.receivingTransmissions[sender];
 			// if free or awaiting for ITS correct region
 			if (failed == false && (this.status == RelayStatus.Free || (this.status == RelayStatus.Awaiting_region && this.busyWith == sender))) {

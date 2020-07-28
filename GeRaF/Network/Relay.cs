@@ -46,10 +46,22 @@ namespace GeRaF.Network
 		public List<int> neighboursIds => neighbours.Select(n => n.id).ToList();
 		public Dictionary<Relay, Position> directionForSink = new Dictionary<Relay, Position>();
 
-		public void OnPacketFinished() {
-		}
+		[JsonIgnore]
+		public Queue<int> passedPacketsQueue = new Queue<int>();
+		[JsonIgnore]
+		public HashSet<int> passedPacketsSet = new HashSet<int>();
 
-		public void UpdateMarkov() {
+		public void OnPacketFinished() {
+			if (sim.protocolParameters.protocolVersion == ProtocolVersion.Plus) {
+				if (packetToSend.result == Result.Passed) {
+					if (this.passedPacketsQueue.Count > sim.protocolParameters.passed_packets_memory) {
+						var toDelete = this.passedPacketsQueue.Dequeue();
+						this.passedPacketsSet.Remove(toDelete);
+					}
+					this.passedPacketsQueue.Enqueue(packetToSend.content_id);
+					this.passedPacketsSet.Add(packetToSend.content_id);
+				}
+			}
 		}
 
 		// for transmitting

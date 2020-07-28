@@ -108,14 +108,15 @@ class Packet {
 		this.receivedTimes = []
 		this.result = parseInt(fields[7])
 
-		if (this.result == 4) {
-			console.log(`Packet: ${this.content_id} - ${this.copy_id} at ${this.generationTime}`)
-		}
-
 		let hops_list = fields[5].split(",")
 		for (let h of hops_list) {
 			let element = parseInt(h);
 			this.hops.push(element)
+		}
+
+		// if (this.result == 4) {
+		if(this.hops.length!=new Set(this.hops).size){
+			console.log(`Packet: ${this.content_id} - ${this.copy_id} at ${this.generationTime}, loop: ${this.hops.length-new Set(this.hops).size}`)
 		}
 
 		let received_list = fields[6].split(",")
