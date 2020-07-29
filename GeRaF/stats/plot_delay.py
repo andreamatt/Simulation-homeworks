@@ -6,6 +6,8 @@ from collections import OrderedDict
 def plot_delay_over_lambda_and_duty(runResults):
 	duty_cycles = list(OrderedDict.fromkeys([stat.duty for stat in runResults.DLstats]))
 	protocol_versions = list(OrderedDict.fromkeys([stat.version for stat in runResults.DLstats]))
+	n_nodes = runResults.DLstats[0].N
+	shape_type = runResults.DLstats[0].shape
 	
 	legend_patches = []
 	colors = ["red", "blue", "green", "grey", "black"] # for duties
@@ -32,14 +34,19 @@ def plot_delay_over_lambda_and_duty(runResults):
 				legend_patches.append(patches.Patch(color=color, label=f'd = {duty}'))
 	
 	plt.legend(handles=legend_patches)
-	plt.title('avg_delay, N=?')
+	plt.title('Average delay over $\lambda$ and duty cycle\n' + "Shape=" + str(shape_type) + ', N='+ str(n_nodes))
 	plt.xlabel('$\lambda$')
 	plt.ylabel('delay')
-	plt.show()
+	plt.xlim(0)
+	plt.ylim(0)
+	plt.savefig("plt_delay_over_lambda_and_duty.png", dpi=300, pad_inches = 0.05)
+	plt.close()
 
 def plot_delay_over_lambda_and_n(runResults):
 	Ns = list(OrderedDict.fromkeys([stat.N for stat in runResults.LNstats]))
 	protocol_versions = list(OrderedDict.fromkeys([stat.version for stat in runResults.LNstats]))
+	d_cycle = runResults.LNstats[0].duty
+	shape_type = runResults.LNstats[0].shape
 	
 	legend_patches = []
 	colors = ["red", "blue", "green", "grey", "black"] # for duties
@@ -66,7 +73,10 @@ def plot_delay_over_lambda_and_n(runResults):
 				legend_patches.append(patches.Patch(color=color, label=f'N = {N}'))
 	
 	plt.legend(handles=legend_patches)
-	plt.title('avg_delay, d=?')
+	plt.title('Average delay over $\lambda$ and N\n' + "Shape=" + str(shape_type) + ', d='+ str(d_cycle))
 	plt.xlabel('$\lambda$')
 	plt.ylabel('delay')
-	plt.show()
+	plt.xlim(0)
+	plt.ylim(0)
+	plt.savefig("plt_delay_over_lambda_and_n.png", dpi=300, pad_inches = 0.05)
+	plt.close()

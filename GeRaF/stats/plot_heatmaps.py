@@ -9,17 +9,19 @@ def plot_heatmaps(runResults: RunResult):
 	protocol_versions = list(OrderedDict.fromkeys([stat.version for stat in runResults.ShapeStats]))
 	shapes = list(OrderedDict.fromkeys([stat.shape for stat in runResults.ShapeStats]))
 	
-	fig, axs = plt.subplots(len(protocol_versions), len(shapes)*2)
+	fig, axs = plt.subplots(len(protocol_versions), len(shapes)*2, figsize=(15,15))
+	fig.subplots_adjust(hspace=-0.89)
 
 	vmin = 0
 	vmax = [0]*len(shapes)*2
 
+	luminosity = 2.5
 	res = 1
 	for i in range(len(shapes)):
 		shape = shapes[i]
 		stats = list(filter(lambda s: s.shape == shape, runResults.ShapeStats))
-		vmax[i*2] = np.max([np.max(s.traffic) for s in stats])
-		vmax[i*2+1] = np.max([np.max(s.failurePoints) for s in stats])
+		vmax[i*2] = np.max([np.max(s.traffic) for s in stats]) / luminosity
+		vmax[i*2+1] = np.max([np.max(s.failurePoints) for s in stats]) / luminosity
 		for k in range(len(protocol_versions)):
 			version = protocol_versions[k]
 			stat = stats[k]
@@ -27,8 +29,8 @@ def plot_heatmaps(runResults: RunResult):
 			traffic = np.repeat(np.repeat(traffic, res, axis=0), res, axis=1)
 			failures = np.array(stat.failurePoints).T
 			failures = np.repeat(np.repeat(failures, res, axis=0), res, axis=1)
-			axs[k,i*2].imshow(traffic, vmin=vmin, vmax=vmax[i*2], cmap='hot')
-			axs[k, 1+i*2].imshow(failures, vmin=vmin, vmax=vmax[i*2+1], cmap='hot')
+			axs[k,i*2].imshow(traffic, vmin=vmin, vmax=vmax[i*2], cmap='afmhot')
+			axs[k, 1+i*2].imshow(failures, vmin=vmin, vmax=vmax[i*2+1], cmap='afmhot')
 			if i!=0:
 				axs[k,i*2].axis('off')
 			axs[k, 1+i*2].axis('off')
@@ -44,15 +46,19 @@ def plot_heatmaps(runResults: RunResult):
 		axs[k][0].set_yticks([])
 		axs[k][0].set_xticks([])
 
-	# plt.tight_layout(h_pad=0.08, w_pad=0.08, rect=(0.3, 0.3, 0.97, 0.97))
-	plt.show()
+	#plt.tight_layout(h_pad=0.08, w_pad=0.08, rect=(0.3, 0.3, 0.97, 0.97))
+	plt.suptitle("Traffic Flow", y=0.604, fontsize=20)
+	plt.savefig("plt_heatmaps.png", dpi=300, bbox_inches = 'tight', pad_inches = 0.05)
+	plt.close()
 
 
 def plot_heatmaps_hist(runResults):
 	protocol_versions = list(OrderedDict.fromkeys([stat.version for stat in runResults.ShapeStats]))
 	shapes = list(OrderedDict.fromkeys([stat.shape for stat in runResults.ShapeStats]))
 
-	fig, axs = plt.subplots(2, len(shapes))
+	fig, axs = plt.subplots(2, len(shapes), figsize=(15,10))
+	fig.subplots_adjust(hspace=0.1)
+	fig.subplots_adjust(wspace=0.25)
 
 	for i in range(len(shapes)):
 		shape = shapes[i]
@@ -65,11 +71,14 @@ def plot_heatmaps_hist(runResults):
 
 			sns.kdeplot(traffic, ax=axs[0, i], label=version)
 			sns.kdeplot(failures, ax=axs[1, i], label=version)
+			#ax=axs[0, i].set_xlim(0,0.04)
 
-	axs[0][0].set_ylabel("traffic")
-	axs[1][0].set_ylabel("failures")
+	axs[0][0].set_ylabel("traffic", fontsize=13)
+	axs[1][0].set_ylabel("failures", fontsize=13)
 	
 	for i in range(len(shapes)):
 		axs[0][i].set_title(shapes[i])
 
-	plt.show()
+	plt.suptitle('Traffic Hist', y=0.94, fontsize=18)
+	plt.savefig("plt_heatmaps_hist.png", dpi=300, bbox_inches = 'tight', pad_inches = 0.05)
+	plt.close()

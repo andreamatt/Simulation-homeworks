@@ -10,7 +10,9 @@ def plot_outcomes(runResults):
 	shapes = list(OrderedDict.fromkeys([stat.shape for stat in runResults.outcomeStats]))
 	protocol_versions = list(OrderedDict.fromkeys([stat.version for stat in runResults.outcomeStats]))
 
-	fig, axs = plt.subplots(1, len(shapes))
+	fig, axs = plt.subplots(1, len(shapes), figsize=(15,5))
+	fig.subplots_adjust(wspace=0.20)
+
 	interesting_outcomes = [1, 3, 4, 5, 6, 7]
 	outcomes_names = ["Success","No_start_relays","Abort_max_region_cycle","Abort_max_sensing","Abort_max_sink_rts","Abort_no_ack"]
 
@@ -30,9 +32,12 @@ def plot_outcomes(runResults):
 		sns.barplot(x=0, y=1, hue="Version", data=data, ax=axs[i])
 		axs[i].set_xticklabels(labels=outcomes_names, rotation=30, horizontalalignment='right')
 		axs[i].set_xlabel("")
+		axs[i].set_ylabel("")
 		axs[i].set_title(shape)
 	
-	plt.show()
+	plt.suptitle('Outcomes By Obstacle Type')
+	plt.savefig("plt_outcomes.png",  dpi=300, bbox_inches = 'tight', pad_inches = 0.15)
+	plt.close()
 
 
 	# for i in range(len(protocol_versions)):
