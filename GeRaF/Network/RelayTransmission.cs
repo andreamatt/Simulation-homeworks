@@ -108,7 +108,7 @@ namespace GeRaF.Network
 							var direction = sender.directionForSink[sink];
 							var aimX = direction.X;
 							var aimY = direction.Y;
-							var sourceToSink = sim.distances[sender.id][sink.id]; // same distance as sink, by design
+							var sourceToSink = sim.distances[sender.id, sink.id]; // same distance as sink, by design
 							var limitToSink = sourceToSink - sender.range;
 							var regionWidth = sender.range / sim.protocolParameters.n_regions;
 							var dist = Math.Sqrt(Math.Pow(position.X - aimX, 2) + Math.Pow(position.Y - aimY, 2));
@@ -117,10 +117,10 @@ namespace GeRaF.Network
 						}
 					default: {
 							var sink = sender.packetToSend.sink;
-							var sourceToSink = sim.distances[sender.id][sink.id];
+							var sourceToSink = sim.distances[sender.id, sink.id];
 							var limitToSink = sourceToSink - sender.range;
 							var regionWidth = sender.range / sim.protocolParameters.n_regions;
-							var dist = sim.distances[this.id][sink.id];
+							var dist = sim.distances[this.id, sink.id];
 							myIndex = (int)Math.Floor((dist - limitToSink) / regionWidth);
 							break;
 						}
@@ -198,7 +198,7 @@ namespace GeRaF.Network
 						var direction = sender.directionForSink[sink];
 						var aimX = direction.X;
 						var aimY = direction.Y;
-						var sourceToSink = sim.distances[sender.id][sink.id]; // same distance as sink, by design
+						var sourceToSink = sim.distances[sender.id, sink.id]; // same distance as sink, by design
 						var limitToSink = sourceToSink - sender.range;
 						var regionWidth = sender.range / sim.protocolParameters.n_regions;
 						var dist = Math.Sqrt(Math.Pow(position.X - aimX, 2) + Math.Pow(position.Y - aimY, 2));
@@ -207,10 +207,10 @@ namespace GeRaF.Network
 					}
 				default: {
 						var sink = sender.packetToSend.sink;
-						var sourceToSink = sim.distances[sender.id][sink.id];
+						var sourceToSink = sim.distances[sender.id, sink.id];
 						var limitToSink = sourceToSink - sender.range;
 						var regionWidth = sender.range / sim.protocolParameters.n_regions;
-						var dist = sim.distances[this.id][sink.id];
+						var dist = sim.distances[this.id, sink.id];
 						myIndex = (int)Math.Floor((dist - limitToSink) / regionWidth);
 						break;
 					}

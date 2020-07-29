@@ -1,3 +1,4 @@
 debug.json filter=lfs diff=lfs merge=lfs -text
 GeRaF/debug.json filter=lfs diff=lfs merge=lfs -text
 GeRaF/graphic_debug/debug_data.js filter=lfs diff=lfs merge=lfs -text
+GeRaF/stats/runResults.json filter=lfs diff=lfs merge=lfs -text

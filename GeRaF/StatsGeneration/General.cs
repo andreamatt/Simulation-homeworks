@@ -14,7 +14,7 @@ namespace GeRaF.StatsGeneration
 
 			// set default values
 			if (parameters.lambdas.Count == 0) parameters.lambdas.Add(sp.packet_rate);
-			if (parameters.relay_densities.Count == 0) parameters.relay_densities.Add(sp.n_nodes);
+			if (parameters.relay_densities.Count == 0) parameters.relay_densities.Add(sp.n_density);
 			if (parameters.dutyCycles.Count == 0) parameters.dutyCycles.Add(pp.duty_cycle);
 			if (parameters.versions.Count == 0) parameters.versions.Add(pp.protocolVersion);
 			if (parameters.emptyRegionTypes.Count == 0) parameters.emptyRegionTypes.Add(sp.emptyRegionType);
@@ -96,7 +96,7 @@ namespace GeRaF.StatsGeneration
 										delay = packetsSuccess.Average(p => {
 											var startTime = p.receivedTimes.First();
 											var endTime = p.receivedTimes.Last();
-											var dist = sim.distances[p.startRelayId][p.sinkId];
+											var dist = sim.distances[p.startRelayId, p.sinkId];
 											return (endTime - startTime) / dist;
 										});
 									}

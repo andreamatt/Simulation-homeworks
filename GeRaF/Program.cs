@@ -16,7 +16,7 @@ namespace GeRaF
 			customCulture.NumberFormat.NumberDecimalSeparator = ".";
 			System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
 			maxParallel = Environment.ProcessorCount - 1;
-			//maxParallel = 3;
+			maxParallel = 4;
 			Console.WriteLine("Max parallel sims: " + maxParallel);
 
 
@@ -34,14 +34,16 @@ namespace GeRaF
 				n_max_region_cycle = 5,
 				passed_packets_memory = 10
 			};
+
+			int factor = 4;
 			var sp = new SimulationParameters() {
-				area_side = 100,
+				area_side = factor * 100,
 				debug_interval = 1,
 				debugType = DebugType.Never,
 				debug_file = "../../graphic_debug/debug_data.js",
-				max_time = 500,
-				n_nodes = 200,
-				packet_rate = 0.5,
+				max_time = 50,// / (factor * factor),
+				n_density = 100, // this is density (nodes per 100^2 area), not total nodes
+				packet_rate = 1,
 				range = 20,
 				min_distance = 1,
 				asleepEnergy = 2,
@@ -64,19 +66,19 @@ namespace GeRaF
 				lambdas = new List<double> { 0.1, 1, 5, 10 },
 				dutyCycles = new List<double>() { 0.1, 0.3, 0.5, 0.9 },
 				versions = versions,
-				simulations = 20
+				simulations = 50
 			};
 			var LNparameters = new GeneralParameters() {
-				lambdas = new List<double> { 1, 5, 10, 20, 100 },
-				relay_densities = new List<int> { 50, 100, 150, 200 }, // CHANGE PROPORTIONAL TO AREA
+				lambdas = new List<double> { 1, 5, 10, 20 },
+				relay_densities = new List<float> { 100, 150, 200 }, // CHANGE PROPORTIONAL TO AREA
 				versions = versions,
-				simulations = 20
+				simulations = 50
 			};
 			var shapeParameters = new GeneralParameters() {
 				//lambdas = new List<double> { 5, 20 },
 				versions = versions,
 				emptyRegionTypes = shapes,
-				simulations = 100
+				simulations = 500
 			};
 			var outcomesParameters = new GeneralParameters() {
 				versions = versions,
@@ -89,9 +91,9 @@ namespace GeRaF
 				simulations = 1
 			};
 
-			//runResults.dutyLambdas = General.Generate("DL", sp, pp, DLparameters);
-			//runResults.lambdaNs = General.Generate("LN", sp, pp, LNparameters);
-			//runResults.shapeStats = General.Generate("Shapes", sp, pp, shapeParameters);
+			runResults.dutyLambdas = General.Generate("DL", sp, pp, DLparameters);
+			runResults.lambdaNs = General.Generate("LN", sp, pp, LNparameters);
+			runResults.shapeStats = General.Generate("Shapes", sp, pp, shapeParameters);
 			runResults.outcomeStats = General.Generate("Outcomes", sp, pp, outcomesParameters);
 
 			// debug

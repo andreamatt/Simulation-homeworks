@@ -22,7 +22,7 @@ namespace GeRaF
 		// system state
 		public List<Relay> relays;
 		public Dictionary<int, Relay> relayById;
-		public Dictionary<int, Dictionary<int, double>> distances;
+		public float[,] distances;
 		public List<Packet> packetsFinished = new List<Packet>();
 		public List<Packet> packetsPassed = new List<Packet>();
 		public PacketGenerator packetGenerator = new PacketGenerator();
@@ -82,6 +82,9 @@ namespace GeRaF
 					previous = null
 				});
 			}
+
+			// create distance matrix
+			distances = new float[relays.Count, relays.Count];
 
 			// move disconnected
 			//Console.WriteLine("Placing relays");
@@ -147,7 +150,7 @@ namespace GeRaF
 				//Console.WriteLine("Checking connected relays");
 
 				// calculate new neighbours
-				distances = GraphUtils.Distances(relays);
+				GraphUtils.Distances(relays, distances);
 				GraphUtils.SetNeighbours(relays, distances);
 				connected = GraphUtils.Connected(relays);
 			}
@@ -199,11 +202,11 @@ namespace GeRaF
 			}
 		}
 
-		public double slotToX(int slot) {
+		public float slotToX(int slot) {
 			return slot * simulationParameters.min_distance + simulationParameters.min_distance;
 		}
 
-		public int xToSlot(double x) {
+		public int xToSlot(float x) {
 			return (int)Math.Round((x - simulationParameters.min_distance) / simulationParameters.min_distance);
 		}
 	}

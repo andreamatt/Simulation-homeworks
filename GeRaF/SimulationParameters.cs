@@ -30,11 +30,12 @@ namespace GeRaF
 	{
 		public double max_time;
 		public int area_side;
-		public double range;
-		public double min_distance;
+		public float range;
+		public float min_distance;
 		public EmptyRegionType emptyRegionType;
-		public double emptyRegionSize;
+		public float emptyRegionSize;
 		public int n_nodes;
+		public float n_density;
 		public double packet_rate;
 		public double asleepEnergy;
 		public double idleEnergy;
