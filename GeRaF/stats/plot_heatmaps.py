@@ -10,12 +10,14 @@ def plot_heatmaps(runResults: RunResult):
 	shapes = list(OrderedDict.fromkeys([stat.shape for stat in runResults.ShapeStats]))
 	
 	fig, axs = plt.subplots(len(protocol_versions), len(shapes)*2, figsize=(15,15))
-	fig.subplots_adjust(hspace=-0.89)
+	growth = lambda x: 3.38*10**(-3)*x**3 -3.954*10**(-2)*x**2 + 0.1625*x - 1.082
+	fig.subplots_adjust(hspace= growth(len(protocol_versions)))
+	fig.subplots_adjust(wspace=0.03)
 
 	vmin = 0
 	vmax = [0]*len(shapes)*2
 
-	luminosity = 2.5
+	luminosity = 2
 	res = 1
 	for i in range(len(shapes)):
 		shape = shapes[i]
@@ -47,7 +49,7 @@ def plot_heatmaps(runResults: RunResult):
 		axs[k][0].set_xticks([])
 
 	#plt.tight_layout(h_pad=0.08, w_pad=0.08, rect=(0.3, 0.3, 0.97, 0.97))
-	plt.suptitle("Traffic Flow", y=0.604, fontsize=20)
+	#plt.suptitle("Traffic Flow", y=0.604, fontsize=20)
 	plt.savefig("plt_heatmaps.png", dpi=300, bbox_inches = 'tight', pad_inches = 0.05)
 	plt.close()
 

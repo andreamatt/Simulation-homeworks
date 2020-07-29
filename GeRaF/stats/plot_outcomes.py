@@ -34,7 +34,7 @@ def plot_outcomes(runResults):
 		axs[i].set_xlabel("")
 		axs[i].set_ylabel("")
 		axs[i].set_title(shape)
-	
+
 	plt.suptitle('Outcomes By Obstacle Type')
 	plt.savefig("plt_outcomes.png",  dpi=300, bbox_inches = 'tight', pad_inches = 0.15)
 	plt.close()
