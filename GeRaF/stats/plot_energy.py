@@ -11,25 +11,24 @@ def plot_energy_over_lambda_and_duty(runResults):
 	n_nodes = runResults.DLstats[0].N
 	shape_type = runResults.DLstats[0].shape
 
-	colors = ["red", "blue", "green", "grey", "black"] # for duties
-	#line_markers = ["-", ":", "-."]	# for protocol versions
-	dashes_list = [
-		(1, 0),
-		(5, 2),
-		(2, 1, 4, 3),
-		(2, 2, 10, 2),
-		(1,3)
-	]
-	legend_patches = []
+	colors = ["green", "blue", "red","grey", "black"] # for duties
+	line_styles = ["-", "--", ":", "-."]	# for protocol versions
+	# dashes_list = [
+	# 	(1, 0),
+	# 	(5, 2),
+	# 	(2, 1, 4, 3),
+	# 	(2, 2, 10, 2),
+	# 	(1,3)
+	# ]
+	legend_duties = []
 	legend_versions = []
-	for i, v in enumerate(protocol_versions):
-		legend_versions.append(Line2D([0], [0], color='black', linewidth=2, dashes=dashes_list[i], label=v))
-	
+
 	for i in range(len(protocol_versions)):
 		version = protocol_versions[i]
+		color = colors[i]
+		legend_versions.append(patches.Patch(color=color, label=version))
 		for j in range(len(duty_cycles)):
 			duty = duty_cycles[j]
-			color = colors[j]
 			avg_energy = []
 			lambdas = []
 
@@ -39,13 +38,13 @@ def plot_energy_over_lambda_and_duty(runResults):
 				avg_energy.append(np.mean(stat.energy))
 				lambdas.append(stat.lam)
 
-			line = plt.plot(lambdas, avg_energy,  marker=".", lw=1, color=color, dashes=dashes_list[i])
+			line = plt.plot(lambdas, avg_energy,  marker=".", lw=1, color=color, ls=line_styles[j])
 			
 			if i==0:
-				legend_patches.append(patches.Patch(color=color, label=f'd = {duty}'))
+				legend_duties.append(Line2D([0], [0], color='black', linewidth=2, ls=line_styles[j], label=f'd = {duty}'))
 	
-	legend_1 = plt.legend(handles=legend_patches, loc='upper left', bbox_to_anchor=(1, 1))
-	legend_2 =plt.legend(handles=legend_versions, loc='lower left', bbox_to_anchor=(1, 0))
+	legend_1 = plt.legend(handles=legend_duties, loc='upper left', bbox_to_anchor=(1, 1))
+	legend_2 = plt.legend(handles=legend_versions, loc='lower left', bbox_to_anchor=(1, 0))
 	plt.gca().add_artist(legend_1)
 	plt.title('Average energy over $\lambda$ and duty cycle\n' + "Shape="+ str(shape_type) +', N=' + str(n_nodes))
 	plt.xlabel('$\lambda$')
@@ -61,26 +60,18 @@ def plot_energy_over_lambda_and_n(runResults):
 	d_cycle = runResults.LNstats[0].duty
 	shape_type = runResults.LNstats[0].shape
 	
-	legend_patches = []
-	colors = ["red", "blue", "green", "grey", "black"] # for duties
-	#line_markers = ["-", ":", "-."]	# for protocol versions
-	dashes_list = [
-		(1, 0),
-		(5, 2),
-		(2, 1, 4, 3),
-		(2, 2, 10, 2),
-		(1,3)
-	]
-	legend_patches = []
+	colors = ["green", "blue", "red","grey", "black"] # for duties
+	line_styles = ["-", "--", ":", "-."]	# for protocol versions
+
+	legend_Ns = []
 	legend_versions = []
-	for i, v in enumerate(protocol_versions):
-		legend_versions.append(Line2D([0], [0], color='black', linewidth=2, dashes=dashes_list[i], label=v))
-	
+
 	for i in range(len(protocol_versions)):
 		version = protocol_versions[i]
+		color = colors[i]
+		legend_versions.append(patches.Patch(color=color, label=version))
 		for j in range(len(Ns)):
 			N = Ns[j]
-			color = colors[j]
 			avg_energy = []
 			lambdas = []
 
@@ -90,13 +81,13 @@ def plot_energy_over_lambda_and_n(runResults):
 				avg_energy.append(np.mean(stat.energy))
 				lambdas.append(stat.lam)
 
-			line = plt.plot(lambdas, avg_energy,  marker=".", lw=1, color=color, dashes=dashes_list[i])
+			line = plt.plot(lambdas, avg_energy,  marker=".", lw=1, color=color, ls=line_styles[j])
 			
 			if i==0:
-				legend_patches.append(patches.Patch(color=color, label=f'N = {N}'))
+				legend_Ns.append(Line2D([0], [0], color='black', linewidth=2, ls=line_styles[j], label=f'N = {N}'))
 	
-	legend_1 = plt.legend(handles=legend_patches, loc='upper left', bbox_to_anchor=(1, 1))
-	legend_2 =plt.legend(handles=legend_versions, loc='lower left', bbox_to_anchor=(1, 0))
+	legend_1 = plt.legend(handles=legend_Ns, loc='upper left', bbox_to_anchor=(1, 1))
+	legend_2 = plt.legend(handles=legend_versions, loc='lower left', bbox_to_anchor=(1, 0))
 	plt.gca().add_artist(legend_1)
 	plt.title('Average energy over $\lambda$ and N\n' + "Shape="+ str(shape_type) +', d=' + str(d_cycle))
 	plt.xlabel('$\lambda$')
