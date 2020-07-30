@@ -12,7 +12,10 @@ namespace GeRaF
 	enum ProtocolVersion
 	{
 		Base,
-		Plus // Calculate regions based on next hop direction instead of sink direction. Next hop direction is included in RTS
+		BFS, // Calculate regions based on next hop direction instead of sink direction. Next hop direction is included in RTS
+		BFS_half,
+		Rx,
+		Rx_plus
 	}
 
 	class ProtocolParameters : ICloneable
@@ -39,6 +42,10 @@ namespace GeRaF
 		public ProtocolVersion protocolVersion = ProtocolVersion.Base;
 
 		public int passed_packets_memory = 10;
+		public bool avoid_back_flow => protocolVersion == ProtocolVersion.BFS || protocolVersion == ProtocolVersion.Rx;
+
+		// for Rx_plus
+		public int n_right_jumps = 6;
 
 		public object Clone() {
 			return MemberwiseClone();

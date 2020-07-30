@@ -35,13 +35,12 @@ namespace GeRaF
 				passed_packets_memory = 10
 			};
 
-			int factor = 4;
 			var sp = new SimulationParameters() {
-				area_side = factor * 100,
+				area_side = 400,
 				debug_interval = 1,
 				debugType = DebugType.Never,
 				debug_file = "../../graphic_debug/debug_data.js",
-				max_time = 50,// / (factor * factor),
+				max_time = 100,// / (factor * factor),
 				n_density = 100, // this is density (nodes per 100^2 area), not total nodes
 				packet_rate = 1,
 				range = 20,
@@ -65,17 +64,18 @@ namespace GeRaF
 			var DLparameters = new GeneralParameters() {
 				lambdas = new List<double> { 0.1, 1, 5, 10 },
 				dutyCycles = new List<double>() { 0.1, 0.3, 0.5, 0.9 },
+				emptyRegionTypes = new List<EmptyRegionType> { EmptyRegionType.None, EmptyRegionType.Lines },
 				versions = versions,
 				simulations = 50
 			};
 			var LNparameters = new GeneralParameters() {
 				lambdas = new List<double> { 1, 5, 10, 20 },
 				relay_densities = new List<float> { 100, 150, 200 }, // CHANGE PROPORTIONAL TO AREA
+				emptyRegionTypes = new List<EmptyRegionType> { EmptyRegionType.None, EmptyRegionType.Lines },
 				versions = versions,
 				simulations = 50
 			};
 			var shapeParameters = new GeneralParameters() {
-				//lambdas = new List<double> { 5, 20 },
 				versions = versions,
 				emptyRegionTypes = shapes,
 				simulations = 500
@@ -83,18 +83,19 @@ namespace GeRaF
 			var outcomesParameters = new GeneralParameters() {
 				versions = versions,
 				emptyRegionTypes = shapes,//new List<EmptyRegionType> { EmptyRegionType.None },
-				simulations = 500
+				simulations = 50
 			};
 			var debugParameters = new GeneralParameters() {
-				versions = new List<ProtocolVersion> { ProtocolVersion.Plus },
+				versions = new List<ProtocolVersion> { ProtocolVersion.Rx },
 				emptyRegionTypes = new List<EmptyRegionType> { EmptyRegionType.Lines },
 				simulations = 1
 			};
 
 			runResults.dutyLambdas = General.Generate("DL", sp, pp, DLparameters);
 			runResults.lambdaNs = General.Generate("LN", sp, pp, LNparameters);
-			runResults.shapeStats = General.Generate("Shapes", sp, pp, shapeParameters);
-			runResults.outcomeStats = General.Generate("Outcomes", sp, pp, outcomesParameters);
+			runResults.outcomeStats = runResults.shapeStats = General.Generate("Shapes and outcomes", sp, pp, shapeParameters);
+			//runResults.shapeStats = General.Generate("Shapes", sp, pp, shapeParameters);
+			//runResults.outcomeStats =  General.Generate("Outcomes", sp, pp, outcomesParameters);
 
 			// debug
 			//sp.debugType = DebugType.Always;

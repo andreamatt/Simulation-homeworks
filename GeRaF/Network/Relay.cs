@@ -52,7 +52,7 @@ namespace GeRaF.Network
 		public HashSet<int> passedPacketsSet = new HashSet<int>();
 
 		public void OnPacketFinished() {
-			if (sim.protocolParameters.protocolVersion == ProtocolVersion.Plus) {
+			if (sim.protocolParameters.avoid_back_flow) {
 				if (packetToSend.result == Result.Passed) {
 					if (this.passedPacketsQueue.Count > sim.protocolParameters.passed_packets_memory) {
 						var toDelete = this.passedPacketsQueue.Dequeue();

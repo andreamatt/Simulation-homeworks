@@ -53,6 +53,9 @@ namespace GeRaF.Events.Transmissions
 				// become sender
 				relay.FreeNow(this);
 				relay.packetToSend = packet;
+				if (relay.packetToSend.right_jump_index > 0) {
+					relay.packetToSend.right_jump_index--;
+				}
 				relay.SelfReserve();
 				sim.eventQueue.Add(new StartSensingEvent {
 					time = sim.clock,

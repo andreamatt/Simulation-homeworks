@@ -93,39 +93,14 @@ namespace GeRaF.Network
 
 		private void HandleRTS(Event cause, Relay sender) {
 			var packetContentID = sender.packetToSend.content_id;
-			if (sim.protocolParameters.protocolVersion == ProtocolVersion.Plus && passedPacketsSet.Contains(packetContentID)) {
+			if (sim.protocolParameters.avoid_back_flow && passedPacketsSet.Contains(packetContentID)) {
 				// do not reply
 				return;
 			}
 			bool failed = this.receivingTransmissions[sender];
 			// if free or awaiting for ITS correct region
 			if (failed == false && (this.status == RelayStatus.Free || (this.status == RelayStatus.Awaiting_region && this.busyWith == sender))) {
-				int myIndex = -1;
-				switch (sim.protocolParameters.protocolVersion) {
-					case ProtocolVersion.Plus: {
-							// Calculate regions based on next hop direction instead of sink direction
-							var sink = sender.packetToSend.sink;
-							var direction = sender.directionForSink[sink];
-							var aimX = direction.X;
-							var aimY = direction.Y;
-							var sourceToSink = sim.distances[sender.id, sink.id]; // same distance as sink, by design
-							var limitToSink = sourceToSink - sender.range;
-							var regionWidth = sender.range / sim.protocolParameters.n_regions;
-							var dist = Math.Sqrt(Math.Pow(position.X - aimX, 2) + Math.Pow(position.Y - aimY, 2));
-							myIndex = (int)Math.Floor((dist - limitToSink) / regionWidth);
-							break;
-						}
-					default: {
-							var sink = sender.packetToSend.sink;
-							var sourceToSink = sim.distances[sender.id, sink.id];
-							var limitToSink = sourceToSink - sender.range;
-							var regionWidth = sender.range / sim.protocolParameters.n_regions;
-							var dist = sim.distances[this.id, sink.id];
-							myIndex = (int)Math.Floor((dist - limitToSink) / regionWidth);
-							break;
-						}
-				}
-
+				int myIndex = CalculateRegionIndex(sender);
 				// if I'm in the correct region
 				if (myIndex == sender.REGION_index) {
 					this.Reserve(sender, cause);
@@ -190,31 +165,7 @@ namespace GeRaF.Network
 
 		private void HandleCOL(Event cause, Relay sender) {
 			bool failed = this.receivingTransmissions[sender];
-			int myIndex = -1;
-			switch (sim.protocolParameters.protocolVersion) {
-				case ProtocolVersion.Plus: {
-						// Calculate regions based on next hop direction instead of sink direction
-						var sink = sender.packetToSend.sink;
-						var direction = sender.directionForSink[sink];
-						var aimX = direction.X;
-						var aimY = direction.Y;
-						var sourceToSink = sim.distances[sender.id, sink.id]; // same distance as sink, by design
-						var limitToSink = sourceToSink - sender.range;
-						var regionWidth = sender.range / sim.protocolParameters.n_regions;
-						var dist = Math.Sqrt(Math.Pow(position.X - aimX, 2) + Math.Pow(position.Y - aimY, 2));
-						myIndex = (int)Math.Floor((dist - limitToSink) / regionWidth);
-						break;
-					}
-				default: {
-						var sink = sender.packetToSend.sink;
-						var sourceToSink = sim.distances[sender.id, sink.id];
-						var limitToSink = sourceToSink - sender.range;
-						var regionWidth = sender.range / sim.protocolParameters.n_regions;
-						var dist = sim.distances[this.id, sink.id];
-						myIndex = (int)Math.Floor((dist - limitToSink) / regionWidth);
-						break;
-					}
-			}
+			int myIndex = CalculateRegionIndex(sender);
 
 			// if i'm busy with sender it means I did send CTS
 			// check region to be sure I'm still valid (could have missed my CTS, next RTS, other CTSs and this is their COL)
@@ -260,6 +211,18 @@ namespace GeRaF.Network
 					previous = cause
 				});
 			}
+		}
+
+		private int CalculateRegionIndex(Relay sender) {
+			var sink = sender.packetToSend.sink;
+			var aimX = sender.packetToSend.current_aim.X;
+			var aimY = sender.packetToSend.current_aim.Y;
+			var sourceToAim = sim.distances[sender.id, sink.id]; // always same as sink, by design
+			var limitToAim = sourceToAim - sender.range;
+			var regionWidth = sender.range / sim.protocolParameters.n_regions;
+			var distToAim = GraphUtils.Distance(position.X, position.Y, aimX, aimY);
+			//var distToAim = sender.packetToSend.current_aim_relay == null ? GraphUtils.Distance(position.X, position.Y, aimX, aimY) : sim.distances[this.id, sender.packetToSend.current_aim_relay.id];
+			return (int)Math.Floor((distToAim - limitToAim) / regionWidth);
 		}
 	}
 }

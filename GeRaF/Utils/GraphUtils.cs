@@ -38,8 +38,7 @@ namespace GeRaF.Utils
 				foreach (var r2 in relays) {
 					distances[r1.id, r2.id] = 0;
 					if (r1 != r2) {
-						var dist = (float)Math.Sqrt(Math.Pow(r1.position.X - r2.position.X, 2) + Math.Pow(r1.position.Y - r2.position.Y, 2));
-						distances[r1.id, r2.id] = dist;
+						distances[r1.id, r2.id] = Distance(r1.position.X, r1.position.Y, r2.position.X, r2.position.Y);
 					}
 				}
 			}
@@ -58,7 +57,7 @@ namespace GeRaF.Utils
 			}
 		}
 
-		static public void RepeatedBFS(List<Relay> relays, float[,] distances) {
+		static public void RepeatedBFS(List<Relay> relays, float[,] distances, ProtocolVersion version) {
 			var nextHop = new Dictionary<int, Dictionary<int, Relay>>();
 
 			foreach (var start in relays) {
@@ -96,9 +95,23 @@ namespace GeRaF.Utils
 						var dx = hop.position.X - r1.position.X;
 						var dy = hop.position.Y - r1.position.Y;
 
-						// aim in the same direction as nextHop, but at sink distance (different region radius/shape)
-						var aimX = r1.position.X + dx * distToSink / distToHop;
-						var aimY = r1.position.Y + dy * distToSink / distToHop;
+						float aimX;
+						float aimY;
+						if (version == ProtocolVersion.BFS) {
+							// aim in the same direction as nextHop, but at sink distance (different region radius/shape)
+							aimX = r1.position.X + dx * distToSink / distToHop;
+							aimY = r1.position.Y + dy * distToSink / distToHop;
+						}
+						else {
+							// aim at an angle between sink and nextHop
+							var CX = r1.position.X + dx * distToSink / distToHop;
+							var CY = r1.position.Y + dy * distToSink / distToHop;
+							var DX = r1.position.X + dx * distToSink / distToHop;
+							var DY = r1.position.Y + dy * distToSink / distToHop;
+							var d_r1_D = GraphUtils.Distance(r1.position.X, r1.position.Y, DX, DY);
+							aimX = r1.position.X + (DX - r1.position.X) * distToSink / d_r1_D;
+							aimY = r1.position.Y + (DY - r1.position.Y) * distToSink / d_r1_D;
+						}
 						r1.directionForSink[r2] = new Position() {
 							X = aimX,
 							Y = aimY
@@ -107,5 +120,9 @@ namespace GeRaF.Utils
 				}
 			}
 		}
+
+		static public double Distance(double x1, double y1, double x2, double y2) => Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2));
+
+		static public float Distance(float x1, float y1, float x2, float y2) => (float)Distance((double)x1, y1, x2, y2);
 	}
 }

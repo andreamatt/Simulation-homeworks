@@ -133,10 +133,10 @@ namespace GeRaF
 								break;
 							case EmptyRegionType.Holes:
 								radius = simulationParameters.emptyRegionSize;
-								var d1 = Math.Sqrt(Math.Pow(X - c / 2, 2) + Math.Pow(Y - c / 2, 2));
-								var d2 = Math.Sqrt(Math.Pow(X - c / 2, 2) + Math.Pow(Y - 3 * c / 2, 2));
-								var d3 = Math.Sqrt(Math.Pow(X - 3 * c / 2, 2) + Math.Pow(Y - c / 2, 2));
-								var d4 = Math.Sqrt(Math.Pow(X - 3 * c / 2, 2) + Math.Pow(Y - 3 * c / 2, 2));
+								var d1 = GraphUtils.Distance(X, Y, 0.5 * c, 0.5 * c);
+								var d2 = GraphUtils.Distance(X, Y, 0.5 * c, 1.5 * c);
+								var d3 = GraphUtils.Distance(X, Y, 1.5 * c, 0.5 * c);
+								var d4 = GraphUtils.Distance(X, Y, 1.5 * c, 1.5 * c);
 								validRegion = d1 >= radius && d2 >= radius && d3 >= radius && d4 >= radius;
 								break;
 						}
@@ -154,8 +154,8 @@ namespace GeRaF
 				GraphUtils.SetNeighbours(relays, distances);
 				connected = GraphUtils.Connected(relays);
 			}
-			if (protocolParameters.protocolVersion == ProtocolVersion.Plus) {
-				GraphUtils.RepeatedBFS(relays, distances);
+			if (protocolParameters.protocolVersion == ProtocolVersion.BFS || protocolParameters.protocolVersion == ProtocolVersion.BFS_half) {
+				GraphUtils.RepeatedBFS(relays, distances, protocolParameters.protocolVersion);
 			}
 			//Console.WriteLine("Placed relays");
 

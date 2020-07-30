@@ -41,6 +41,9 @@ namespace GeRaF.Network
 
 		public Result result = Result.None;
 
+		public int right_jump_index = 0;
+		public Position current_aim = new Position();
+
 		private Packet() { }
 
 		public Packet(PacketGenerator gen) {
@@ -59,7 +62,8 @@ namespace GeRaF.Network
 				result = Result.None,
 				copy_id = gen.next_copy_id[packet.content_id],
 				hopsIds = packet.hopsIds.ToList(),
-				receivedTimes = packet.receivedTimes.ToList()
+				receivedTimes = packet.receivedTimes.ToList(),
+				right_jump_index = packet.right_jump_index
 			};
 			gen.next_copy_id[p.content_id]++;
 			return p;
