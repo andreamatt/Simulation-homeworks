@@ -42,7 +42,7 @@ namespace GeRaF
 		public ProtocolVersion protocolVersion = ProtocolVersion.Base;
 
 		public int passed_packets_memory = 10;
-		public bool avoid_back_flow => protocolVersion == ProtocolVersion.BFS || protocolVersion == ProtocolVersion.Rx;
+		public bool avoid_back_flow => protocolVersion != ProtocolVersion.Base;
 
 		// for Rx_plus
 		public int n_right_jumps = 6;

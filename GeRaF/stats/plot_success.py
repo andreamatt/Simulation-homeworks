@@ -38,7 +38,7 @@ def plot_success_over_lambda_and_duty(runResults):
 					avg_succ = []
 					lambdas = []
 
-					stats = list(filter(lambda s : s.duty == duty and s.version == version, runResults.DLstats))
+					stats = list(filter(lambda stat : stat.duty == duty and stat.version == version and stat.shape==shapes[s], runResults.DLstats))
 
 					for stat in stats:
 						avg_succ.append(np.mean(stat.success))
@@ -89,7 +89,7 @@ def plot_success_over_lambda_and_n(runResults):
 					avg_succ = []
 					lambdas = []
 
-					stats = list(filter(lambda s : s.N == N and s.version == version, runResults.LNstats))
+					stats = list(filter(lambda stat : stat.N == N and stat.version == version and stat.shape==shapes[s], runResults.LNstats))
 
 					for stat in stats:
 						avg_succ.append(np.mean(stat.success))

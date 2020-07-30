@@ -38,10 +38,10 @@ def plot_energy_over_lambda_and_duty(runResults):
 					avg_energy = []
 					lambdas = []
 
-					stats = list(filter(lambda s : s.duty == duty and s.version == version, runResults.DLstats))
+					stats = list(filter(lambda stat : stat.duty == duty and stat.version == version and stat.shape==shapes[s], runResults.DLstats))
 
 					for stat in stats:
-						avg_energy.append(np.mean(stat.success))
+						avg_energy.append(np.mean(stat.energy))
 						lambdas.append(stat.lam)
 
 					ax[s,k].plot(lambdas, avg_energy,  marker=".", lw=1.25, color=color, ls=line_styles[j])
@@ -88,10 +88,10 @@ def plot_energy_over_lambda_and_n(runResults):
 					avg_energy = []
 					lambdas = []
 
-					stats = list(filter(lambda s : s.N == N and s.version == version, runResults.LNstats))
+					stats = list(filter(lambda stat : stat.N == N and stat.version == version and stat.shape==shapes[s], runResults.LNstats))
 
 					for stat in stats:
-						avg_energy.append(np.mean(stat.success))
+						avg_energy.append(np.mean(stat.energy))
 						lambdas.append(stat.lam)
 
 					ax[s,k].plot(lambdas, avg_energy,  marker=".", lw=1.25, color=color, ls=line_styles[j])

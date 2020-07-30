@@ -36,11 +36,11 @@ namespace GeRaF
 			};
 
 			var sp = new SimulationParameters() {
-				area_side = 400,
+				area_side = 200,
 				debug_interval = 1,
 				debugType = DebugType.Never,
 				debug_file = "../../graphic_debug/debug_data.js",
-				max_time = 100,// / (factor * factor),
+				max_time = 50,// / (factor * factor),
 				n_density = 100, // this is density (nodes per 100^2 area), not total nodes
 				packet_rate = 1,
 				range = 20,
@@ -91,11 +91,11 @@ namespace GeRaF
 				simulations = 1
 			};
 
+			runResults.shapeStats = General.Generate("Shapes", sp, pp, shapeParameters);
 			runResults.dutyLambdas = General.Generate("DL", sp, pp, DLparameters);
 			runResults.lambdaNs = General.Generate("LN", sp, pp, LNparameters);
-			runResults.outcomeStats = runResults.shapeStats = General.Generate("Shapes and outcomes", sp, pp, shapeParameters);
-			//runResults.shapeStats = General.Generate("Shapes", sp, pp, shapeParameters);
 			//runResults.outcomeStats =  General.Generate("Outcomes", sp, pp, outcomesParameters);
+			//runResults.outcomeStats = runResults.shapeStats = General.Generate("Shapes and outcomes", sp, pp, shapeParameters);
 
 			// debug
 			//sp.debugType = DebugType.Always;

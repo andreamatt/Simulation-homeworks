@@ -38,10 +38,10 @@ def plot_delay_over_lambda_and_duty(runResults):
 					avg_delay = []
 					lambdas = []
 
-					stats = list(filter(lambda s : s.duty == duty and s.version == version, runResults.DLstats))
+					stats = list(filter(lambda stat : stat.duty == duty and stat.version == version and stat.shape==shapes[s], runResults.DLstats))
 
 					for stat in stats:
-						avg_delay.append(np.mean(stat.success))
+						avg_delay.append(np.mean(stat.delay))
 						lambdas.append(stat.lam)
 
 					ax[s,k].plot(lambdas, avg_delay,  marker=".", lw=1.25, color=color, ls=line_styles[j])
@@ -88,10 +88,10 @@ def plot_delay_over_lambda_and_n(runResults):
 					avg_delay = []
 					lambdas = []
 
-					stats = list(filter(lambda s : s.N == N and s.version == version, runResults.LNstats))
+					stats = list(filter(lambda stat : stat.N == N and stat.version == version and stat.shape==shapes[s], runResults.LNstats))
 
 					for stat in stats:
-						avg_delay.append(np.mean(stat.success))
+						avg_delay.append(np.mean(stat.delay))
 						lambdas.append(stat.lam)
 
 					ax[s,k].plot(lambdas, avg_delay,  marker=".", lw=1.25, color=color, ls=line_styles[j])

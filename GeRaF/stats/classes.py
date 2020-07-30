@@ -59,6 +59,6 @@ class RunResult:
 		self.baseSP = SimulationParameters(data['baseSP'])
 		self.DLstats = [BaseStat(s) for s in data['dutyLambdas']]
 		self.LNstats = [BaseStat(s) for s in data['lambdaNs']]
-		self.outcomeStats = [BaseStat(s) for s in data['outcomeStats']]
+		self.outcomeStats = [BaseStat(s) for s in data['shapeStats']]
 		self.ShapeStats = [BaseStat(s) for s in data['shapeStats']]
 		
