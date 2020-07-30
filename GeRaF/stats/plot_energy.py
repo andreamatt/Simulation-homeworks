@@ -46,8 +46,8 @@ def plot_energy_over_lambda_and_duty(runResults):
 
 					ax[s,k].plot(lambdas, avg_energy,  marker=".", lw=1.25, color=color, ls=line_styles[j])
 					
-			ax[s,k].set_xlim(0)
-			ax[s,k].set_ylim(0,1)
+			#ax[s,k].set_xlim(0)
+			#ax[s,k].set_ylim(0)
 			ax[s,k].grid()
 			ax[s,k].legend(handles=legend_versions)
 			if s == len(shapes)-1:
@@ -96,8 +96,8 @@ def plot_energy_over_lambda_and_n(runResults):
 
 					ax[s,k].plot(lambdas, avg_energy,  marker=".", lw=1.25, color=color, ls=line_styles[j])
 					
-			ax[s,k].set_xlim(0)
-			ax[s,k].set_ylim(0,1)
+			#ax[s,k].set_xlim(0)
+			#ax[s,k].set_ylim(0)
 			ax[s,k].grid()
 			ax[s,k].legend(handles=legend_versions)
 			if s == len(shapes)-1:
