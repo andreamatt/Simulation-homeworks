@@ -12,7 +12,7 @@ line_styles = ["-", "--", "-.", ":"]	# for duties
 def plot_success_over_lambda_and_duty(runResults):
 	duty_cycles = list(OrderedDict.fromkeys([stat.duty for stat in runResults.DLstats]))
 	protocol_versions = list(OrderedDict.fromkeys([stat.version for stat in runResults.DLstats]))
-	n_nodes = runResults.DLstats[0].N
+	N = runResults.DLstats[0].N
 	shapes = list(OrderedDict.fromkeys([stat.shape for stat in runResults.DLstats]))
 
 	fig, ax = plt.subplots(len(shapes), len(versions_to_plot), figsize=(14,9), sharex=True, sharey=True)
@@ -23,7 +23,7 @@ def plot_success_over_lambda_and_duty(runResults):
 	legend_duties = []
 	for j in range(len(duty_cycles)):
 		duty = duty_cycles[j]
-		legend_duties.append(Line2D([0], [0], color='black', linewidth=2, ls=line_styles[j], label=f'd = {duty}'))
+		legend_duties.append(Line2D([0], [0], color='black', linewidth=2, ls=line_styles[j], label=f'Duty_cycle = {duty}'))
 	legend_1 = ax[0,len(versions_to_plot)-1].legend(handles=legend_duties, loc='lower right', bbox_to_anchor=(1, 1))
 	
 	for s in range(len(shapes)):
@@ -52,10 +52,10 @@ def plot_success_over_lambda_and_duty(runResults):
 			ax[s,k].legend(handles=legend_versions)
 			if s == len(shapes)-1:
 				ax[s,k].set_xlabel('$\lambda$', fontsize=12)
-		ax[s,0].set_ylabel("% success"+ ",  Shape="+ shapes[s], fontsize=12)
+		ax[s,0].set_ylabel("% Success"+ ",  Shape="+ shapes[s], fontsize=12)
 
 	ax[0,len(versions_to_plot)-1].add_artist(legend_1)
-	plt.suptitle('Percentage of packets successfully delivered to the sink\nN=' + str(n_nodes), fontsize=17)
+	plt.suptitle('Percentage of packets successfully delivered to the sink\nN_density=' + str(N), fontsize=17)
 	plt.savefig("plt_success_over_lambda_and_duty.png", dpi=300, pad_inches = 0.05, bbox_inches = 'tight')
 	plt.close()
 
@@ -74,7 +74,7 @@ def plot_success_over_lambda_and_n(runResults):
 	legend_Ns = []
 	for j in range(len(Ns)):
 		N = Ns[j]
-		legend_Ns.append(Line2D([0], [0], color='black', linewidth=2, ls=line_styles[j], label=f'N = {N}'))
+		legend_Ns.append(Line2D([0], [0], color='black', linewidth=2, ls=line_styles[j], label=f'N_density = {N}'))
 	legend_1 = ax[0,len(versions_to_plot)-1].legend(handles=legend_Ns, loc='lower right', bbox_to_anchor=(1, 1))
 	
 	for s in range(len(shapes)):
@@ -103,9 +103,9 @@ def plot_success_over_lambda_and_n(runResults):
 			ax[s,k].legend(handles=legend_versions)
 			if s == len(shapes)-1:
 				ax[s,k].set_xlabel('$\lambda$', fontsize=12)
-		ax[s,0].set_ylabel("% success"+ ",  Shape="+ shapes[s], fontsize=12)
+		ax[s,0].set_ylabel("% Success"+ ",  Shape="+ shapes[s], fontsize=12)
 
 	ax[0,len(versions_to_plot)-1].add_artist(legend_1)
-	plt.suptitle('Percentage of packets successfully delivered to the sink\nd=' + str(d_cycle), fontsize=17)
+	plt.suptitle('Percentage of packets successfully delivered to the sink\nDuty_cycle=' + str(d_cycle), fontsize=17)
 	plt.savefig("plt_success_over_lambda_and_n.png", dpi=300, pad_inches = 0.05, bbox_inches = 'tight')
 	plt.close()

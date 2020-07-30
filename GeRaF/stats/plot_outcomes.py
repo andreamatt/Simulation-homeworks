@@ -9,8 +9,8 @@ import pandas as pd
 def plot_outcomes(runResults):
 	shapes = list(OrderedDict.fromkeys([stat.shape for stat in runResults.outcomeStats]))
 	protocol_versions = list(OrderedDict.fromkeys([stat.version for stat in runResults.outcomeStats]))
-	N = runResults.outcomeStats[0].N
 	lam = runResults.outcomeStats[0].lam
+	N = runResults.outcomeStats[0].N
 	d_cycle = runResults.outcomeStats[0].duty
 
 	fig, axs = plt.subplots(1, len(shapes), figsize=(15,5))
@@ -38,7 +38,7 @@ def plot_outcomes(runResults):
 		axs[i].set_ylabel("")
 		axs[i].set_title(shape)
 
-	plt.suptitle('Outcomes By Obstacle Type\nN=' + str(N) + ", $\lambda=$" + str(lam) + ", d=" + str(d_cycle), y=1)
+	plt.suptitle('Outcomes By Obstacle Type\nN_density=' + str(N) + ",  $\lambda=$" + str(lam) + ",  duty=" + str(d_cycle), y=1.01, fontsize=14)
 	plt.savefig("plt_outcomes.png",  dpi=300, bbox_inches = 'tight', pad_inches = 0.15)
 	plt.close()
 
