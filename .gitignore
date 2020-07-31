@@ -133,3 +133,6 @@ dmypy.json
 
 # Plots
 GeRaF/stats/*.png
+
+# Run results
+GeRaF/stats/*.json
