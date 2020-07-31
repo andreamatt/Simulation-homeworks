@@ -41,12 +41,9 @@ class Plot {
 		this.relays = Object.values(this.relays_dict)
 		this.distances = JSON.parse(data_sections[3])
 		GraphUtils.SetNeighbours(this.relays, this.distances)
-		if(this.protocol_params.protocolVersion=="Base"){
-			GraphUtils.BaseVersionBFS(this.relays, this.distances)
-		}
-		else {
-			GraphUtils.RepeatedBFS(this.relays, this.distances)
-		}
+		// if(this.protocol_params.protocolVersion=="BFS" || this.protocol_params.protocolVersion=="BFS_half"){
+		// 	GraphUtils.RepeatedBFS(this.relays, this.distances, this.protocol_params.protocolVersion)
+		// }
 
 		let other_lines = data_sections[4].split(/\r?\n/).map(d => d.trim())
 		this.frame_lines = other_lines.filter(l => l[0] == 'F').map(l => l.substring(2))
@@ -137,6 +134,11 @@ class Plot {
 		this.updateIndex(index)
 	}
 
+	sink_for_relay(id){
+		let r = this.relays_dict[id]
+		return this.relays_dict[this.packets[r.packetToSend.content_id][r.packetToSend.copy_id].sinkId]
+	}
+
 	plot() {
 		let time_before_draw = Date.now()
 
@@ -155,7 +157,7 @@ class Plot {
 		let relays_regions = []
 		for (let rel of this.relays.filter(r => r.status == RelayStatus.Transmitting && r.transmissionType == TransmissionType.RTS)) {
 			for (let reg of range(this.protocol_params.n_regions)) {
-				relays_regions.push({ rel: rel, reg: reg })
+				relays_regions.push({ rel: rel, reg: reg, aim: rel.current_aim })
 			}
 		}
 
@@ -303,16 +305,16 @@ class Plot {
 
 		// mask with sink range
 		masks.append('circle')
-			.attr('cx', t => t.rel.directionForSink[t.rel.packetToSend.sinkId][0] * this.scale)
-			.attr('cy', t => t.rel.directionForSink[t.rel.packetToSend.sinkId][1] * this.scale)
+			.attr('cx', t => t.aim.X * this.scale)
+			.attr('cy', t => t.aim.Y * this.scale)
 			.attr('r', t => (this.distances[t.rel.id][t.rel.packetToSend.sinkId] - t.rel.range + t.reg * t.rel.range / this.protocol_params.n_regions) * this.scale)
 			.style('stroke', 'none')
 			.style('fill', '#000000')
 
 		// circle that fills
 		region_groups.append('circle')
-			.attr('cx', t => t.rel.directionForSink[t.rel.packetToSend.sinkId][0] * this.scale)
-			.attr('cy', t => t.rel.directionForSink[t.rel.packetToSend.sinkId][1] * this.scale)
+			.attr('cx', t => t.aim.X * this.scale)
+			.attr('cy', t => t.aim.Y * this.scale)
 			.attr('r', t => (this.distances[t.rel.id][t.rel.packetToSend.sinkId] - t.rel.range + (t.reg + 1) * t.rel.range / this.protocol_params.n_regions) * this.scale)
 			.attr('mask', t => `url(#mask_${t.rel.id}_${t.reg})`)
 			.style('fill', t => t.rel.REGION_index == t.reg ? '#00e00080' : '#0000e080')

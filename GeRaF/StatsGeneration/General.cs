@@ -36,17 +36,19 @@ namespace GeRaF.StatsGeneration
 								new_sp.emptyRegionType = emptyRegionType;
 								var area = Math.Pow(new_sp.area_side, 2);
 								switch (emptyRegionType) {
-									case EmptyRegionType.Circle:
-										new_sp.emptyRegionSize = new_sp.area_side / 6; // radius
-										area = area - Math.PI * Math.Pow(new_sp.emptyRegionSize, 2);
+									case EmptyRegionType.Cross:
+										new_sp.emptyRegionSize = new_sp.area_side; // long side = 80% area side
+										var w = new_sp.emptyRegionSize;
+										var h = Math.Max(new_sp.emptyRegionSize / 10, new_sp.range + 2);
+										area = area - w * h * 2 + h * h;
 										break;
 									case EmptyRegionType.Square:
 										new_sp.emptyRegionSize = new_sp.area_side / 3; // side
 										area = area - Math.Pow(new_sp.emptyRegionSize, 2);
 										break;
 									case EmptyRegionType.Lines:
-										new_sp.emptyRegionSize = new_sp.area_side / 10 * 8; // long side = 80% area side
-										area = area - new_sp.emptyRegionSize * Math.Max(new_sp.emptyRegionSize / 8, new_sp.range + 2) * 2;
+										new_sp.emptyRegionSize = new_sp.area_side / 10 * 6; // long side = 80% area side
+										area = area - new_sp.emptyRegionSize * Math.Max(new_sp.emptyRegionSize / 6, new_sp.range + 2) * 2;
 										break;
 									case EmptyRegionType.Holes:
 										new_sp.emptyRegionSize = new_sp.area_side / 6; // half radius of circle

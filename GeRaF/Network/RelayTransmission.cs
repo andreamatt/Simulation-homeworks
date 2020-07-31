@@ -215,8 +215,8 @@ namespace GeRaF.Network
 
 		private int CalculateRegionIndex(Relay sender) {
 			var sink = sender.packetToSend.sink;
-			var aimX = sender.packetToSend.current_aim.X;
-			var aimY = sender.packetToSend.current_aim.Y;
+			var aimX = sender.current_aim.X;
+			var aimY = sender.current_aim.Y;
 			var sourceToAim = sim.distances[sender.id, sink.id]; // always same as sink, by design
 			var limitToAim = sourceToAim - sender.range;
 			var regionWidth = sender.range / sim.protocolParameters.n_regions;

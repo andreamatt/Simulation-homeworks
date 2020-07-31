@@ -29,7 +29,6 @@ namespace GeRaF
 		public List<BaseStat> dutyLambdas = new List<BaseStat>();
 		public List<BaseStat> lambdaNs = new List<BaseStat>();
 		public List<BaseStat> shapeStats = new List<BaseStat>();
-		public List<BaseStat> outcomeStats = new List<BaseStat>();
 	}
 
 	class BaseStat

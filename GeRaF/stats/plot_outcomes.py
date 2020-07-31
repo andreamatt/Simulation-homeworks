@@ -16,8 +16,8 @@ def plot_outcomes(runResults):
 	fig, axs = plt.subplots(1, len(shapes), figsize=(15,5))
 	fig.subplots_adjust(wspace=0.20)
 
-	interesting_outcomes = [1, 3, 4, 5, 6, 7]
-	outcomes_names = ["Success","No_start_relays","Abort_max_region_cycle","Abort_max_sensing","Abort_max_sink_rts","Abort_no_ack"]
+	interesting_outcomes = [1, 4, 5, 6, 7]
+	outcomes_names = ["Success","Abort_max_region_cycle","Abort_max_sensing","Abort_max_sink_rts","Abort_no_ack"]
 
 	for i in range(len(shapes)):
 		shape = shapes[i]

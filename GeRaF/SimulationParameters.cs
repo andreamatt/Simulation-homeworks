@@ -20,10 +20,10 @@ namespace GeRaF
 	public enum EmptyRegionType
 	{
 		None,
-		Circle,
 		Square,
+		Holes,
 		Lines,
-		Holes
+		Cross
 	}
 
 	class SimulationParameters : ICloneable

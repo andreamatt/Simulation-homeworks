@@ -32,6 +32,7 @@ namespace GeRaF.Network
 		public int id = -1;
 		public Position position;
 		public double range = -1;
+		public Position current_aim = new Position();
 
 		//public override bool Equals(object obj) {
 		//	return id == (obj as Relay).id;
@@ -99,6 +100,7 @@ namespace GeRaF.Network
 					res += $"|{REGION_index}|{COL_count}|{SENSE_count}|{SINK_RTS_count}";
 					res += $"|{PKT_count}|{REGION_cycle}|{BusyWithId}";
 					res += $"|{packetToSend.content_id}|{packetToSend.copy_id}";
+					res += $"|{current_aim.X}|{current_aim.Y}";
 				}
 			}
 			return res;

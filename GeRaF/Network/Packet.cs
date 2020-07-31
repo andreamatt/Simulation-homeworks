@@ -42,7 +42,6 @@ namespace GeRaF.Network
 		public Result result = Result.None;
 
 		public int right_jump_index = 0;
-		public Position current_aim = new Position();
 
 		private Packet() { }
 

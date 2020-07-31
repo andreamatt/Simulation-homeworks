@@ -115,10 +115,19 @@ namespace GeRaF
 							case EmptyRegionType.None:
 								validRegion = true;
 								break;
-							case EmptyRegionType.Circle:
-								var distanceToCenter = Math.Sqrt(dx * dx + dy * dy);
-								var radius = simulationParameters.emptyRegionSize;
-								validRegion = distanceToCenter >= radius;
+							case EmptyRegionType.Cross:
+								var w = simulationParameters.emptyRegionSize / Math.Sqrt(2);
+								var h = Math.Max(relay.range + 2, simulationParameters.emptyRegionSize / 10) / Math.Sqrt(2);
+								var l = simulationParameters.area_side;
+								var w1 = (l - w) > (X + Y);
+								var w2 = (l + w) < (X + Y);
+								var w3 = (w) < (X - Y);
+								var w4 = -(w) > (X - Y);
+								var h1 = (h) < (X - Y);
+								var h2 = -(h) > (X - Y);
+								var h3 = (l - h) > (X + Y);
+								var h4 = (l + h) < (X + Y);
+								validRegion = (w1 || w2 || h1 || h2) && (w3 || w4 || h3 || h4);
 								break;
 							case EmptyRegionType.Square:
 								var side = simulationParameters.emptyRegionSize;
@@ -126,13 +135,13 @@ namespace GeRaF
 								break;
 							case EmptyRegionType.Lines:
 								var side_w = simulationParameters.emptyRegionSize;
-								var side_h = Math.Max(relay.range + 2, side_w / 8);
+								var side_h = Math.Max(relay.range + 2, side_w / 6);
 								var validFirstLine = (X <= c - side_w / 2) || (X >= c + side_w / 2) || (Y <= c * 3 / 2 - side_h / 2) || (Y >= c * 3 / 2 + side_h / 2);
 								var validSecondLine = (X <= c - side_w / 2) || (X >= c + side_w / 2) || (Y <= c * 1 / 2 - side_h / 2) || (Y >= c * 1 / 2 + side_h / 2);
 								validRegion = validFirstLine && validSecondLine;
 								break;
 							case EmptyRegionType.Holes:
-								radius = simulationParameters.emptyRegionSize;
+								var radius = simulationParameters.emptyRegionSize;
 								var d1 = GraphUtils.Distance(X, Y, 0.5 * c, 0.5 * c);
 								var d2 = GraphUtils.Distance(X, Y, 0.5 * c, 1.5 * c);
 								var d3 = GraphUtils.Distance(X, Y, 1.5 * c, 0.5 * c);

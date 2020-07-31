@@ -12,10 +12,10 @@ namespace GeRaF
 	enum ProtocolVersion
 	{
 		Base,
-		BFS, // Calculate regions based on next hop direction instead of sink direction. Next hop direction is included in RTS
-		BFS_half,
 		Rx,
-		Rx_plus
+		Rx_plus,
+		BFS, // Calculate regions based on next hop direction instead of sink direction. Next hop direction is included in RTS
+		BFS_half
 	}
 
 	class ProtocolParameters : ICloneable

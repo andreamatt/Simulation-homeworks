@@ -20,13 +20,13 @@ namespace GeRaF.Events.Transmissions
 			if (version == ProtocolVersion.BFS || version == ProtocolVersion.BFS_half) {
 				// Calculate regions based on next hop direction instead of sink direction
 				var direction = relay.directionForSink[sink];
-				relay.packetToSend.current_aim.X = direction.X;
-				relay.packetToSend.current_aim.Y = direction.Y;
+				relay.current_aim.X = direction.X;
+				relay.current_aim.Y = direction.Y;
 			}
 			else if (version == ProtocolVersion.Rx && relay.REGION_cycle > sim.protocolParameters.n_max_region_cycle / 2) {
 				// aim 90 degrees to the right, only after half the region_cycles have failed
-				relay.packetToSend.current_aim.X = relay.position.X + (sink.position.Y - relay.position.Y);
-				relay.packetToSend.current_aim.Y = relay.position.Y - (sink.position.X - relay.position.X);
+				relay.current_aim.X = relay.position.X - (sink.position.Y - relay.position.Y);
+				relay.current_aim.Y = relay.position.Y + (sink.position.X - relay.position.X);
 			}
 			else if (version == ProtocolVersion.Rx_plus) {
 				if (relay.REGION_cycle > sim.protocolParameters.n_max_region_cycle / 2) {
@@ -38,15 +38,15 @@ namespace GeRaF.Events.Transmissions
 				var angle = Math.Atan((sink.position.Y - relay.position.Y) / (sink.position.X - relay.position.X));
 				if (relay.packetToSend.right_jump_index > 0) {
 					var angle_fraction = ((float)Math.PI / 2) / sim.protocolParameters.n_right_jumps;
-					angle -= angle_fraction * relay.packetToSend.right_jump_index;
+					angle += angle_fraction * relay.packetToSend.right_jump_index;
 				}
 				float flip = relay.position.X < sink.position.X ? 1 : -1;
-				relay.packetToSend.current_aim.X = relay.position.X + flip * (float)Math.Cos(angle) * dist;
-				relay.packetToSend.current_aim.Y = relay.position.Y + flip * (float)Math.Sin(angle) * dist;
+				relay.current_aim.X = relay.position.X + flip * (float)Math.Cos(angle) * dist;
+				relay.current_aim.Y = relay.position.Y + flip * (float)Math.Sin(angle) * dist;
 			}
 			else {
-				relay.packetToSend.current_aim.X = sink.position.X;
-				relay.packetToSend.current_aim.Y = sink.position.Y;
+				relay.current_aim.X = sink.position.X;
+				relay.current_aim.Y = sink.position.Y;
 			}
 
 			StartTransmission();
