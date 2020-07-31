@@ -21,22 +21,21 @@ def plot_heatmaps(runResults: RunResult):
 	vmin = 0
 	vmax = [0]*len(shapes)*2
 
-	luminosity = 2
+	luminosity = 1
 	res = 1
 	for i in range(len(shapes)):
 		shape = shapes[i]
 		stats = list(filter(lambda s: s.shape == shape, runResults.ShapeStats))
-		vmax[i*2] = np.max([np.max(s.traffic) for s in stats]) / luminosity
-		vmax[i*2+1] = np.max([np.max(s.failurePoints) for s in stats]) / luminosity
+		vmax[i*2] = np.max([np.percentile(s.traffic,99) for s in stats]) / luminosity
+		vmax[i*2+1] = np.max([np.percentile(s.failurePoints, 99) for s in stats]) / luminosity
 		for k in range(len(protocol_versions)):
 			version = protocol_versions[k]
 			stat = stats[k]
-			traffic = np.array(stat.traffic).T
-			traffic = np.repeat(np.repeat(traffic, res, axis=0), res, axis=1)
-			failures = np.array(stat.failurePoints).T
-			failures = np.repeat(np.repeat(failures, res, axis=0), res, axis=1)
-			axs[k,i*2].imshow(traffic, vmin=vmin, vmax=vmax[i*2], cmap='afmhot')
-			im = axs[k, 1+i*2].imshow(failures, vmin=vmin, vmax=vmax[i*2+1], cmap='afmhot')
+			traffic = stat.traffic / vmax[i*2]
+			failures = stat.failurePoints  / vmax[i*2+1]
+
+			axs[k,i*2].imshow(traffic, vmin=vmin, vmax=1, cmap='afmhot')
+			im = axs[k, 1+i*2].imshow(failures, vmin=vmin, vmax=1, cmap='afmhot')
 			if i!=0:
 				axs[k,i*2].axis('off')
 			axs[k, 1+i*2].axis('off')
