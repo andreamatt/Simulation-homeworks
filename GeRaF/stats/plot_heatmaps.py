@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt, patches
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 from collections import OrderedDict
 import seaborn as sns
 import numpy as np
@@ -8,7 +9,10 @@ from classes import *
 def plot_heatmaps(runResults: RunResult):
 	protocol_versions = list(OrderedDict.fromkeys([stat.version for stat in runResults.ShapeStats]))
 	shapes = list(OrderedDict.fromkeys([stat.shape for stat in runResults.ShapeStats]))
-	
+	lam = runResults.ShapeStats[0].lam
+	N = runResults.ShapeStats[0].N
+	d_cycle = runResults.ShapeStats[0].duty
+
 	fig, axs = plt.subplots(len(protocol_versions), len(shapes)*2, figsize=(15,15))
 	growth = lambda x: 3.38*10**(-3)*x**3 -3.954*10**(-2)*x**2 + 0.1625*x - 1.082
 	fig.subplots_adjust(hspace= growth(len(protocol_versions)))
@@ -32,10 +36,11 @@ def plot_heatmaps(runResults: RunResult):
 			failures = np.array(stat.failurePoints).T
 			failures = np.repeat(np.repeat(failures, res, axis=0), res, axis=1)
 			axs[k,i*2].imshow(traffic, vmin=vmin, vmax=vmax[i*2], cmap='afmhot')
-			axs[k, 1+i*2].imshow(failures, vmin=vmin, vmax=vmax[i*2+1], cmap='afmhot')
+			im = axs[k, 1+i*2].imshow(failures, vmin=vmin, vmax=vmax[i*2+1], cmap='afmhot')
 			if i!=0:
 				axs[k,i*2].axis('off')
 			axs[k, 1+i*2].axis('off')
+			
 
 	for i in range(len(shapes)):
 		axs[0][i*2].set_title("traffic")
@@ -48,8 +53,10 @@ def plot_heatmaps(runResults: RunResult):
 		axs[k][0].set_yticks([])
 		axs[k][0].set_xticks([])
 
+	cbar_ax = fig.add_axes([0.91, 0.31, 0.01, 0.37])
+	fig.colorbar(im, cax=cbar_ax)
 	#plt.tight_layout(h_pad=0.08, w_pad=0.08, rect=(0.3, 0.3, 0.97, 0.97))
-	#plt.suptitle("Traffic Flow", y=0.604, fontsize=20)
+	plt.suptitle('Relative Traffic Flow\nN_density=' + str(N) + ",  $\lambda=$" + str(lam) + ",  Duty_cycle=" + str(d_cycle), fontsize=16, y=0.74)
 	plt.savefig("plt_heatmaps.png", dpi=300, bbox_inches = 'tight', pad_inches = 0.05)
 	plt.close()
 
