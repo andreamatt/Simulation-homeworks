@@ -49,7 +49,7 @@ def plot_success_over_lambda_and_duty(runResults):
 			#ax[s,k].set_xlim(0)
 			#ax[s,k].set_ylim(0,1)
 			ax[s,k].grid()
-			ax[s,k].legend(handles=legend_versions)
+			ax[s,k].legend(handles=legend_versions, framealpha=0.5)
 			if s == len(shapes)-1:
 				ax[s,k].set_xlabel('$\lambda$', fontsize=12)
 		ax[s,0].set_ylabel("% Success"+ ",  Shape="+ shapes[s], fontsize=12)
@@ -100,7 +100,7 @@ def plot_success_over_lambda_and_n(runResults):
 			#ax[s,k].set_xlim(0)
 			#ax[s,k].set_ylim(0,1)
 			ax[s,k].grid()
-			ax[s,k].legend(handles=legend_versions)
+			ax[s,k].legend(handles=legend_versions, framealpha=0.5)
 			if s == len(shapes)-1:
 				ax[s,k].set_xlabel('$\lambda$', fontsize=12)
 		ax[s,0].set_ylabel("% Success"+ ",  Shape="+ shapes[s], fontsize=12)
