@@ -44,7 +44,7 @@ namespace GeRaF
 				n_density = 200, // this is density (nodes per 100^2 area), not total nodes
 				packet_rate = 1,
 				range = 20,
-				min_distance = 1,
+				min_distance = 2,
 				asleepEnergy = 2,
 				idleEnergy = 10,
 				transmissionEnergy = 50,
@@ -70,7 +70,7 @@ namespace GeRaF
 			};
 			var LNparameters = new GeneralParameters() {
 				lambdas = new List<double> { 1, 5, 10 },
-				relay_densities = new List<float> { 100, 150, 200 }, // CHANGE PROPORTIONAL TO AREA
+				relay_densities = new List<float> { 100, 200, 300 }, // CHANGE PROPORTIONAL TO AREA
 				emptyRegionTypes = new List<EmptyRegionType> { EmptyRegionType.None, EmptyRegionType.Lines },
 				versions = versions,
 				simulations = 20
@@ -86,8 +86,8 @@ namespace GeRaF
 				simulations = 1
 			};
 
-			runResults.shapeStats = General.Generate("Shapes", sp, pp, shapeParameters);
-			//runResults.dutyLambdas = General.Generate("DL", sp, pp, DLparameters);
+			//runResults.shapeStats = General.Generate("Shapes", sp, pp, shapeParameters);
+			runResults.dutyLambdas = General.Generate("DL", sp, pp, DLparameters);
 			//runResults.lambdaNs = General.Generate("LN", sp, pp, LNparameters);
 
 			// debug
