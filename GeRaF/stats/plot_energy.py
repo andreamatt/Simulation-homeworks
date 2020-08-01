@@ -49,7 +49,7 @@ def plot_energy_over_lambda_and_duty(runResults):
 			#ax[s,k].set_xlim(0)
 			#ax[s,k].set_ylim(0)
 			ax[s,k].grid()
-			ax[s,k].legend(handles=legend_versions, framealpha=0.5)
+			ax[s,k].legend(handles=legend_versions, framealpha=0.5, loc='upper right')
 			if s == len(shapes)-1:
 				ax[s,k].set_xlabel('$\lambda$', fontsize=12)
 		ax[s,0].set_ylabel("Energy"+ ",  Shape="+ shapes[s], fontsize=12)
@@ -99,7 +99,7 @@ def plot_energy_over_lambda_and_n(runResults):
 			#ax[s,k].set_xlim(0)
 			#ax[s,k].set_ylim(0)
 			ax[s,k].grid()
-			ax[s,k].legend(handles=legend_versions, framealpha=0.5)
+			ax[s,k].legend(handles=legend_versions, framealpha=0.5, loc='upper left')
 			if s == len(shapes)-1:
 				ax[s,k].set_xlabel('$\lambda$', fontsize=12)
 		ax[s,0].set_ylabel("Energy"+ ",  Shape="+ shapes[s], fontsize=12)
