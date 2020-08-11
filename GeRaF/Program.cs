@@ -40,7 +40,7 @@ namespace GeRaF
 				debug_interval = 1,
 				debugType = DebugType.Never,
 				debug_file = "../../graphic_debug/debug_data.js",
-				max_time = 50,// / (factor * factor),
+				max_time = 10,// / (factor * factor),
 				n_density = 200, // this is density (nodes per 100^2 area), not total nodes
 				packet_rate = 1,
 				range = 20,
@@ -81,18 +81,18 @@ namespace GeRaF
 				simulations = 200
 			};
 			var debugParameters = new GeneralParameters() {
-				versions = new List<ProtocolVersion> { ProtocolVersion.BFS },
-				emptyRegionTypes = new List<EmptyRegionType> { EmptyRegionType.Cross },
+				versions = new List<ProtocolVersion> { ProtocolVersion.Base },
+				emptyRegionTypes = new List<EmptyRegionType> { EmptyRegionType.Lines },
 				simulations = 1
 			};
 
 			//runResults.shapeStats = General.Generate("Shapes", sp, pp, shapeParameters);
-			runResults.dutyLambdas = General.Generate("DL", sp, pp, DLparameters);
+			//runResults.dutyLambdas = General.Generate("DL", sp, pp, DLparameters);
 			//runResults.lambdaNs = General.Generate("LN", sp, pp, LNparameters);
 
 			// debug
-			//sp.debugType = DebugType.Always;
-			//General.Generate("Debug", sp, pp, debugParameters);
+			sp.debugType = DebugType.Always;
+			General.Generate("Debug", sp, pp, debugParameters);
 
 			runResults.endTime = DateTime.Now;
 

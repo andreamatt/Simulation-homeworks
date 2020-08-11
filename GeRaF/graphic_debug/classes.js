@@ -158,6 +158,8 @@ class Relay {
 	update(fields, packets) {
 		this.status = parseInt(fields[1])
 		this.ShouldBeAwake = parseInt(fields[2])
+		this.packetContentId = -1
+		this.packetCopyId = -1
 
 		if (fields.length > 3) {
 			this.transmissionType = parseInt(fields[3])
@@ -205,45 +207,4 @@ class Relay {
 		if (this.info_modality == InfoModality.finished_transmissions) return `FINISHED`
 		if (this.info_modality == InfoModality.packet_info) return `PACKET: ${JSON.stringify(this.packetToSend)}`
 	}
-
-	// Aim(protocolParameters, relays_dict){
-	// 	let version = protocolParameters.protocolVersion
-	// 	let sink = relays_dict[this.packetToSend.sinkId];
-	// 	if (version == "BFS" || version == "BFS_half") {
-	// 		// Calculate regions based on next hop direction instead of sink direction
-	// 		let direction = this.directionForSink[sink];
-	// 		return direction
-	// 	}
-	// 	else if (version == "Rx" && this.REGION_cycle > protocolParameters.n_max_region_cycle / 2) {
-	// 		// aim 90 degrees to the right, only after half the region_cycles have failed
-	// 		return {
-	// 			X: this.X + (sink.Y - this.Y),
-	// 			Y: this.Y - (sink.X - this.X)
-	// 		}
-	// 	}
-	// 	else if (version == "Rx_plus") {
-	// 		if (this.REGION_cycle > protocolParameters.n_max_region_cycle / 2) {
-	// 			// set right_jumps
-	// 			this.packetToSend.right_jump_index = protocolParameters.n_right_jumps;
-	// 		}
-	// 		// aim (90 degrees on max index, then slowly converge to 0) degrees to the right
-	// 		let dist = GraphUtils.Distance(this.X, this.Y, sink.X, sink.Y);
-	// 		let angle = Math.atan((sink.Y - this.Y) / (sink.X - this.X));
-	// 		if (this.packetToSend.right_jump_index > 0) {
-	// 			let angle_fraction = (Math.PI / 2) / protocolParameters.n_right_jumps;
-	// 			angle -= angle_fraction * this.packetToSend.right_jump_index;
-	// 		}
-	// 		let flip = this.X < sink.X ? 1 : -1;
-	// 		return {
-	// 			X: this.X + flip * Math.cos(angle) * dist,
-	// 			Y: this.Y + flip * Math.sin(angle) * dist
-	// 		}
-	// 	}
-	// 	else {
-	// 		return {
-	// 			X: sink.X,
-	// 			Y: sink.Y
-	// 		}
-	// 	}
-	// }
 }

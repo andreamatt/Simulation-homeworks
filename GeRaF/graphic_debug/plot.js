@@ -56,6 +56,11 @@ class Plot {
 				this.packets[p.content_id] = {}
 			}
 			this.packets[p.content_id][p.copy_id] = p
+			for (let i=0; i<p.hops.length-1; i++){
+				if(this.relays_dict[p.hops[i]].X == this.relays_dict[p.sinkId].X){
+					console.log("FOUND: " + p.content_id + ", " + p.copy_id + ", at " + p.hops[i])
+				}
+			}
 		}
 
 		this.relay_details = {}
@@ -161,12 +166,38 @@ class Plot {
 			}
 		}
 
+		let relays_with_packets = this.relays.filter(r => r.packetToSend != null)
+		console.log("rel with p: " + relays_with_packets.length)
+		let previous_packet_arrows_data = []
+		let sink_packet_arrows_data = []
+		for (let rel of relays_with_packets){
+			sink_packet_arrows_data.push({
+				content_id: rel.packetToSend.content_id,
+				source: rel.id,
+				dest: rel.packetToSend.sinkId
+			})
+			for (let i=0; i<rel.packetToSend.hops.length-1; i++){
+				let a = {
+					content_id: rel.packetToSend.content_id,
+					copy_id: rel.packetToSend.copy_id,
+					source: rel.packetToSend.hops[i],
+					dest: rel.packetToSend.hops[i+1]
+				}
+				previous_packet_arrows_data.push(a)
+				// console.log(`${a.content_id};${a.source};${a.dest}`)
+			}
+		}
+
 		let circle_dots = this.svg.select('#circle_dots').selectAll('.circle_dot')
 			.data(this.relays, r => r.id)
 		let circle_ranges = this.svg.select('#circle_ranges').selectAll('.circle_range')
 			.data(this.relays.filter(r => r.actualStatus == RelayStatus.Transmitting), r => r.id)
 		let packet_arrows = this.svg.select('#packet_arrows').selectAll('.packet_arrow')
 			.data(this.relays.filter(r => r.actualStatus == RelayStatus.Transmitting && r.transmissionType == TransmissionType.PKT), r => r.id)
+		let previous_packet_arrows = this.svg.select('#previous_packet_arrows').selectAll('.previous_packet_arrow')
+			.data(previous_packet_arrows_data, a => `${a.content_id};${a.source};${a.dest}`)
+		let sink_packet_arrows = this.svg.select('#sink_packet_arrows').selectAll('.sink_packet_arrow')
+			.data(sink_packet_arrows_data, a => `${a.content_id};${a.source};${a.dest}`)
 		let sink_arrows = this.svg.select('#sink_arrows').selectAll('.sink_arrow')
 			.data(this.relays.filter(r => r.packetToSend != null && this.relay_details[r.id] == InfoModality.packet_info), r => r.id)
 		let regions = this.svg.select('#regions').selectAll('.region')
@@ -261,10 +292,39 @@ class Plot {
 			.attr('y1', r => r.Y * this.scale)
 			.attr('x2', r => this.relays_dict[r.transmissionDestinationId].X * this.scale)
 			.attr('y2', r => this.relays_dict[r.transmissionDestinationId].Y * this.scale)
+			.attr('stroke', 'red')
+			.attr('stroke-width', 0.2 * this.scale)
+			.attr('marker-end', 'url(#arrow)');
+
+		// prev pkt arrows
+		previous_packet_arrows.exit().remove()
+
+		previous_packet_arrows.enter()
+			.append('line')
+			.attr('class', 'previous_packet_arrow')
+			// .attr('relay_id', r => r.id)
+			.attr('x1', a => this.relays_dict[a.source].X * this.scale)
+			.attr('y1', a => this.relays_dict[a.source].Y * this.scale)
+			.attr('x2', a => this.relays_dict[a.dest].X  * this.scale)
+			.attr('y2', a => this.relays_dict[a.dest].Y  * this.scale)
 			.attr('stroke', 'black')
 			.attr('stroke-width', 0.2 * this.scale)
 			.attr('marker-end', 'url(#arrow)');
 
+		// prev pkt arrows
+		sink_packet_arrows.exit().remove()
+
+		sink_packet_arrows.enter()
+			.append('line')
+			.attr('class', 'sink_packet_arrow')
+			// .attr('relay_id', r => r.id)
+			.attr('x1', a => this.relays_dict[a.source].X * this.scale)
+			.attr('y1', a => this.relays_dict[a.source].Y * this.scale)
+			.attr('x2', a => this.relays_dict[a.dest].X  * this.scale)
+			.attr('y2', a => this.relays_dict[a.dest].Y  * this.scale)
+			.attr('stroke', 'grey')
+			.attr('stroke-width', 0.2 * this.scale)
+			.attr('marker-end', 'url(#arrow)');
 
 		// sink arrows
 		sink_arrows.exit().remove()

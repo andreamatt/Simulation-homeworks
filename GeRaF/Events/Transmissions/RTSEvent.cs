@@ -35,14 +35,21 @@ namespace GeRaF.Events.Transmissions
 				}
 				// aim (90 degrees on max index, then slowly converge to 0) degrees to the right
 				var dist = sim.distances[relay.id, sink.id];
-				var angle = Math.Atan((sink.position.Y - relay.position.Y) / (sink.position.X - relay.position.X));
+				//var angle = Math.Atan((sink.position.Y - relay.position.Y) / (sink.position.X - relay.position.X));
+				//if (relay.packetToSend.right_jump_index > 0) {
+				//	var angle_fraction = ((float)Math.PI / 2) / sim.protocolParameters.n_right_jumps;
+				//	angle += angle_fraction * relay.packetToSend.right_jump_index;
+				//}
+				//float flip = relay.position.X < sink.position.X ? 1 : -1;
+				//relay.current_aim.X = relay.position.X + flip * (float)Math.Cos(angle) * dist;
+				//relay.current_aim.Y = relay.position.Y + flip * (float)Math.Sin(angle) * dist;
+				var angle = Math.Atan2(sink.position.Y - relay.position.Y, sink.position.X - relay.position.X);
 				if (relay.packetToSend.right_jump_index > 0) {
 					var angle_fraction = ((float)Math.PI / 2) / sim.protocolParameters.n_right_jumps;
 					angle += angle_fraction * relay.packetToSend.right_jump_index;
 				}
-				float flip = relay.position.X < sink.position.X ? 1 : -1;
-				relay.current_aim.X = relay.position.X + flip * (float)Math.Cos(angle) * dist;
-				relay.current_aim.Y = relay.position.Y + flip * (float)Math.Sin(angle) * dist;
+				relay.current_aim.X = relay.position.X + (float)Math.Cos(angle) * dist;
+				relay.current_aim.Y = relay.position.Y + (float)Math.Sin(angle) * dist;
 			}
 			else {
 				relay.current_aim.X = sink.position.X;

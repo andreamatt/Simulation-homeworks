@@ -17,12 +17,12 @@ runResult = RunResult(data)
 plot_outcomes(runResult)
 # plot_success_over_distance(runResult)
 
-plot_delay_over_lambda_and_duty(runResult)
-plot_success_over_lambda_and_duty(runResult)
-plot_energy_over_lambda_and_duty(runResult)
-plot_success_over_lambda_and_n(runResult)
-plot_delay_over_lambda_and_n(runResult)
-plot_energy_over_lambda_and_n(runResult)
+# plot_delay_over_lambda_and_duty(runResult)
+# plot_success_over_lambda_and_duty(runResult)
+# plot_energy_over_lambda_and_duty(runResult)
+# plot_success_over_lambda_and_n(runResult)
+# plot_delay_over_lambda_and_n(runResult)
+# plot_energy_over_lambda_and_n(runResult)
 
 
 plot_heatmaps(runResult)

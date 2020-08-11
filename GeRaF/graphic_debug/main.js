@@ -16,6 +16,8 @@ graph.append('g').attr('id', 'regions')
 graph.append('g').attr('id', 'circle_dots')
 graph.append('g').attr('id', 'sink_arrows')
 graph.append('g').attr('id', 'packet_arrows')
+graph.append('g').attr('id', 'previous_packet_arrows')
+graph.append('g').attr('id', 'sink_packet_arrows')
 graph.append('g').attr('id', 'circle_labels')
 graph.append('g').attr('id', 'info_tooltips')
 
